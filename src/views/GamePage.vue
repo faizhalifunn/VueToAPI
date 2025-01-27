@@ -50,12 +50,13 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "GamePage",
   setup() {
-    // Game Code
-    const gameCode = ref("Loading...");
+    const router = useRouter();
+    const gameCode = ref("");
     const isProcessing = ref(false);
 
     // Data bunga
@@ -69,35 +70,14 @@ export default {
     // Form data bunga
     const form = ref(bungaData.map(() => 0)); // Semua nilai bunga awalnya 0
 
-    // Fetch gameCode
-    const fetchGameCode = async () => {
-      const storedGameCode = localStorage.getItem("gameCode"); // Cek apakah gameCode sudah ada di LocalStorage
+    // Cek dan ambil gameCode dari LocalStorage
+    const fetchGameCode = () => {
+      const storedGameCode = localStorage.getItem("gameCode");
       if (storedGameCode) {
-        // Jika gameCode ada, gunakan dari LocalStorage
         gameCode.value = storedGameCode;
-        return;
-      }
-
-      // Jika tidak ada gameCode, buat game baru
-      try {
-        const response = await fetch("https://api-fastify-pi.vercel.app/game/creategame", {
-          method: "POST",
-        });
-        const result = await response.json();
-        if (result.message === "Game created successfully") {
-          const newGameCode = result.data.gameCode;
-
-          // Simpan gameCode ke LocalStorage
-          localStorage.setItem("gameCode", newGameCode);
-
-          // Set nilai gameCode
-          gameCode.value = newGameCode;
-        } else {
-          gameCode.value = "Error";
-        }
-      } catch (error) {
-        console.error("Error fetching game code:", error);
-        gameCode.value = "Error";
+      } else {
+        // Jika gameCode tidak ditemukan, redirect ke halaman CreateGame
+        router.push("/");
       }
     };
 
@@ -167,7 +147,7 @@ export default {
     };
 
     onMounted(() => {
-      fetchGameCode();
+      fetchGameCode(); // Ambil gameCode saat komponen dimuat
     });
 
     return { gameCode, bungaData, form, isProcessing, handleSubmit };

@@ -22,6 +22,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import CreateGameButton from '../components/CreateGameButton.vue';
 import GamePage from '../views/GamePage.vue';
+import Adminpage from '../components/AdminControlPage.vue'
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
     path: '/game/:gameCode',
     name: 'GamePage',
     component: GamePage,
+  },
+  {
+    path: '/admin/:gameCode',
+    name: 'Adminpage',
+    component: Adminpage,
   },
 ];
 
