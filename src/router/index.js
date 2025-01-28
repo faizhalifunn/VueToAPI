@@ -23,15 +23,27 @@ import { createRouter, createWebHistory } from 'vue-router';
 import CreateGameButton from '../components/CreateGameButton.vue';
 import GamePage from '../views/GamePage.vue';
 import Adminpage from '../components/AdminControlPage.vue'
+import JoinGame from '../components/JoinGame.vue';
+import First from '../components/FirstPage.vue'
 
 const routes = [
   {
     path: '/',
+    name: 'First',
+    component: First,
+  },
+  {
+    path: '/Join',
+    name: 'JoinGame',
+    component: JoinGame,
+  },
+  {
+    path: '/admin',
     name: 'CreateGame',
     component: CreateGameButton,
   },
   {
-    path: '/game/:gameCode',
+    path: '/admin/start/:gameCode',
     name: 'GamePage',
     component: GamePage,
   },

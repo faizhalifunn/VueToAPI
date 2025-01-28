@@ -1,13 +1,36 @@
 <template>
-  <div class="h-screen flex items-center justify-center">
+  <div class="h-screen flex flex-col items-center justify-center bg-black space-y-8">
+    <!-- Tombol Create Game -->
     <button
       @click="resetAndCreateGame"
       :disabled="isProcessing"
-      class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+      class="text-white bg-black border-2 border-white font-bold text-lg px-8 py-3 rounded-full shadow-md hover:bg-gray-800 hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-      <span>{{ isProcessing ? 'Processing...' : 'Create Game' }}</span>
+      <span>{{ isProcessing ? "Processing..." : "CREATE ROOM" }}</span>
     </button>
+
+    <!-- Text Separator -->
+    <span class="text-gray-400 font-medium text-lg">Or</span>
+
+    <!-- Input dan Tombol Join Game -->
+    <div class="bg-white rounded-lg shadow-md px-6 py-4 flex flex-col items-center space-y-4 w-80">
+      <h2 class="text-black font-bold text-lg">Join Game</h2>
+      <input
+        v-model="joinGameCode"
+        type="text"
+        placeholder="Enter Code"
+        class="w-full px-4 py-2 border border-gray-300 text-black rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-gray-500"
+      />
+      <button
+        @click="joinGame"
+        :disabled="isProcessing"
+        class="bg-black text-white font-medium text-lg px-6 py-2 rounded-full hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span v-if="isProcessing" class="loading-spinner mr-2"></span>
+        <span>{{ isProcessing ? "Processing..." : "Enter" }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -20,6 +43,7 @@ export default {
   setup() {
     const router = useRouter();
     const isProcessing = ref(false); // State untuk animasi loading
+    const joinGameCode = ref(""); // State untuk input gameCode
 
     // Fungsi untuk mereset localStorage dan membuat game baru
     const resetAndCreateGame = async () => {
@@ -54,7 +78,52 @@ export default {
       }
     };
 
-    return { resetAndCreateGame, isProcessing };
+    // Fungsi untuk Join Game
+    const joinGame = async () => {
+      if (isProcessing.value || !joinGameCode.value.trim()) {
+        alert("Please enter a valid game code!");
+        return;
+      }
+
+      isProcessing.value = true; // Set tombol ke status loading
+
+      // Bersihkan localStorage
+      localStorage.clear();
+
+      try {
+        const response = await fetch(
+          `https://api-fastify-pi.vercel.app/game/getgame/${joinGameCode.value}`,
+          { method: "GET" }
+        );
+        const result = await response.json();
+
+        if (result.message === "Game retrieved successfully") {
+          const status = result.data.gameData.status;
+          const gameCode = result.data.gameData.gameCode;
+
+          // Simpan gameCode ke LocalStorage
+          localStorage.setItem("gameCode", gameCode);
+
+          // Redirect berdasarkan status game
+          if (status === "onGoing") {
+            router.push({ name: "Adminpage", params: { gameCode } });
+          } else if (status === "Waiting") {
+            router.push({ name: "GamePage", params: { gameCode } });
+          } else {
+            alert("Unknown game status. Please try again.");
+          }
+        } else {
+          alert("Game not found. Please check the game code and try again.");
+        }
+      } catch (error) {
+        console.error("Error while joining game:", error);
+        alert("An error occurred. Please try again.");
+      } finally {
+        isProcessing.value = false; // Reset tombol ke status normal
+      }
+    };
+
+    return { resetAndCreateGame, joinGame, isProcessing, joinGameCode };
   },
 };
 </script>
