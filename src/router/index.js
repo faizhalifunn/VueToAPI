@@ -24,7 +24,10 @@ import CreateGameButton from '../components/CreateGameButton.vue';
 import GamePage from '../views/GamePage.vue';
 import Adminpage from '../components/AdminControlPage.vue'
 import JoinGame from '../components/JoinGame.vue';
-import First from '../components/FirstPage.vue'
+import First from '../components/FirstPage.vue';
+import CreateTeam from '../components/CreateTeam.vue';
+import PlayerPage from '@/components/PlayerPage.vue';
+import PlayerWait from '@/views/PlayerWait.vue';
 
 const routes = [
   {
@@ -51,6 +54,21 @@ const routes = [
     path: '/admin/:gameCode',
     name: 'Adminpage',
     component: Adminpage,
+  },
+  {
+    path: '/player',
+    name: 'CreateTeam',
+    component: CreateTeam,
+  },
+  {
+    path: '/player/input',
+    name: 'PlayerPage',
+    component: PlayerPage,
+  },
+  {
+    path: '/player/wait',
+    name: 'PlayerWait',
+    component: PlayerWait,
   },
 ];
 

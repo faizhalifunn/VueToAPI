@@ -3,7 +3,7 @@
       <div class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
         <!-- Round Header -->
         <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
-          Round - {{ round }}
+          {{ round }}
         </div>
   
         <!-- Leaderboard -->
