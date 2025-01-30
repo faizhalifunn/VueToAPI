@@ -82,7 +82,7 @@
   
       const rightInputs = {
         KreditProduktif: "Kredit Produktif",
-        Giro: "Giro",
+        Giro: "Dana Pihak Ketiga",
         Asuransi: "Asuransi",
         Bintang: "Bintang",
       };

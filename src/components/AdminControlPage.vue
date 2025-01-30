@@ -1,7 +1,7 @@
 <template>
     <div class="h-screen flex items-center justify-center bg-black">
       <div class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
-        <!-- Round Header -->
+        <!-- Round Header -->>
         <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
           {{ round }}
         </div>
@@ -30,7 +30,7 @@
         </div>
   
         <!-- Action Buttons -->
-        <div class="flex justify-center space-x-4 mt-4">
+        <div class="flex justify-center space-x-4 mt-4 pt-5 gap-10">
           <button
             @click="endRound"
             :disabled="isProcessing"
@@ -42,7 +42,7 @@
   
           <button
             @click="endGame"
-            class="bg-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-600 transition"
+            class="text-white px-6 bg-red-900 py-2 rounded-lg font-medium hover:bg-gray-600 transition"
           >
             END GAME
           </button>
