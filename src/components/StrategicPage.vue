@@ -168,7 +168,7 @@
 
     if (selectedFire.value && selectedFire.value !== "") {
       await fetch("https://api-fastify-pi.vercel.app/team/fireemployee", {
-        method: "POST",
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           gameCode,

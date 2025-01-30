@@ -28,7 +28,9 @@ import First from '../components/FirstPage.vue';
 import CreateTeam from '../components/CreateTeam.vue';
 import PlayerPage from '@/components/PlayerPage.vue';
 import PlayerWait from '@/views/PlayerWait.vue';
-import Strategic from '../components/StrategicPage.vue'
+import Strategic from '../components/StrategicPage.vue';
+import Marketing from '../components/MarketingPage.vue';
+import Result from '../components/EndResult.vue';
 
 const routes = [
   {
@@ -75,6 +77,16 @@ const routes = [
     path: '/strategic',
     name: 'Strategic',
     component: Strategic,
+  },
+  {
+    path: '/marketing',
+    name: 'Marketing',
+    component: Marketing,
+  },
+  {
+    path: '/endResult',
+    name: 'Result',
+    component: Result,
   },
 ];
 
