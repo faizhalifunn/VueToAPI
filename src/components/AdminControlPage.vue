@@ -1,6 +1,14 @@
 <template>
   <div class="h-screen flex items-center justify-center bg-black">
-    <div class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
+    <!-- Loading Screen -->
+    <div v-if="isRefreshing" class="fixed inset-0 flex items-center justify-center bg-black text-white">
+      <div class="text-center">
+        <div class="loading-spinner mx-auto mb-4"></div>
+        <p class="text-lg font-semibold">Refreshing...</p>
+      </div>
+    </div>
+
+    <div v-else class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
       <!-- Round Header -->
       <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
         {{ round }}
@@ -64,6 +72,7 @@ export default {
     const round = ref(1);
     const leaderboard = ref([]);
     const isProcessing = ref(false);
+    const isRefreshing = ref(true); // ✅ Tambahkan state untuk loading screen
 
     // Fetch round data and leaderboard
     const fetchRoundData = async () => {
@@ -87,6 +96,10 @@ export default {
       } catch (error) {
         console.error("Error fetching round data:", error);
         alert("An error occurred while fetching leaderboard.");
+      } finally {
+        setTimeout(() => {
+          isRefreshing.value = false; // ✅ Sembunyikan loading setelah data dimuat
+        }, 1000);
       }
     };
 
@@ -102,7 +115,45 @@ export default {
       });
     });
 
-    // ✅ END GAME: Panggil `/round/countall` lalu redirect ke `/endresult`
+    // ✅ END ROUND: Panggil `/round/add`
+    const endRound = async () => {
+      if (isProcessing.value) return;
+      isProcessing.value = true;
+      const gameCode = localStorage.getItem("gameCode");
+
+      try {
+        console.log("Ending round for game:", gameCode);
+
+        // 🔹 1. Jalankan endpoint `/round/add`
+        const response = await fetch("https://api-fastify-pi.vercel.app/round/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gameCode }),
+        });
+
+        const result = await response.json();
+        console.log("API Response:", result);
+
+        if (!response.ok) {
+          throw new Error(result.message || "Failed to end round.");
+        }
+
+        alert("Round ended successfully!");
+
+        // ✅ Tambahkan loading sebelum refresh halaman
+        isRefreshing.value = true;
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+        console.error("Error ending round:", error);
+      } finally {
+        isProcessing.value = false;
+      }
+    };
+
+    // ✅ END GAME tetap sama
     const endGame = async () => {
       if (isProcessing.value) return;
       isProcessing.value = true;
@@ -110,8 +161,7 @@ export default {
 
       try {
         console.log("Ending game and counting rounds for game:", gameCode);
-        
-        // 🔹 1. Jalankan endpoint `/round/countall`
+
         const response = await fetch("https://api-fastify-pi.vercel.app/Game/End", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -126,8 +176,6 @@ export default {
         }
 
         alert("Game ended successfully! Redirecting to end result...");
-
-        // 🔹 2. Redirect ke `/endresult`
         router.push("/endresult");
       } catch (error) {
         alert(`Error: ${error.message}`);
@@ -137,17 +185,12 @@ export default {
       }
     };
 
-    // END ROUND Placeholder
-    const endRound = async () => {
-      alert("End round feature is not implemented yet.");
-    };
-
     // Fetch data saat halaman dimuat
     onMounted(() => {
       fetchRoundData();
     });
 
-    return { round, sortedLeaderboard, formatNumber, endRound, endGame, isProcessing };
+    return { round, sortedLeaderboard, formatNumber, endRound, endGame, isProcessing, isRefreshing };
   },
 };
 </script>
@@ -155,12 +198,12 @@ export default {
 <style>
 /* 🔥 Animasi Loading Spinner */
 .loading-spinner {
-  border: 2px solid transparent;
-  border-top: 2px solid white;
+  border: 4px solid transparent;
+  border-top: 4px solid white;
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 0.8s linear infinite;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
