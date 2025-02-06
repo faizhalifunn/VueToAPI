@@ -1,53 +1,55 @@
 <template>
-    <div class="h-screen flex items-center justify-center bg-black">
-      <div class="bg-gray-200 rounded-2xl shadow-md p-8 w-full max-w-md">
+  <div class="h-screen flex items-center justify-center bg-black">
+    <div class="bg-gray-200 rounded-2xl shadow-md p-8 w-full max-w-md">
+      <form @submit.prevent="submitRole">
         <div class="flex flex-col space-y-4">
-          <!-- Tombol Navigasi -->
+          <!-- Pilihan Role -->
+          <label v-for="(role, index) in roles" :key="index" class="flex items-center space-x-2">
+            <input type="radio" v-model="selectedRole" :value="role" class="cursor-pointer" />
+            <span class="text-lg font-semibold text-gray-800">{{ role.label }}</span>
+          </label>
+
+          <!-- Tombol Submit -->
           <button
-            v-for="(role, index) in roles"
-            :key="index"
-            @click="selectRole(role)"
+            type="submit"
             class="w-full bg-gray-800 text-white text-lg font-semibold py-3 rounded-lg hover:bg-gray-700 transition"
           >
-            {{ role.label }}
+            Pilih Role
           </button>
         </div>
-      </div>
+      </form>
     </div>
-  </template>
-  
-  <script>
-  import { useRouter } from "vue-router";
-  
-  export default {
-    name: "RoleSelection",
-    setup() {
-      const router = useRouter();
-  
-      // Daftar Role dengan Path
-      const roles = [
-        { label: "Admin", path: "/admin" },
-        { label: "Player", path: "/join" },
-        { label: "Strategic", path: "/join" },
-        { label: "Marketing", path: "/join" },
-      ];
-  
-      // Fungsi untuk memilih role dan membersihkan localStorage
-      const selectRole = (role) => {
-        localStorage.clear(); // Membersihkan semua data di localStorage
-        localStorage.setItem("userRole", role.label); // Simpan role ke localStorage
-        router.push(role.path); // Redirect ke halaman sesuai role
-      };
-  
-      return { roles, selectRole };
-    },
-  };
-  </script>
-  
-  <style>
-  /* Menambahkan margin antar tombol jika dibutuhkan */
-  button {
-    margin-bottom: 10px;
-  }
-  </style>
-  
+  </div>
+</template>
+
+<script>
+import { useRouter } from "vue-router";
+import { ref } from "vue";
+
+export default {
+  name: "RoleSelection",
+  setup() {
+    const router = useRouter();
+    const selectedRole = ref(null);
+
+    const roles = [
+      { label: "Admin", path: "/admin" },
+      { label: "Player", path: "/join" },
+      { label: "Strategic", path: "/join" },
+      { label: "Marketing", path: "/join" },
+    ];
+
+    const submitRole = () => {
+      if (!selectedRole.value) {
+        alert("Pilih role terlebih dahulu!");
+        return;
+      }
+      localStorage.clear();
+      localStorage.setItem("userRole", selectedRole.value.label);
+      router.push(selectedRole.value.path);
+    };
+
+    return { roles, selectedRole, submitRole };
+  },
+};
+</script>
