@@ -1,5 +1,13 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black">
+  <div class="h-screen flex flex-col items-center justify-center bg-black relative">
+    <!-- 🔙 Tombol Back -->
+    <button
+      @click="goBack"
+      class="absolute top-8 left-8 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition z-50"
+    >
+      ← Back
+    </button>
+
     <!-- Loading Screen -->
     <div v-if="isRefreshing" class="fixed inset-0 flex items-center justify-center bg-black text-white">
       <div class="text-center">
@@ -8,22 +16,14 @@
       </div>
     </div>
 
-    <div v-else class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl relative">
-      <!-- 🔙 Tombol Back -->
-      <button
-        @click="goBack"
-        class="absolute top-4 left-4 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition"
-      >
-        ← Back
-      </button>
-
+    <div v-else class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
       <!-- Round Header -->
       <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
         {{ round }}
       </div>
 
       <!-- Leaderboard -->
-      <div class="bg-gray-200 p-6 rounded-lg shadow-md mt-10">
+      <div class="bg-gray-200 p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold text-black mb-4">Leaderboard</h2>
         <div class="grid grid-cols-[1fr_2fr_1fr_auto] gap-2 text-sm font-medium text-gray-950 mb-2">
           <span>Rank</span>
@@ -82,8 +82,9 @@ export default {
     const isProcessing = ref(false);
     const isRefreshing = ref(true);
 
+    // ✅ Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
-      router.go(-1); // 🔙 Kembali ke halaman sebelumnya
+      router.go(-1);
     };
 
     // Fetch round data and leaderboard
@@ -127,76 +128,11 @@ export default {
       });
     });
 
-    const endRound = async () => {
-      if (isProcessing.value) return;
-      isProcessing.value = true;
-      const gameCode = localStorage.getItem("gameCode");
-
-      try {
-        console.log("Ending round for game:", gameCode);
-
-        const response = await fetch("https://api-fastify-pi.vercel.app/round/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gameCode }),
-        });
-
-        const result = await response.json();
-        console.log("API Response:", result);
-
-        if (!response.ok) {
-          throw new Error(result.message || "Failed to end round.");
-        }
-
-        alert("Round ended successfully!");
-        isRefreshing.value = true;
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } catch (error) {
-        alert(`Error: ${error.message}`);
-        console.error("Error ending round:", error);
-      } finally {
-        isProcessing.value = false;
-      }
-    };
-
-    const endGame = async () => {
-      if (isProcessing.value) return;
-      isProcessing.value = true;
-      const gameCode = localStorage.getItem("gameCode");
-
-      try {
-        console.log("Ending game and counting rounds for game:", gameCode);
-
-        const response = await fetch("https://api-fastify-pi.vercel.app/Game/End", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gameCode }),
-        });
-
-        const result = await response.json();
-        console.log("API Response:", result);
-
-        if (!response.ok) {
-          throw new Error(result.message || "Failed to end game.");
-        }
-
-        alert("Game ended successfully! Redirecting to end result...");
-        router.push("/endresult");
-      } catch (error) {
-        alert(`Error: ${error.message}`);
-        console.error("Error ending game:", error);
-      } finally {
-        isProcessing.value = false;
-      }
-    };
-
     onMounted(() => {
       fetchRoundData();
     });
 
-    return { round, sortedLeaderboard, formatNumber, endRound, endGame, isProcessing, isRefreshing, goBack };
+    return { round, sortedLeaderboard, formatNumber, goBack, isProcessing, isRefreshing };
   },
 };
 </script>
