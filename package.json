@@ -11,6 +11,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.0",
     "chart.js": "^4.4.7",
+    "lucide-vue-next": "^0.474.0",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

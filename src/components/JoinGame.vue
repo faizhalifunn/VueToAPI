@@ -1,5 +1,13 @@
 <template>
-  <div class="h-screen flex flex-col items-center justify-center bg-black">
+  <div class="h-screen flex flex-col items-center justify-center bg-black relative">
+    <!-- 🔙 Tombol Back Berwarna Merah -->
+    <button
+      @click="goBack"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+    >
+      ← Back
+    </button>
+
     <!-- Kotak Join Game -->
     <div class="bg-white rounded-lg shadow-md px-6 py-6 flex flex-col items-center space-y-4 w-80">
       <h2 class="text-black font-bold text-lg">Join Game</h2>
@@ -36,7 +44,12 @@ export default {
     const isProcessing = ref(false);
     const joinGameCode = ref("");
 
-    // Fungsi untuk Join Game
+    // ✅ Fungsi kembali ke halaman sebelumnya
+    const goBack = () => {
+      router.go(-1);
+    };
+
+    // ✅ Fungsi untuk Join Game
     const joinGame = async () => {
       if (isProcessing.value || !joinGameCode.value.trim()) {
         alert("Please enter a valid game code!");
@@ -92,7 +105,7 @@ export default {
       }
     };
 
-    return { joinGame, isProcessing, joinGameCode };
+    return { joinGame, isProcessing, joinGameCode, goBack };
   },
 };
 </script>

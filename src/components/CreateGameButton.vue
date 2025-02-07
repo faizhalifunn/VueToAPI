@@ -1,5 +1,13 @@
 <template>
-  <div class="h-screen flex flex-col items-center justify-center bg-black space-y-8">
+  <div class="h-screen flex flex-col items-center justify-center bg-black space-y-8 relative">
+    <!-- 🔙 Tombol Back Berwarna Merah -->
+    <button
+      @click="goBack"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+    >
+      ← Back
+    </button>
+
     <!-- Tombol Create Game -->
     <button
       @click="resetAndCreateGame"
@@ -44,6 +52,11 @@ export default {
     const router = useRouter();
     const isProcessing = ref(false); // State untuk animasi loading
     const joinGameCode = ref(""); // State untuk input gameCode
+
+    // Fungsi kembali ke halaman sebelumnya
+    const goBack = () => {
+      router.go(-1);
+    };
 
     // Fungsi untuk mereset localStorage dan membuat game baru
     const resetAndCreateGame = async () => {
@@ -123,7 +136,7 @@ export default {
       }
     };
 
-    return { resetAndCreateGame, joinGame, isProcessing, joinGameCode };
+    return { resetAndCreateGame, joinGame, isProcessing, joinGameCode, goBack };
   },
 };
 </script>

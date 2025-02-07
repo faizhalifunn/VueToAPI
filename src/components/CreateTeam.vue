@@ -1,5 +1,13 @@
-x<template>
-  <div class="h-screen flex items-center justify-center bg-black">
+<template>
+  <div class="h-screen flex items-center justify-center bg-black relative">
+    <!-- 🔙 Tombol Back Berwarna Merah -->
+    <button
+      @click="goBack"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+    >
+      ← Back
+    </button>
+
     <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-sm">
       
       <h2 class="text-lg font-semibold text-black mb-2">
@@ -59,6 +67,11 @@ export default {
     const loading = ref(false);
     const router = useRouter();
     const savedTeamName = ref(localStorage.getItem("teamName")); // Cek apakah ada teamName tersimpan
+
+    // ✅ Fungsi untuk kembali ke halaman sebelumnya
+    const goBack = () => {
+      router.go(-1);
+    };
 
     // ✅ Fungsi untuk Reconnect Team
     const reconnectTeam = async () => {
@@ -145,7 +158,7 @@ export default {
       savedTeamName.value = null;
     };
 
-    return { teamName, joinGame, reconnectTeam, resetTeam, loading, savedTeamName };
+    return { teamName, joinGame, reconnectTeam, resetTeam, loading, savedTeamName, goBack };
   },
 };
 </script>

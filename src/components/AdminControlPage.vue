@@ -1,7 +1,13 @@
 <template>
   <div class="h-screen flex flex-col items-center justify-center bg-black relative">
-    <!-- 🔙 Tombol Back -->
-    <div class="absolute top-0 bg-black w-20 h-20"></div>
+    <!-- 🔙 Tombol Back Berwarna Merah -->
+    <button
+      @click="goBack"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+    >
+      ← Back
+    </button>
+
     <!-- Loading Screen -->
     <div v-if="isRefreshing" class="fixed inset-0 flex items-center justify-center bg-black text-white">
       <div class="text-center">

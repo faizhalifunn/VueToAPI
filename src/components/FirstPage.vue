@@ -1,18 +1,21 @@
 <template>
   <div class="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-    <div class="bg-gray-100 rounded-2xl shadow-lg p-8 w-full max-w-md">
-      <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Pilih Peran Anda</h2>
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md border border-gray-300">
+      <!-- Judul dengan font modern & lebih user-friendly -->
+      <h2 class="text-2xl font-semibold text-gray-900 text-center mb-10 tracking-wide font-poppins">
+        Pilih <span class="text-blue-500">Peran</span> Anda
+      </h2>
 
-      <div class="flex flex-col space-y-4">
-        <!-- Tombol Navigasi dengan Ikon -->
+      <!-- Container tombol dengan lebih banyak jarak -->
+      <div class="grid grid-cols-1 gap-5">
         <button
           v-for="(role, index) in roles"
           :key="index"
           @click="selectRole(role)"
-          class="w-full flex items-center justify-center bg-gray-800 text-white text-lg font-semibold py-3 rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-md transform hover:scale-105"
+          class="w-full flex items-center justify-start px-6 py-3 bg-gray-800 text-white text-lg font-medium rounded-lg shadow-md transition-all duration-300 hover:bg-blue-500 hover:scale-105 hover:shadow-lg"
         >
-          <component :is="role.icon" class="w-6 h-6 mr-3 text-white" />
-          {{ role.label }}
+          <component :is="role.icon" class="w-6 h-6 text-white mr-4" />
+          <span class="flex-1 text-left">{{ role.label }}</span>
         </button>
       </div>
     </div>
@@ -21,7 +24,7 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { User, Users, Briefcase, LineChart } from "lucide-vue-next"; // Gunakan ikon dari Lucide
+import { User, Users, Briefcase, LineChart } from "lucide-vue-next";
 
 export default {
   name: "RoleSelection",
@@ -46,3 +49,11 @@ export default {
 };
 </script>
 
+<!-- Import Google Font Poppins -->
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+
+.font-poppins {
+  font-family: "Poppins", sans-serif;
+}
+</style>
