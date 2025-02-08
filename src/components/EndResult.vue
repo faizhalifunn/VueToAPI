@@ -69,8 +69,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
-import * as XLSX from "xlsx"; // Library untuk ekspor Excel
-
 export default {
   name: "EndResultPage",
   setup() {
@@ -187,6 +185,18 @@ export default {
 
     return { gameCode, sortedTeams, formatNumber, isLoading, chartCanvas, goBack };
   },
+};
+
+const exportToExcel = async () => {
+  const XLSX = await import("xlsx"); // Import secara dinamis
+
+  // Buat worksheet dan workbook
+  const worksheet = XLSX.utils.json_to_sheet(sortedTeams.value);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "End Result");
+
+  // Simpan file Excel
+  XLSX.writeFile(workbook, `EndResult_${gameCode}.xlsx`);
 };
 </script>
 
