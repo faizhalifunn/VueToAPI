@@ -41,8 +41,24 @@
       <!-- Loading Indicator -->
       <div v-if="isLoading" class="text-center text-lg font-semibold mt-4">Loading...</div>
 
+      <!-- Export Buttons -->
+      <div class="mt-4 flex justify-center gap-4">
+        <button
+          @click="exportToCSV"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-500 transition hover:scale-105 shadow-md"
+        >
+          📥 Export to CSV
+        </button>
+        <button
+          @click="exportToExcel"
+          class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
+        >
+          📥 Export to Excel
+        </button>
+      </div>
+
       <!-- Chart Wrapper -->
-      <div class="chart-container">
+      <div class="chart-container mt-6">
         <canvas ref="chartCanvas"></canvas>
       </div>
     </div>
@@ -53,6 +69,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
+import * as XLSX from "xlsx"; // Library untuk ekspor Excel
 
 export default {
   name: "EndResultPage",
@@ -112,7 +129,7 @@ export default {
       if (!chartCanvas.value) return;
 
       if (chartInstance) {
-        chartInstance.destroy(); // Hapus chart sebelumnya jika ada
+        chartInstance.destroy();
       }
 
       const ctx = chartCanvas.value.getContext("2d");
@@ -122,29 +139,27 @@ export default {
       teams.value.forEach(team => {
         team.rounds.forEach(round => allRounds.add(round.round));
       });
-      const sortedRounds = [...allRounds].sort(); // Urutkan round
+      const sortedRounds = [...allRounds].sort();
 
       // Data untuk chart
-      const datasets = teams.value.map(team => {
-        return {
-          label: team.team,
-          data: sortedRounds.map(round => {
-            const roundData = team.rounds.find(r => r.round === round);
-            return roundData ? roundData.ContributionPoint : 0;
-          }),
-          borderColor: getRandomColor(),
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1
-        };
-      });
+      const datasets = teams.value.map(team => ({
+        label: team.team,
+        data: sortedRounds.map(round => {
+          const roundData = team.rounds.find(r => r.round === round);
+          return roundData ? roundData.ContributionPoint : 0;
+        }),
+        borderColor: getRandomColor(),
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1
+      }));
 
       // Buat chart
       chartInstance = new Chart(ctx, {
         type: "line",
         data: {
-          labels: sortedRounds, // Label sumbu X (Round 1, Round 2, dst.)
-          datasets: datasets, // Data per tim
+          labels: sortedRounds,
+          datasets: datasets,
         },
         options: {
           responsive: true,
@@ -152,16 +167,10 @@ export default {
           scales: {
             y: {
               beginAtZero: true,
-              title: {
-                display: true,
-                text: "Contribution Points",
-              },
+              title: { display: true, text: "Contribution Points" },
             },
             x: {
-              title: {
-                display: true,
-                text: "Rounds",
-              },
+              title: { display: true, text: "Rounds" },
             },
           },
         },
@@ -170,12 +179,7 @@ export default {
 
     // ✅ Generate Warna Acak untuk Setiap Tim
     const getRandomColor = () => {
-      const letters = "0123456789ABCDEF";
-      let color = "#";
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
+      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
     };
 
     // Fetch data ketika halaman dimuat
@@ -187,11 +191,10 @@ export default {
 </script>
 
 <style>
-/* 🔥 Pastikan Chart Tidak Membesar Tanpa Batas */
 .chart-container {
   width: 100%;
-  max-width: 600px; /* Ukuran maksimal chart */
-  height: 400px; /* Tetapkan tinggi agar tidak membesar terus */
+  max-width: 600px;
+  height: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
