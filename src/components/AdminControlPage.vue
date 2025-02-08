@@ -15,24 +15,34 @@
     </div>
 
     <div v-else class="bg-white rounded-2xl shadow-md p-6 w-full max-w-2xl">
-      <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
-        {{ round }}
-      </div>
+  <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg text-center">
+    {{ round }} 
+  </div>
 
-      <div class="bg-gray-200 p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-bold text-black mb-4">Leaderboard</h2>
-        <div class="grid grid-cols-[1fr_2fr_1fr_auto] gap-2 text-sm font-medium text-gray-950 mb-2">
-          <span>Rank</span>
-          <span>Team Name</span>
-          <span>Contribution</span>
-          <span></span>
-        </div>
-        <div v-for="(team, index) in sortedLeaderboard" :key="index" class="grid grid-cols-[1fr_2fr_1fr_auto] gap-2 items-center bg-gray-300 py-2 px-4 rounded-lg mb-2">
-          <span class="font-semibold text-gray-700">{{ index + 1 }}</span>
-          <span class="font-medium text-gray-700">{{ team.team || "N/A" }}</span>
-          <span class="font-mono text-gray-700">{{ formatNumber(team.data.ContributionPoint) }}</span>
-          <button class="text-gray-700 font-bold">•••</button>
-        </div>
+  <div class="bg-gray-200 p-6 rounded-lg shadow-md">
+
+    <!-- Header Table -->
+    <div class="grid grid-cols-5 gap-4 text-sm font-bold text-gray-900 bg-gray-300 px-4 py-2 rounded-md border-b border-gray-400">
+      <span class="text-left">Rank</span>
+      <span class="text-left">Team Name</span>
+      <span class="text-right">Contribution</span>
+      <span class="text-right">Total Bintang</span>
+      <span class="text-center"></span> <!-- Placeholder untuk tombol -->
+    </div>
+
+        <!-- List Leaderboard -->
+         <!-- List Leaderboard --> 
+    <div
+      v-for="(team, index) in sortedLeaderboard"
+      :key="index"
+      class="grid grid-cols-5 gap-4 items-center bg-gray-300 px-4 py-2 rounded-lg mb-2"
+    >
+      <span class="font-semibold text-gray-700 text-left">{{ index + 1 }}</span>
+      <span class="font-medium text-gray-700 text-left">{{ team.team || "N/A" }}</span>
+      <span class="font-mono text-gray-700 text-center">{{ formatNumber(team.data.ContributionPoint) }}</span>
+      <span class="font-mono text-gray-700 text-center">{{ new Intl.NumberFormat("id-ID").format(team.TotalBintang) }}</span>
+      <button class="text-gray-700 font-bold text-center">•••</button>
+    </div>
       </div>
 
       <div class="flex justify-center space-x-4 mt-4 pt-5 gap-10">
@@ -126,12 +136,15 @@ export default {
     };
 
     const endGame = () => {
-      isProcessing.value = true;
-      setTimeout(() => {
-        alert("Game ended successfully!");
-        isProcessing.value = false;
-      }, 2000);
-    };
+  isProcessing.value = true;
+  setTimeout(() => {
+    alert("Game ended successfully!");
+    isProcessing.value = false;
+
+    // Redirect ke halaman /endResult
+    router.push("/endResult");
+  }, 2000);
+};
 
     onMounted(() => {
       fetchRoundData();
