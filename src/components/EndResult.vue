@@ -38,6 +38,9 @@
         </div>
       </div>
 
+      <div class="chart-container mt-6">
+        <canvas ref="chartCanvas"></canvas>
+      </div>
       <!-- Loading Indicator -->
       <div v-if="isLoading" class="text-center text-lg font-semibold mt-4">Loading...</div>
 
@@ -58,9 +61,7 @@
       </div>
 
       <!-- Chart Wrapper -->
-      <div class="chart-container mt-6">
-        <canvas ref="chartCanvas"></canvas>
-      </div>
+      
     </div>
   </div>
 </template>
