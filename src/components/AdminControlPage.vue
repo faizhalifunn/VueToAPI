@@ -23,7 +23,7 @@
 
     <!-- Header Table -->
     <div class="grid grid-cols-5 gap-4 text-sm font-bold text-gray-900 bg-gray-300 px-4 py-2 rounded-md border-b border-gray-400">
-      <span class="text-left">Rank akoakekak</span>
+      <span class="text-left">Rank</span>
       <span class="text-left">Team Name</span>
       <span class="text-right">Contribution</span>
       <span class="text-right">Total Bintang</span>
