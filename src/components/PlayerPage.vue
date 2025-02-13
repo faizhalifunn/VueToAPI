@@ -1,221 +1,104 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black relative text-gray-800">
-    <!-- 🔙 Tombol Back Berwarna Merah -->
-    <button
-      @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
-    >
+  <div class="h-screen flex items-center justify-center bg-black p-6 relative">
+    <!-- Tombol Back -->
+    <button @click="goBack" class="absolute top-6 left-6 bg-red-600 text-white py-2 px-4 rounded-md font-bold hover:bg-red-700 transition duration-300">
       ← Back
     </button>
 
-    <!-- Form Input Data -->
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-2xl">
-      <div class="grid grid-cols-2 gap-6">
+    <!-- Form Pengisian Data -->
+    <div class="bg-white text-black rounded-xl shadow-lg p-8 w-full max-w-3xl border border-gray-600">
+      <div class="grid grid-cols-2 gap-8 items-start">
         <!-- Kolom Kiri -->
         <div>
-          <h2 class="text-2xl font-bold mb-4">Input Data</h2>
-          <div v-for="(label, key) in leftInputs" :key="key" class="mb-3">
-            <p class="font-semibold">• {{ label }}</p>
+          <h2 class="text-3xl font-bold mb-6">Input Data</h2>
+          <div v-for="(label, key) in leftInputs" :key="key" class="mb-5">
+            <p class="text-left font-bold" :class="label.class">{{ label.text }}</p>
             <input
               v-model="formData[key]"
-              type="number"
-              placeholder="Enter value"
-              class="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              type="text"
+              class="w-full p-3 rounded-md border border-gray-400 bg-gray-100 text-black font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-gray-600"
             />
           </div>
         </div>
 
         <!-- Kolom Kanan -->
         <div>
-          <h2 class="text-2xl font-bold mb-4">{{ currentRound }}</h2>
-          <div v-for="(label, key) in rightInputs" :key="key" class="mb-3">
-            <p class="font-semibold">• {{ label }}</p>
+          <h2 class="text-3xl font-bold mb-6 text-right">Round - n</h2>
+          <div v-for="(label, key) in rightInputs" :key="key" class="mb-5">
+            <p class="text-left font-bold" :class="label.class">{{ label.text }}</p>
             <input
               v-model="formData[key]"
-              type="number"
-              placeholder="Enter value"
-              class="w-full p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              type="text"
+              class="w-full p-3 rounded-md border border-gray-400 bg-gray-100 text-black font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-gray-600"
             />
           </div>
         </div>
       </div>
-
+      
+      <div class="grid grid-cols-2 gap-8 items-center">
+        <div>
+          <p class="text-green-600 font-bold">Kartu Kredit</p>
+          <input v-model="formData.KartuKredit" type="text" class="w-full p-3 rounded-md border border-gray-400 bg-gray-100 text-black font-bold shadow-sm" />
+        </div>
+        <div>
+          <p class="font-bold">Bintang</p>
+          <input v-model="formData.Bintang" type="text" class="w-full p-3 rounded-md border border-gray-400 bg-gray-100 text-black font-bold shadow-sm" />
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <p class="text-green-600 font-bold">Asuransi</p>
+        <input v-model="formData.Asuransi" type="text" class="w-full p-3 rounded-md border border-gray-400 bg-gray-100 text-black font-bold shadow-sm" />
+      </div>
+      
       <!-- Tombol Submit -->
-      <div class="flex justify-center mt-6">
+      <div class="flex justify-center mt-10">
         <button
           @click="submitForm"
-          :disabled="loading"
-          class="bg-black text-white text-lg font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition"
+          class="bg-black text-white text-xl font-bold py-3 px-12 rounded-md hover:bg-gray-800 transition duration-300 shadow-lg"
         >
-          {{ loading ? "Submitting..." : "Submit" }}
+          Submit
         </button>
-      </div>
-
-      <!-- Pesan Sukses -->
-      <div v-if="successMessage" class="mt-4 text-center text-green-700 font-semibold">
-        {{ successMessage }}
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref } from "vue";
 
 export default {
-  name: "PlayerPage",
   setup() {
-    const router = useRouter();
     const formData = ref({
-      KreditProduktif: "",
       KreditKonsumtif: "",
-      PenempatanPusat: "",
-      Giro: "",
-      PinjamanPusat: "",
-      Asuransi: "",
+      KreditProduktif: "",
       KartuKredit: "",
+      Asuransi: "",
+      DanaPihakKetiga: "",
+      PenempatanPusat: "",
+      PinjamanPusat: "",
       Bintang: "",
     });
 
-    const currentRound = ref("Loading...");
-    const loading = ref(false);
-    const successMessage = ref("");
-
-    // ✅ Fungsi kembali ke halaman sebelumnya
-    const goBack = () => {
-      router.go(-1);
-    };
-
-    // Data untuk label input
     const leftInputs = {
-      KreditKonsumtif: "Kredit Konsumtif",
-      PenempatanPusat: "Penempatan Pusat",
-      PinjamanPusat: "Pinjaman Pusat",
-      KartuKredit: "Kartu Kredit",
+      KreditKonsumtif: { text: "Kredit Konsumtif", class: "text-green-600 font-bold" },
+      KreditProduktif: { text: "Kredit Produktif", class: "text-green-600 font-bold" },
     };
 
     const rightInputs = {
-      KreditProduktif: "Kredit Produktif",
-      Giro: "Dana Pihak Ketiga",
-      Asuransi: "Asuransi",
-      Bintang: "Bintang",
+      DanaPihakKetiga: { text: "Dana Pihak Ketiga (Fund)", class: "text-red-600 font-bold" },
+      PenempatanPusat: { text: "Penempatan/Peminjaman Pusat", class: "text-green-600 font-bold" },
     };
 
-    // Ambil round terbaru
-    const fetchCurrentRound = async () => {
-      const gameCode = localStorage.getItem("gameCode");
-
-      if (!gameCode) {
-        alert("Game code not found! Please rejoin the game.");
-        return;
-      }
-
-      try {
-        const response = await fetch(`https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch round data.");
-        }
-
-        const data = await response.json();
-
-        if (data.rounds && data.rounds.length > 0) {
-          currentRound.value = data.rounds[0].round; // Ambil round pertama dari array
-        } else {
-          currentRound.value = "Unknown";
-        }
-      } catch (error) {
-        console.error("Failed to fetch round:", error);
-        currentRound.value = "Error";
-      }
+    const submitForm = () => {
+      alert("Form submitted! (Dummy action)");
     };
 
-    // Submit Form
-    const submitForm = async () => {
-      const gameCode = localStorage.getItem("gameCode");
-      const teamName = localStorage.getItem("teamName");
-
-      if (!gameCode || !teamName) {
-        alert("Game code or team name not found! Please rejoin the game.");
-        return;
-      }
-
-      loading.value = true;
-      successMessage.value = ""; // Reset success message sebelum submit
-
-      const payload = {
-        gameCode,
-        teamName,
-        ...formData.value,
-      };
-
-      try {
-        // 🔹 1. Kirim data ke endpoint /round/input
-        const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to submit round data. Try again!");
-        }
-
-        // 🔹 2. Setelah sukses, jalankan endpoint /round/count
-        const countResponse = await fetch("https://api-fastify-pi.vercel.app/round/count", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ gameCode, teamName }),
-        });
-
-        if (!countResponse.ok) {
-          throw new Error("Failed to count round. Try again!");
-        }
-
-        successMessage.value = "Data successfully submitted and round counted!";
-
-        // Reset form setelah submit
-        formData.value = {
-          KreditProduktif: "",
-          KreditKonsumtif: "",
-          PenempatanPusat: "",
-          Giro: "",
-          PinjamanPusat: "",
-          Asuransi: "",
-          KartuKredit: "",
-          Bintang: "",
-        };
-
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        loading.value = false;
-      }
+    const goBack = () => {
+      alert("Back button clicked! (Dummy action)");
     };
 
-    // Panggil fetchCurrentRound saat komponen dimuat
-    onMounted(fetchCurrentRound);
-
-    return {
-      formData,
-      leftInputs,
-      rightInputs,
-      currentRound,
-      loading,
-      successMessage,
-      submitForm,
-      goBack,
-    };
+    return { formData, leftInputs, rightInputs, submitForm, goBack };
   },
 };
 </script>
