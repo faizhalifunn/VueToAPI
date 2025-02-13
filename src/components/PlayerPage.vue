@@ -87,7 +87,7 @@ export default {
 
     const rightInputs = {
       DanaPihakKetiga: { text: "Dana Pihak Ketiga (Fund)", class: "text-red-600 font-bold" },
-      PenempatanPusat: { text: "Penempatan/Peminjaman Pusat", class: "text-green-600 font-bold" },
+      PenempatanPusat: { text: "Penempatan atau Peminjaman Pusat", class: "text-green-600 font-bold" },
     };
 
     const submitForm = () => {
