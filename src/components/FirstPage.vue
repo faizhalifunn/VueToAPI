@@ -35,6 +35,7 @@
       <div class="bg-white rounded-lg shadow-lg p-6 w-80">
         <h2 class="text-lg font-semibold text-center mb-4 text-gray-900">Join Game</h2>
         <input
+          ref="joinGameInput"
           v-model="joinGameCode"
           type="text"
           placeholder="Enter Code"
@@ -48,10 +49,14 @@
             Close
           </span>
           <span
+            v-if="!isProcessing"
             @click="joinGame"
             class="text-black text-sm cursor-pointer hover:underline transition"
           >
             Enter
+          </span>
+          <span v-else class="text-black text-sm">
+            Loading...
           </span>
         </div>
       </div>
@@ -70,25 +75,30 @@ export default {
     const isProcessing = ref(false);
     const joinGameCode = ref("");
     const showPlayerForm = ref(false);
+    const joinGameInput = ref(null);
 
-    // ✅ Fungsi kembali ke halaman sebelumnya
+    // Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // ✅ Fungsi buka form Join Game
+    // Fungsi buka form Join Game dengan fokus otomatis pada input
     const openJoinForm = async () => {
       localStorage.setItem("userRole", "Player");
-      await nextTick();
       showPlayerForm.value = true;
+      // Menunggu DOM terupdate, lalu fokuskan input
+      await nextTick();
+      if (joinGameInput.value) {
+        joinGameInput.value.focus();
+      }
     };
 
-    // ✅ Fungsi menutup form Join Game
+    // Fungsi menutup form Join Game
     const closeJoinForm = () => {
       showPlayerForm.value = false;
     };
 
-    // ✅ Fungsi memilih role (Strategic & Marketing diarahkan ke form masing-masing)
+    // Fungsi memilih role (Strategic & Marketing diarahkan ke form masing-masing)
     const selectRole = async (role) => {
       localStorage.setItem("userRole", role);
       await nextTick();
@@ -103,12 +113,17 @@ export default {
       }
     };
 
-    // ✅ Fungsi untuk Join Game (Player, Strategic, dan Marketing sekarang bisa join)
+    // Fungsi untuk Join Game (Player, Strategic, dan Marketing sekarang bisa join)
     const joinGame = async () => {
       const userRole = localStorage.getItem("userRole")?.trim();
       console.log("User Role:", userRole);
 
-      if (!userRole || (userRole !== "Player" && userRole !== "Strategic Facilitator" && userRole !== "Marketing Facilitator")) {
+      if (
+        !userRole ||
+        (userRole !== "Player" &&
+          userRole !== "Strategic Facilitator" &&
+          userRole !== "Marketing Facilitator")
+      ) {
         alert("Invalid role. Please select a valid role before joining.");
         return;
       }
@@ -157,7 +172,17 @@ export default {
       }
     };
 
-    return { goBack, openJoinForm, closeJoinForm, joinGame, selectRole, isProcessing, joinGameCode, showPlayerForm };
+    return { 
+      goBack, 
+      openJoinForm, 
+      closeJoinForm, 
+      joinGame, 
+      selectRole, 
+      isProcessing, 
+      joinGameCode, 
+      showPlayerForm, 
+      joinGameInput 
+    };
   },
 };
 </script>
