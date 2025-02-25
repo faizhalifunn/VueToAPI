@@ -38,20 +38,17 @@
         </div>
       </div>
 
+      <!-- Chart Wrapper -->
       <div class="chart-container mt-6">
         <canvas ref="chartCanvas"></canvas>
       </div>
+
       <!-- Loading Indicator -->
       <div v-if="isLoading" class="text-center text-lg font-semibold mt-4">Loading...</div>
 
       <!-- Export Buttons -->
       <div class="mt-4 flex justify-center gap-4">
-        <button
-          @click="exportToCSV"
-          class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-500 transition hover:scale-105 shadow-md"
-        >
-          📥 Export to CSV
-        </button>
+        
         <button
           @click="exportToExcel"
           class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
@@ -59,9 +56,6 @@
           📥 Export to Excel
         </button>
       </div>
-
-      <!-- Chart Wrapper -->
-      
     </div>
   </div>
 </template>
@@ -70,6 +64,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Chart from "chart.js/auto";
+
 export default {
   name: "EndResultPage",
   setup() {
@@ -123,7 +118,12 @@ export default {
       });
     });
 
-    // ✅ Draw Chart (Perubahan Contribution Point per Round)
+    // ✅ Generate Warna Acak untuk Setiap Tim
+    const getRandomColor = () => {
+      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+    };
+
+    // ✅ Draw Chart (Detail lebih jelas, tidak gepeng)
     const drawChart = () => {
       if (!chartCanvas.value) return;
 
@@ -150,7 +150,7 @@ export default {
         borderColor: getRandomColor(),
         borderWidth: 2,
         fill: false,
-        tension: 0.1
+        tension: 0.3
       }));
 
       // Buat chart
@@ -176,36 +176,58 @@ export default {
       });
     };
 
-    // ✅ Generate Warna Acak untuk Setiap Tim
-    const getRandomColor = () => {
-      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+    // ✅ Export to Excel (dengan API)
+    const exportToExcel = async () => {
+      try {
+        if (!gameCode) {
+          alert("No game code found!");
+          return;
+        }
+
+        // Panggil API untuk mendapatkan file Excel
+        const response = await fetch(`https://api-fastify-pi.vercel.app/game/Excelresult?gameCode=${gameCode}`, {
+          method: "GET",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch Excel file from the server.");
+        }
+
+        // Konversi respons ke blob
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Buat elemen <a> untuk mengunduh file
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `EndResult_${gameCode}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Hapus elemen <a> setelah unduhan
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        alert("Excel file downloaded successfully!");
+      } catch (error) {
+        console.error("Error exporting to Excel:", error);
+        alert("Failed to export to Excel. Please try again.");
+      }
     };
 
-    // Fetch data ketika halaman dimuat
+    // Fetch data saat halaman dimuat
     onMounted(fetchEndResult);
 
-    return { gameCode, sortedTeams, formatNumber, isLoading, chartCanvas, goBack };
+    return { gameCode, sortedTeams, formatNumber, isLoading, chartCanvas, goBack, exportToExcel };
   },
-};
-
-const exportToExcel = async () => {
-  const XLSX = await import("xlsx"); // Import secara dinamis
-
-  // Buat worksheet dan workbook
-  const worksheet = XLSX.utils.json_to_sheet(sortedTeams.value);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "End Result");
-
-  // Simpan file Excel
-  XLSX.writeFile(workbook, `EndResult_${gameCode}.xlsx`);
 };
 </script>
 
 <style>
 .chart-container {
   width: 100%;
-  max-width: 600px;
-  height: 400px;
+  max-width: 700px;
+  height: 450px;
   display: flex;
   justify-content: center;
   align-items: center;
