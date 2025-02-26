@@ -35,7 +35,7 @@
       </div>
 
       <!-- Submit Button -->
-      <div class="mt-6 flex justify-center">
+      <div class="mt-6 flex justify-center py-4">
         <button
           @click="submitUpgrade"
           class="bg-black text-white text-lg font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition flex items-center gap-2"

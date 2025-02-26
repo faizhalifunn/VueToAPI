@@ -35,7 +35,6 @@
       <div class="bg-white rounded-lg shadow-lg p-6 w-80">
         <h2 class="text-lg font-semibold text-center mb-4 text-gray-900">Join Game</h2>
         <input
-          ref="joinGameInput"
           v-model="joinGameCode"
           type="text"
           placeholder="Enter Code"
@@ -75,22 +74,17 @@ export default {
     const isProcessing = ref(false);
     const joinGameCode = ref("");
     const showPlayerForm = ref(false);
-    const joinGameInput = ref(null);
 
     // Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // Fungsi buka form Join Game dengan fokus otomatis pada input
+    // Fungsi buka form Join Game
     const openJoinForm = async () => {
       localStorage.setItem("userRole", "Player");
-      showPlayerForm.value = true;
-      // Menunggu DOM terupdate, lalu fokuskan input
       await nextTick();
-      if (joinGameInput.value) {
-        joinGameInput.value.focus();
-      }
+      showPlayerForm.value = true;
     };
 
     // Fungsi menutup form Join Game
@@ -118,12 +112,7 @@ export default {
       const userRole = localStorage.getItem("userRole")?.trim();
       console.log("User Role:", userRole);
 
-      if (
-        !userRole ||
-        (userRole !== "Player" &&
-          userRole !== "Strategic Facilitator" &&
-          userRole !== "Marketing Facilitator")
-      ) {
+      if (!userRole || (userRole !== "Player" && userRole !== "Strategic Facilitator" && userRole !== "Marketing Facilitator")) {
         alert("Invalid role. Please select a valid role before joining.");
         return;
       }
@@ -172,17 +161,7 @@ export default {
       }
     };
 
-    return { 
-      goBack, 
-      openJoinForm, 
-      closeJoinForm, 
-      joinGame, 
-      selectRole, 
-      isProcessing, 
-      joinGameCode, 
-      showPlayerForm, 
-      joinGameInput 
-    };
+    return { goBack, openJoinForm, closeJoinForm, joinGame, selectRole, isProcessing, joinGameCode, showPlayerForm };
   },
 };
 </script>
