@@ -16,7 +16,7 @@
 
       <!-- Jika ada teamName tersimpan, tampilkan opsi reconnect -->
       <div v-if="savedTeamName">
-        <p class="text-gray-700 text-center mb-4">You were in team <strong>{{ savedTeamName }}</strong></p>
+        <p class="text-gray-700 text-center mb-4 pb-1">You were in team <strong>{{ savedTeamName }}</strong></p>
         <button
           @click="reconnectTeam"
           :disabled="loading"
@@ -27,25 +27,25 @@
         </button>
         <button
           @click="resetTeam"
-          class="text-gray-600 mt-2 text-sm underline w-full text-center block"
+          class="text-gray-600 mt-2 text-sm underline w-full text-center block pt-1"
         >
           Join with a different team
         </button>
       </div>
 
       <!-- Jika tidak ada teamName, tampilkan input untuk memasukkan team baru -->
-      <div v-else>
-        <label class="block text-lg font-semibold text-black mb-2">Team Name:</label>
+      <div v-else >
+        <label class="block text-lg font-semibold text-black mb-2 pb-2">Team Name:</label>
         <input
           v-model="teamName"
           type="text"
           placeholder="Enter team name"
-          class="w-full p-2 rounded-lg border text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          class="w-full p-2 rounded-lg border text-gray-700 border-gray-300 focus:outline-none focus:ring-2 pb-2 focus:ring-gray-500"
         />
         <button
           @click="joinGame"
           :disabled="loading"
-          class="w-full bg-black text-white text-lg font-semibold py-2 rounded-lg hover:bg-gray-800 transition mt-4"
+          class="bg-black w-full text-white text-lg font-semibold py-2 rounded-lg hover:bg-gray-800 transition mt-4"
         >
           <span v-if="loading" class="loading-spinner mr-2"></span>
           <span>{{ loading ? "Joining..." : "Join Game" }}</span>

@@ -19,7 +19,7 @@
       </button>
 
       <!-- Pilihan Role (Admin, Strategic, Marketing) -->
-      <div class="flex justify-center gap-x-8 mt-6">
+      <div class="flex justify-center gap-x-8 mt-6 pt-4">
         <button @click="selectRole('Admin')" class="text-black text-sm font-medium hover:underline">Admin</button>
         <button @click="selectRole('Strategic Facilitator')" class="text-black text-sm font-medium hover:underline">
           Strategic
@@ -33,14 +33,14 @@
     <!-- Form Join Game (Modal) -->
     <div v-if="showPlayerForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white rounded-lg shadow-lg p-6 w-80">
-        <h2 class="text-lg font-semibold text-center mb-4 text-gray-900">Join Game</h2>
+        <h2 class="text-lg font-semibold text-center mb-4 text-gray-900 pb-1">Join Game</h2>
         <input
           v-model="joinGameCode"
           type="text"
           placeholder="Enter Code"
           class="w-full px-4 py-2 border border-gray-300 text-black rounded-lg text-center mt-2"
         />
-        <div class="flex justify-between mt-6">
+        <div class="flex justify-between mt-6 pt-1">
           <span
             @click="closeJoinForm"
             class="text-gray-600 text-sm cursor-pointer hover:underline transition"

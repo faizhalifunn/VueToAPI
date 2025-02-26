@@ -3,7 +3,7 @@
     <!-- 🔙 Tombol Back Berwarna Merah -->
     <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
@@ -12,32 +12,36 @@
     <button
       @click="resetAndCreateGame"
       :disabled="isProcessing"
-      class="text-white bg-black border-2 border-white font-bold text-lg px-8 py-3 rounded-full shadow-md hover:bg-gray-800 hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+      class="text-white bg-black border-2 border-white font-bold text-lg px-8 py-3 rounded-xl shadow-md hover:bg-gray-800 hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span v-if="isProcessing" class="loading-spinner mr-2"></span>
       <span>{{ isProcessing ? "Processing..." : "CREATE ROOM" }}</span>
     </button>
 
     <!-- Text Separator -->
-    <span class="text-gray-400 font-medium text-lg">Or</span>
+    <span class="text-gray-400 font-medium text-lg py-2">Or</span>
 
     <!-- Input dan Tombol Join Game -->
-    <div class="bg-white rounded-lg shadow-md px-6 py-4 flex flex-col items-center space-y-4 w-80">
-      <h2 class="text-black font-bold text-lg">Join Game</h2>
-      <input
+    <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center space-y-4 w-80">
+      <div>
+        <h2 class="text-black font-bold text-lg">Join Game</h2>
+        <input
         v-model="joinGameCode"
         type="text"
         placeholder="Enter Code"
         class="w-full px-4 py-2 border border-gray-300 text-black rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-gray-500"
-      />
-      <button
-        @click="joinGame"
-        :disabled="isProcessing"
-        class="bg-black text-white font-medium text-lg px-6 py-2 rounded-full hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-        <span>{{ isProcessing ? "Processing..." : "Enter" }}</span>
-      </button>
+        />
+      </div>
+      <div class="pt-2">
+        <button
+          @click="joinGame"
+          :disabled="isProcessing"
+          class="bg-black text-white font-medium text-lg px-6 py-2 rounded-xl hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span v-if="isProcessing" class="loading-spinner mr-2"></span>
+          <span>{{ isProcessing ? "Processing..." : "Enter" }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
