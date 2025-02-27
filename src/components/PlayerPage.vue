@@ -176,12 +176,12 @@ export default {
 
     // Jika DPK < total kredit => Penempatan aktif
     const isPenempatanEnabled = computed(() => {
-      return formData.value.DanaPihakKetiga < totalKredit.value;
+      return formData.value.DanaPihakKetiga > totalKredit.value;
     });
 
     // Jika DPK > total kredit => Peminjaman aktif
     const isPeminjamanEnabled = computed(() => {
-      return formData.value.DanaPihakKetiga > totalKredit.value;
+      return formData.value.DanaPihakKetiga < totalKredit.value;
     });
 
     // Styling input
