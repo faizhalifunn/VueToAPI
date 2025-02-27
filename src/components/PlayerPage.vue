@@ -70,7 +70,7 @@
             :disabled="!isPenempatanEnabled || isLoading"
           />
           <p v-if="!isPenempatanEnabled" class="text-gray-600 text-sm mt-1">
-            Dana Pihak Ketiga lebih kecil dari Total Kredit
+            Dana Pihak Ketiga lebih besar dari Total Kredit
           </p>
         </div>
 
@@ -84,7 +84,7 @@
             :disabled="!isPeminjamanEnabled || isLoading"
           />
           <p v-if="!isPeminjamanEnabled" class="text-gray-600 text-sm mt-1">
-            Dana Pihak Ketiga lebih besar dari Total Kredit
+            Dana Pihak Ketiga lebih kecil dari Total Kredit
           </p>
         </div>
       </div>
