@@ -52,7 +52,7 @@
       <!-- Dropdown Forecast & Milestone -->
       <div class="flex justify-evenly gap-3 py-2 text-gray-600">
         <select v-model="selectedMilestone" class="p-3 rounded-lg bg-gray-100 border border-gray-400 shadow-sm">
-          <option value="no milestone">Select this round Milestone</option>
+          <option value="no milestone" disabled>Select this round Milestone</option>
           <option value="no milestone">No Milestone</option>
           <option v-for="milestone in milestones" :key="milestone.id" :value="milestone.id">
             {{ milestone.note }}
@@ -60,7 +60,7 @@
         </select>
 
         <select v-model="selectedForecast" class="p-3 rounded-lg bg-gray-100 border border-gray-400 shadow-sm">
-          <option value="no forecast">Select this round Forecast</option>
+          <option value="no forecast" disabled>Select this round Forecast</option>
           <option value="no forecast">No Forecast</option>
           <option v-for="forecast in forecasts" :key="forecast.id" :value="forecast.id">
             {{ forecast.note }}
