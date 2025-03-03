@@ -226,50 +226,90 @@ export default {
 
     // Submit form ke endpoint /round/input
     const submitForm = async () => {
-      isLoading.value = true;
-      try {
-        const gameCode = localStorage.getItem("gameCode");
-        const teamName = localStorage.getItem("teamName");
+    isLoading.value = true;
+    
+    try {
+      const gameCode = localStorage.getItem("gameCode");
+      const teamName = localStorage.getItem("teamName");
 
-        if (!gameCode || !teamName) {
-          throw new Error("gameCode atau teamName tidak ditemukan di localStorage");
-        }
-
-        // Tentukan mana yang dipakai => Penempatan / Peminjaman
-        let penempatanAtauPeminjamanValue = 0;
-        if (isPenempatanEnabled.value) {
-          penempatanAtauPeminjamanValue = formData.value.PenempatanPusat;
-        } else if (isPeminjamanEnabled.value) {
-          penempatanAtauPeminjamanValue = formData.value.PinjamPusat;
-        }
-
-        // Buat payload sesuai kebutuhan endpoint
-        const payload = {
-          gameCode: gameCode,
-          teamName: teamName,
-          KreditProduktif: Number(formData.value.KreditProduktif),
-          KreditKonsumtif: Number(formData.value.KreditKonsumtif),
-          Giro: Number(formData.value.DanaPihakKetiga), // DPK -> Giro
-          PenempatanAtauPeminjaman: Number(penempatanAtauPeminjamanValue),
-          Asuransi: formData.value.Asuransi,
-          KartuKredit: formData.value.KartuKredit,
-          Bintang: formData.value.Bintang,
-        };
-
-        const response = await axios.post(
-          "https://api-fastify-pi.vercel.app/round/input",
-          payload
-        );
-
-        console.log("Submit success:", response.data);
-        alert("Input success !");
-      } catch (error) {
-        console.error("Submit error:", error);
-        alert("Terjadi kesalahan: " + error.message);
-      } finally {
-        isLoading.value = false;
+      if (!gameCode || !teamName) {
+        throw new Error("gameCode atau teamName tidak ditemukan di localStorage");
       }
-    };
+
+      // Tentukan mana yang dipakai => Penempatan / Peminjaman
+      let penempatanAtauPeminjamanValue = 0;
+      if (isPenempatanEnabled.value) {
+        penempatanAtauPeminjamanValue = Number(formData.value.PenempatanPusat) || 0;
+      } else if (isPeminjamanEnabled.value) {
+        penempatanAtauPeminjamanValue = Number(formData.value.PinjamPusat) || 0;
+      }
+
+      // 🔹 Buat payload dengan memastikan semua angka dikonversi ke Number
+      const payload = {
+        gameCode: gameCode,
+        teamName: teamName,
+        KreditProduktif: Number(formData.value.KreditProduktif) || 0,
+        KreditKonsumtif: Number(formData.value.KreditKonsumtif) || 0,
+        Giro: Number(formData.value.DanaPihakKetiga) || 0, // DPK -> Giro
+        PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
+        Asuransi: Number(formData.value.Asuransi) || 0,
+        KartuKredit: Number(formData.value.KartuKredit) || 0,
+        Bintang: Number(formData.value.Bintang) || 0,
+      };
+
+      // 🔹 1. Kirim data ke endpoint /round/input
+      const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit round data. Try again!");
+      }
+
+      console.log("Submit success:", await response.json());
+
+      // 🔹 2. Setelah sukses, jalankan endpoint /round/count
+      const countResponse = await fetch("https://api-fastify-pi.vercel.app/round/count", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ gameCode, teamName }),
+      });
+
+      if (!countResponse.ok) {
+        throw new Error("Failed to count round. Try again!");
+      }
+
+      console.log("Round counted successfully:", await countResponse.json());
+
+      alert("Data successfully submitted and round counted!");
+
+      // 🔹 Reset form setelah submit
+      formData.value = {
+        KreditProduktif: "",
+        KreditKonsumtif: "",
+        PenempatanPusat: "",
+        Giro: "",
+        PinjamanPusat: "",
+        Asuransi: "",
+        KartuKredit: "",
+        Bintang: "",
+      };
+
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("Terjadi kesalahan: " + error.message);
+    } finally {
+      isLoading.value = false;
+    }
+};
+
+
 
     // Tombol kembali
     const goBack = () => {
