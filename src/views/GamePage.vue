@@ -156,7 +156,7 @@ export default {
     // Start game
     const startGame = async () => {
       try {
-        const response = await fetch("https://api-fastify-pi.vercel.app/round/add", {
+        const response = await fetch("https://api-fastify-pi.vercel.app/round/start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ gameCode: gameCode.value }),
