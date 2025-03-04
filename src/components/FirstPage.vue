@@ -21,10 +21,10 @@
       <!-- Pilihan Role (Admin, Strategic, Marketing) -->
       <div class="flex justify-center gap-x-8 mt-6 pt-4">
         <button @click="selectRole('Admin')" class="text-black text-sm font-medium hover:underline">Admin</button>
-        <button @click="selectRole('Strategic Facilitator')" class="text-black text-sm font-medium hover:underline">
+        <button @click="selectRole('Strategic')" class="text-black text-sm font-medium hover:underline">
           Strategic
         </button>
-        <button @click="selectRole('Marketing Facilitator')" class="text-black text-sm font-medium hover:underline">
+        <button @click="selectRole('Marketing')" class="text-black text-sm font-medium hover:underline">
           Marketing
         </button>
       </div>
@@ -100,9 +100,9 @@ export default {
       
       if (role === "Admin") {
         router.push("/admin"); // Admin ke halaman New Game
-      } else if (role === "Strategic Facilitator") {
+      } else if (role === "Strategic") {
         router.push("/Join"); // Strategic ke form input
-      } else if (role === "Marketing Facilitator") {
+      } else if (role === "Marketing") {
         router.push("/Join"); // Marketing ke form input
       }
     };
@@ -112,7 +112,7 @@ export default {
       const userRole = localStorage.getItem("userRole")?.trim();
       console.log("User Role:", userRole);
 
-      if (!userRole || (userRole !== "Player" && userRole !== "Strategic Facilitator" && userRole !== "Marketing Facilitator")) {
+      if (!userRole || (userRole !== "Player" && userRole !== "Strategic" && userRole !== "Marketing")) {
         alert("Invalid role. Please select a valid role before joining.");
         return;
       }
@@ -139,10 +139,10 @@ export default {
             case "Player":
               router.push({ path: "/player" });
               break;
-            case "Strategic Facilitator":
+            case "Strategic":
               router.push({ path: "/strategic" });
               break;
-            case "Marketing Facilitator":
+            case "Marketing":
               router.push({ path: "/marketing" });
               break;
             default:
