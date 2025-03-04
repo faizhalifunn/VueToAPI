@@ -101,9 +101,9 @@ export default {
       if (role === "Admin") {
         router.push("/admin"); // Admin ke halaman New Game
       } else if (role === "Strategic Facilitator") {
-        router.push("/strategic"); // Strategic ke form input
+        router.push("/Join"); // Strategic ke form input
       } else if (role === "Marketing Facilitator") {
-        router.push("/marketing"); // Marketing ke form input
+        router.push("/Join"); // Marketing ke form input
       }
     };
 

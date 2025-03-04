@@ -53,7 +53,7 @@
       <div class="flex justify-evenly gap-3 py-2 text-gray-600">
         <select v-model="selectedMilestone" class="p-3 rounded-lg bg-gray-100 border border-gray-400 shadow-sm">
           <option value="" disabled>Select this round Milestone</option>
-          <option value="no milestone">No Milestone</option>
+          <option value="No_Milestone">No Milestone</option>
           <option v-for="milestone in milestones" :key="milestone.id" :value="milestone.id">
             {{ milestone.note }}
           </option>
@@ -61,7 +61,7 @@
 
         <select v-model="selectedForecast" class="p-3 rounded-lg bg-gray-100 border border-gray-400 shadow-sm">
           <option value="" disabled>Select this round Forecast</option>
-          <option value="no forecast">No Forecast</option>
+          <option value="No_Forecast">No Forecast</option>
           <option v-for="forecast in forecasts" :key="forecast.id" :value="forecast.id">
             {{ forecast.note }}
           </option>
@@ -72,13 +72,19 @@
       <!-- Buttons -->
       <div class="flex justify-center space-x-4 mt-4 pt-5 gap-10">
         <!-- END ROUND -->
-        <button @click="confirmEndRound" :disabled="isProcessing" class="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+        <button 
+          @click="confirmEndRound" 
+          :disabled="isProcessing" 
+          class="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed">
           <span v-if="isProcessing" class="loading-spinner mr-2"></span>
           <span>{{ isProcessing ? "Processing..." : "END ROUND" }}</span>
         </button>
 
         <!-- END GAME -->
-        <button @click="confirmEndGame" :disabled="isProcessing" class="text-white px-6 bg-red-900 py-2 rounded-lg font-medium hover:bg-gray-600 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+        <button 
+          @click="confirmEndGame" 
+          :disabled="isProcessing" 
+          class="text-white px-6 bg-red-900 py-2 rounded-lg font-medium hover:bg-gray-600 transition flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed">
           <span v-if="isProcessing" class="loading-spinner mr-2"></span>
           <span>{{ isProcessing ? "Processing..." : "END GAME" }}</span>
         </button>
@@ -152,6 +158,7 @@ export default {
       }
 
       try {
+        isProcessing.value = true; // 🚀 Prevent spam click
         const response = await fetch("https://api-fastify-pi.vercel.app/round/setround", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -166,13 +173,21 @@ export default {
       } catch (error) {
         console.error("Error setting round:", error);
         return false;
+      } finally {
+        isProcessing.value = false; // ✅ Enable button after request
       }
     };
 
     // 🔹 END ROUND
     const confirmEndRound = async () => {
       if (await setRound()) {
-        await fetch("https://api-fastify-pi.vercel.app/round/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gameCode }) });
+        isProcessing.value = true; // 🚀 Prevent spam click
+        await fetch("https://api-fastify-pi.vercel.app/round/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gameCode })
+        });
+        isProcessing.value = false; // ✅ Enable button after request
         location.reload();
       }
     };
@@ -180,7 +195,13 @@ export default {
     // 🔹 END GAME
     const confirmEndGame = async () => {
       if (await setRound()) {
-        await fetch("https://api-fastify-pi.vercel.app/Game/End", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gameCode }) });
+        isProcessing.value = true; // 🚀 Prevent spam click
+        await fetch("https://api-fastify-pi.vercel.app/Game/End", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ gameCode })
+        });
+        isProcessing.value = false; // ✅ Enable button after request
         router.push("/endResult");
       }
     };
@@ -190,7 +211,21 @@ export default {
       fetchDropdownData();
     });
 
-    return { round, sortedLeaderboard: computed(() => leaderboard.value), formatNumber: (num) => num || 0, goBack, isProcessing, isRefreshing, confirmEndRound, confirmEndGame, selectedMilestone, selectedForecast, milestones, forecasts, gameCode };
+    return {
+      round,
+      sortedLeaderboard: computed(() => leaderboard.value),
+      formatNumber: (num) => num || 0,
+      goBack,
+      isProcessing,
+      isRefreshing,
+      confirmEndRound,
+      confirmEndGame,
+      selectedMilestone,
+      selectedForecast,
+      milestones,
+      forecasts,
+      gameCode
+    };
   },
 };
 </script>
