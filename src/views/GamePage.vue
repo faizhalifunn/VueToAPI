@@ -1,195 +1,229 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-gray-900">
-    <div class="bg-gray-100 rounded-2xl shadow-md p-8 w-full max-w-md">
-      <!-- Jika data belum terambil, tampilkan spinner -->
-      <div v-if="!isDataLoaded" class="flex justify-center items-center h-full">
-        <div class="loading-spinner"></div>
+  <div class="h-screen flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-2xl shadow-md p-8 w-full max-w-lg text-neutral-800 relative">
+      <h1 class="text-xl font-bold text-center mb-4">Game Created!</h1>
+
+      <!-- Game Code Display -->
+      <div class="bg-black text-white text-center py-2 rounded-lg mb-6">
+        <span class="text-lg font-bold">{{ gameCode }}</span>
       </div>
 
-      <!-- Jika data sudah terambil, tampilkan form -->
-      <div v-else>
-        <!-- Judul -->
-        <h1 class="text-xl font-bold text-center mb-4 text-black">Game Created!</h1>
-
-        <!-- Game Code -->
-        <div class="bg-black text-white text-center py-2 rounded-lg mb-6">
-          <span class="text-lg font-bold">{{ gameCode }}</span>
-        </div>
-
-        <!-- Form Judul -->
-        <h2 class="text-lg font-bold text-center mb-6 text-black">Setel Bunga</h2>
-
-        <!-- Input Form -->
-        <form @submit.prevent="handleSubmit" class="grid grid-cols-1 gap-y-2">
-          <div
-            v-for="(label, index) in bungaData"
-            :key="index"
-            class="grid grid-cols-[1fr_auto_auto] items-center gap-x-4"
-          >
-            <!-- Label -->
-            <span class="text-gray-700 text-sm font-medium">{{ label }}</span>
-            <!-- Input -->
-            <input
-              v-model="form[index]"
-              type="number"
-              class="w-24 h-10 p-4 border border-gray-300 rounded-lg text-center text-lg text-gray-600 bg-gray-50 shadow-sm"
-              min="0"
-              max="100"
-              required
-            />
-            <!-- Simbol % -->
-            <span class="text-gray-700 text-sm font-medium">%</span>
+      <!-- Forecast & Milestone Panels -->
+      <div class="mb-6">
+        <div class="flex space-x-4">
+          <div class="flex-1">
+            <h2 class="text-lg font-semibold mb-2">Forecast</h2>
+            <div v-for="(item, idx) in forecastRounds" :key="idx" class="mb-2">
+              <label class="text-sm">Round {{ idx + 1 }}</label>
+              <input v-model="item.value" type="text" placeholder="Forecast..." class="w-full border px-3 py-2 rounded" />
+            </div>
           </div>
+          <div class="flex-1">
+            <h2 class="text-lg font-semibold mb-2">Milestone</h2>
+            <div v-for="(item, idx) in milestoneRounds" :key="idx" class="mb-2">
+              <label class="text-sm">Round {{ idx + 1 }}</label>
+              <input v-model="item.value" type="text" placeholder="Milestone..." class="w-full border px-3 py-2 rounded" />
+            </div>
+          </div>
+        </div>
+        <div class="flex space-x-2 mt-4">
+          <button @click="removeRound" :disabled="forecastRounds.length <= 1" class="flex-1 bg-red-300 py-2 rounded disabled:opacity-50">-</button>
+          <button @click="addRound" class="flex-1 bg-green-300 py-2 rounded">+</button>
+        </div>
+      </div>
 
-          <!-- Tombol Submit -->
-          <button
-            type="submit"
-            :disabled="isProcessing"
-            class="mt-8 w-full text-white bg-black hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-3 text-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-            <span>{{ isProcessing ? "Processing..." : "Submit & Start Game" }}</span>
-          </button>
-        </form>
+      <!-- Submit & Confirm -->
+      <button @click="openConfirm" :disabled="isProcessing" class="w-full bg-black text-white py-3 rounded hover:bg-gray-800 disabled:opacity-50">
+        <span v-if="isProcessing">Processing...</span>
+        <span v-else>Submit &amp; Start Game</span>
+      </button>
+
+      <!-- Confirmation Modal -->
+      <div v-if="showConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+          <h2 class="text-lg font-semibold mb-4 text-center">Confirm Submit</h2>
+          <p class="mb-6 text-center">Submit interest before starting the game?</p>
+          <div class="flex justify-between">
+            <button @click="cancelConfirm" class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+            <button @click="openInterestForm" class="px-4 py-2 bg-blue-600 text-white rounded">Yes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interest Form Modal -->
+      <div v-if="showInterest" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+          <h2 class="text-lg font-semibold mb-4 text-center">Submit Interest</h2>
+          <div class="space-y-4">
+            <div>
+              <label>ConInterest (Bunga Konsumtif)</label>
+              <input
+                v-model.number="interest.conInterest"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                class="w-full border px-3 py-2 rounded"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label>ProInterest (Bunga Produktif)</label>
+              <input
+                v-model.number="interest.proInterest"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                class="w-full border px-3 py-2 rounded"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label>HeadInterest (Bunga Kantor Pusat)</label>
+              <input
+                v-model.number="interest.headInterest"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                class="w-full border px-3 py-2 rounded"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label>OutInterest (Bunga Pihak Ketiga)</label>
+              <input
+                v-model.number="interest.outInterest"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                class="w-full border px-3 py-2 rounded"
+                placeholder="0"
+              />
+            </div>
+          </div>
+          <div class="flex justify-end mt-4">
+            <button @click="cancelInterest" class="mr-2 px-4 py-2 bg-gray-300 rounded">Cancel</button>
+            <button @click="submitInterest" :disabled="isProcessing" class="px-4 py-2 bg-green-600 text-white rounded">Submit</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-
+import axios from 'axios';
 export default {
-  name: "GamePage",
-  setup() {
-    const router = useRouter();
-    const gameCode = ref("");
-    const isProcessing = ref(false);
-    const isDataLoaded = ref(false); // Tambahkan state untuk memastikan data terambil
-    const bungaData = [
-      "Bunga Kredit Produktif",
-      "Bunga Kredit Konsumtif",
-      "Bunga Dana Pihak Ketiga",
-      "Bunga Kantor Pusat",
-    ];
-    const form = ref([0, 0, 0, 0]); // Nilai default diisi dengan 0
-
-    // Fetch gameCode dari LocalStorage
-    const fetchGameCode = async () => {
-      const storedGameCode = localStorage.getItem("gameCode");
-      if (storedGameCode) {
-        gameCode.value = storedGameCode;
-        await fetchGameData(storedGameCode); // Fetch data game
-      } else {
-        router.push("/"); // Redirect jika tidak ada gameCode
-      }
+  name: 'GameCreatedModal',
+  data() {
+    return {
+      gameCode: '',
+      forecastRounds: [{ value: '' }, { value: '' }],
+      milestoneRounds: [{ value: '' }, { value: '' }],
+      interest: { conInterest: 0, proInterest: 0, headInterest: 0, outInterest: 0 },
+      isProcessing: false,
+      showConfirm: false,
+      showInterest: false
     };
-
-    // Fetch data game dari API
-    const fetchGameData = async (code) => {
+  },
+  mounted() {
+    const code = localStorage.getItem('gameCode');
+    if (code) this.gameCode = code;
+    else alert('gameCode not found');
+  },
+  methods: {
+    addRound() {
+      this.forecastRounds.push({ value: '' });
+      this.milestoneRounds.push({ value: '' });
+    },
+    removeRound() {
+      if (this.forecastRounds.length > 1) {
+        this.forecastRounds.pop();
+        this.milestoneRounds.pop();
+      }
+    },
+    openConfirm() {
+      this.showConfirm = true;
+    },
+    cancelConfirm() {
+      this.showConfirm = false;
+    },
+    openInterestForm() {
+      this.showConfirm = false;
+      this.showInterest = true;
+    },
+    cancelInterest() {
+      this.showInterest = false;
+    },
+    async submitInterest() {
+      this.isProcessing = true;
       try {
-        const response = await fetch(`https://api-fastify-pi.vercel.app/game/getgame/${code}`);
-        const result = await response.json();
-
-        if (result.message === "Game retrieved successfully") {
-          const gameData = result.data.gameData;
-
-          // Set nilai bunga dari data API
-          form.value = [
-            gameData.ProInterest || 0,
-            gameData.ConInterest || 0,
-            gameData.OutInterest || 0,
-            gameData.HeadInterest || 0,
-          ];
-
-          isDataLoaded.value = true; // Set data sebagai sudah terambil
-        } else {
-          alert("Failed to retrieve game data. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error fetching game data:", error);
-        alert("An error occurred while fetching game data.");
-      }
-    };
-
-    // Fungsi Submit & Start Game
-    const handleSubmit = async () => {
-      if (isProcessing.value) return;
-
-      isProcessing.value = true;
-
-      const interestSubmitted = await submitInterest(); // Submit interest
-      if (interestSubmitted) {
-        const gameStarted = await startGame(); // Start game
-        if (gameStarted) {
-          router.push({ name: "Adminpage", params: { gameCode: gameCode.value } }); // Redirect ke AdminPage
-        }
-      }
-
-      isProcessing.value = false;
-    };
-
-    // Submit bunga data
-    const submitInterest = async () => {
-      try {
-        const response = await fetch("https://api-fastify-pi.vercel.app/game/addinterest", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            gameCode: gameCode.value,
-            ProInterest: form.value[0],
-            ConInterest: form.value[1],
-            OutInterest: form.value[2],
-            HeadInterest: form.value[3],
-          }),
+        await axios.post('https://api-fastify-pi.vercel.app/game/addinterest', {
+          gameCode: this.gameCode,
+          ConInterest: this.interest.conInterest,
+          ProInterest: this.interest.proInterest,
+          HeadInterest: this.interest.headInterest,
+          OutInterest: this.interest.outInterest
         });
-        return response.ok;
-      } catch (error) {
-        console.error("Error submitting interest:", error);
-        return false;
+        this.showInterest = false;
+        await this.submitData();
+      } catch (e) {
+        console.error(e);
+        alert('Error submitting interest');
+      } finally {
+        this.isProcessing = false;
       }
-    };
-
-    // Start game
-    const startGame = async () => {
+    },
+    async submitData() {
+      this.isProcessing = true;
+      const fp = {};
+      this.forecastRounds.forEach((item, idx) => {
+        if (item.value.trim()) fp[`Round ${idx + 1}`] = item.value.trim();
+      });
+      const mp = {};
+      this.milestoneRounds.forEach((item, idx) => {
+        if (item.value.trim()) mp[`Round ${idx + 1}`] = item.value.trim();
+      });
+      try {
+        const requests = [];
+        if (Object.keys(fp).length) {
+          requests.push(
+            axios.post('https://api-fastify-pi.vercel.app/game/addforecast', { gameCode: this.gameCode, ...fp })
+          );
+        }
+        if (Object.keys(mp).length) {
+          requests.push(
+            axios.post('https://api-fastify-pi.vercel.app/game/addmilestone', { gameCode: this.gameCode, ...mp })
+          );
+        }
+        await Promise.all(requests);
+        const roundStarted = await this.startGame();
+        if (!roundStarted) throw new Error('Failed to start round');
+        // Redirect to leaderboard route using path
+        this.$router.push({ path: `/admin/${this.gameCode}` });
+      } catch (e) {
+        console.error(e);
+        alert('Error: ' + (e.message || 'Unknown'));
+      } finally {
+        this.isProcessing = false;
+      }
+    },
+    async startGame() {
       try {
         const response = await fetch("https://api-fastify-pi.vercel.app/round/start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gameCode: gameCode.value }),
+          body: JSON.stringify({ gameCode: this.gameCode }),
         });
         return response.ok;
       } catch (error) {
         console.error("Error starting the game:", error);
         return false;
       }
-    };
-
-    onMounted(() => {
-      fetchGameCode();
-    });
-
-    return { gameCode, bungaData, form, isProcessing, isDataLoaded, handleSubmit };
-  },
+    }
+  }
 };
 </script>
 
 <style>
-.loading-spinner {
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* No extra styles */
 </style>

@@ -22,7 +22,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import CreateGameButton from '../components/CreateGameButton.vue';
 import GamePage from '../views/GamePage.vue';
-import Adminpage from '../components/AdminControlPage.vue'
+import Adminpage from '../components/LeaderboardPage.vue'
 import JoinGame from '../components/JoinGame.vue';
 import First from '../components/FirstPage.vue';
 import CreateTeam from '../components/CreateTeam.vue';
@@ -31,6 +31,7 @@ import PlayerWait from '@/views/PlayerWait.vue';
 import Strategic from '../components/StrategicPage.vue';
 import Marketing from '../components/MarketingPage.vue';
 import Result from '../components/EndResult.vue';
+import Chart from '../components/LeaderboardChart.vue';
 
 const routes = [
   {

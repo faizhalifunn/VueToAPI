@@ -11,7 +11,7 @@
     <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-md">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Upgrade</h2>
-        <h2 class="text-2xl font-bold">Round {{ currentRound }}</h2>
+        <h2 class="text-2xl font-bold">{{ currentRound }}</h2>
       </div>
 
       <!-- Select Team -->
