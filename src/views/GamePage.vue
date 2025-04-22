@@ -157,6 +157,7 @@ export default {
     async submitInterest() {
       this.isProcessing = true;
       try {
+        // 1) Submit interest data
         await axios.post('https://api-fastify-pi.vercel.app/game/addinterest', {
           gameCode: this.gameCode,
           ConInterest: this.interest.conInterest,
@@ -164,11 +165,19 @@ export default {
           HeadInterest: this.interest.headInterest,
           OutInterest: this.interest.outInterest
         });
+
+        // 2) Start the game only after interest is submitted
+        const started = await this.startGame();
+        if (!started) {
+          throw new Error('Gagal memulai game setelah submit interest');
+        }
+
+        // 3) Close interest modal and proceed to submit forecast & milestone
         this.showInterest = false;
         await this.submitData();
       } catch (e) {
         console.error(e);
-        alert('Error submitting interest');
+        alert('Error: ' + (e.message || 'Unknown'));
       } finally {
         this.isProcessing = false;
       }
@@ -196,9 +205,7 @@ export default {
           );
         }
         await Promise.all(requests);
-        const roundStarted = await this.startGame();
-        if (!roundStarted) throw new Error('Failed to start round');
-        // Redirect to leaderboard route using path
+        // Redirect to leaderboard route
         this.$router.push({ path: `/admin/${this.gameCode}` });
       } catch (e) {
         console.error(e);
@@ -209,14 +216,14 @@ export default {
     },
     async startGame() {
       try {
-        const response = await fetch("https://api-fastify-pi.vercel.app/round/start", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('https://api-fastify-pi.vercel.app/round/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ gameCode: this.gameCode }),
         });
         return response.ok;
       } catch (error) {
-        console.error("Error starting the game:", error);
+        console.error('Error starting the game:', error);
         return false;
       }
     }
