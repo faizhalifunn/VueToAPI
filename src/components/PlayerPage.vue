@@ -155,7 +155,7 @@ export default {
       Asuransi: "",
       DanaPihakKetiga: 0, // ini akan menjadi Giro di payload
       PenempatanPusat: 0, // input Penempatan Pusat
-      PinjamPusat: 0,     // input Peminjaman Pusat
+      PeminjamanPusat: 0,     // input Peminjaman Pusat
       Bintang: "",
     });
 
