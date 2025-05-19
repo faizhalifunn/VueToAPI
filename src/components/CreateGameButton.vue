@@ -127,7 +127,7 @@ export default {
           } else if (status === "Waiting") {
             router.push({ name: "GamePage", params: { gameCode } });
           } else {
-            alert("Unknown game status. Please try again.");
+            alert("This game has already ended. You can create or join a new one to continue playing.");
           }
         } else {
           alert("Game not found. Please check the game code and try again.");

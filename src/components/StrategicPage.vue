@@ -1,12 +1,12 @@
 <template>
   <div class="h-screen flex items-center justify-center bg-black text-gray-800">
     <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-md">
-      <!-- Header: Round Now dan Game Code -->
+      <!-- Header -->
       <div class="flex justify-center items-center mb-4">
-  <h1 class="text-3xl font-bold">Strategic</h1>
-</div>
+        <h1 class="text-3xl font-bold">Strategic</h1>
+      </div>
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">{{ currentRound }}</h2>
+        <h2 class="text-2xl font-bold">Round {{ currentRound }}</h2>
         <span class="text-xl font-bold">{{ gameCode }}</span>
       </div>
 
@@ -14,12 +14,16 @@
       <div class="mb-4">
         <label class="text-sm font-semibold">Select Team</label>
         <select v-model="selectedTeam" class="w-full p-2 border rounded-lg bg-white">
-          <option value="">None</option>
-          <option v-for="team in teams" :key="team" :value="team">{{ team }}</option>
+          <option disabled value="">
+            {{ teams.length === 0 ? "Loading teams..." : "Select Team" }}
+          </option>
+          <option v-for="team in teams" :key="team" :value="team">
+            {{ team }} {{ submittedTeams.includes(team) ? "(submitted)" : "" }}
+          </option>
         </select>
       </div>
 
-      <!-- Hire Employee -->
+      <!-- Hire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Hire</label>
         <select v-model="selectedHire" class="w-full p-2 border rounded-lg bg-white">
@@ -30,7 +34,7 @@
         </select>
       </div>
 
-      <!-- Train Employee -->
+      <!-- Train -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Train</label>
         <select v-model="selectedTrain" class="w-full p-2 border rounded-lg bg-white">
@@ -41,7 +45,7 @@
         </select>
       </div>
 
-      <!-- Fire Employee -->
+      <!-- Fire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Fire</label>
         <select v-model="selectedFire" class="w-full p-2 border rounded-lg bg-white">
@@ -52,7 +56,7 @@
         </select>
       </div>
 
-      <!-- Submit Button with Loading Animation -->
+      <!-- Submit Button -->
       <div class="mt-6 flex justify-center py-2">
         <button
           @click="submitActions"
@@ -75,6 +79,7 @@ export default {
   setup() {
     const currentRound = ref("Loading...");
     const teams = ref([]);
+    const submittedTeams = ref([]);
     const hireEmployees = ref([]);
     const trainEmployees = ref([]);
     const fireEmployees = ref([]);
@@ -85,44 +90,58 @@ export default {
     const isLoading = ref(false);
     const gameCode = ref(localStorage.getItem("gameCode") || "");
 
-    // ✅ Fetch Round Now
     const fetchRoundNow = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode.value}`
         );
-        const data = await response.json();
+        const data = await res.json();
         currentRound.value = data.rounds?.[0]?.round || "Unknown";
-      } catch (error) {
-        console.error("Error fetching round:", error);
+      } catch (err) {
+        console.error("Error fetching round:", err);
       }
     };
 
-    // ✅ Fetch Team Names
     const fetchTeams = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           `https://api-fastify-pi.vercel.app/team/getteamnames?gameCode=${gameCode.value}`
         );
-        const data = await response.json();
-        teams.value = data || [];
-      } catch (error) {
-        console.error("Error fetching teams:", error);
+        const data = await res.json();
+        teams.value = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.error("Error fetching teams:", err);
       }
     };
 
-    // ✅ Fetch Employees (Level 1 for Hire)
+    const checkSubmittedTeamsManually = async () => {
+      submittedTeams.value = [];
+      const roundNum = typeof currentRound.value === 'string' ? currentRound.value.match(/\d+/)?.[0] : currentRound.value;
+      for (const team of teams.value) {
+        try {
+          const res = await fetch(
+            `https://firestore.googleapis.com/v1/projects/boardtest-48f8e/databases/(default)/documents/games/${gameCode.value}/${team}/Round ${roundNum}`
+          );
+          const data = await res.json();
+          if (!data.error) {
+            submittedTeams.value.push(team);
+          }
+        } catch (err) {
+          console.error(`Error checking team ${team}:`, err);
+        }
+      }
+    };
+
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("https://api-fastify-pi.vercel.app/game/getemployees");
-        const data = await response.json();
-        hireEmployees.value = data.employees.filter((emp) => emp.level === 1);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+        const res = await fetch(`https://api-fastify-pi.vercel.app/game/getemployees`);
+        const data = await res.json();
+        hireEmployees.value = data.employees.filter(emp => emp.level === 1);
+      } catch (err) {
+        console.error("Error fetching employees:", err);
       }
     };
 
-    // ✅ Fetch Employees for Train and Fire
     const fetchTeamEmployees = async () => {
       if (!selectedTeam.value) {
         trainEmployees.value = [];
@@ -130,26 +149,24 @@ export default {
         return;
       }
       try {
-        const response = await fetch(
+        const res = await fetch(
           `https://api-fastify-pi.vercel.app/team/getemployee?gameCode=${gameCode.value}&teamName=${selectedTeam.value}`
         );
-        const data = await response.json();
+        const data = await res.json();
         trainEmployees.value = data.employees || [];
         fireEmployees.value = data.employees || [];
-      } catch (error) {
-        console.error("Error fetching team employees:", error);
+      } catch (err) {
+        console.error("Error fetching team employees:", err);
       }
     };
 
-    // 🔄 Update Train and Fire Employees when selectedTeam changes
     watch(selectedTeam, fetchTeamEmployees);
 
-    // ✅ Submit Actions (Hire, Train & Fire) with Loading
     const submitActions = async () => {
       isLoading.value = true;
       try {
-        if (selectedHire.value && selectedHire.value !== "") {
-          await fetch("https://api-fastify-pi.vercel.app/team/hire", {
+        if (selectedHire.value) {
+          await fetch(`https://api-fastify-pi.vercel.app/team/hire`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -160,8 +177,8 @@ export default {
           });
         }
 
-        if (selectedTrain.value && selectedTrain.value !== "") {
-          await fetch("https://api-fastify-pi.vercel.app/team/promote", {
+        if (selectedTrain.value) {
+          await fetch(`https://api-fastify-pi.vercel.app/team/promote`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -172,8 +189,8 @@ export default {
           });
         }
 
-        if (selectedFire.value && selectedFire.value !== "") {
-          await fetch("https://api-fastify-pi.vercel.app/team/fireemployee", {
+        if (selectedFire.value) {
+          await fetch(`https://api-fastify-pi.vercel.app/team/fireemployee`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -184,26 +201,27 @@ export default {
           });
         }
 
-        alert("Actions successfully submitted!");
-      } catch (error) {
-        alert("Error submitting actions");
-        console.error(error);
+        alert("Actions submitted successfully!");
+      } catch (err) {
+        alert("Error submitting actions.");
+        console.error(err);
       } finally {
         isLoading.value = false;
-        window.location.reload(); // 🔄 Refresh halaman setelah selesai
+        window.location.reload();
       }
     };
 
-    // 🔄 Fetch all initial data
-    onMounted(() => {
-      fetchRoundNow();
-      fetchTeams();
-      fetchEmployees();
+    onMounted(async () => {
+      await fetchRoundNow();
+      await fetchTeams();
+      await fetchEmployees();
+      await checkSubmittedTeamsManually();
     });
 
     return {
       currentRound,
       teams,
+      submittedTeams,
       hireEmployees,
       trainEmployees,
       fireEmployees,
@@ -220,7 +238,6 @@ export default {
 </script>
 
 <style>
-/* 🔥 Animasi Loading Spinner */
 .loading-spinner {
   border: 3px solid white;
   border-top: 3px solid transparent;
@@ -232,7 +249,8 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

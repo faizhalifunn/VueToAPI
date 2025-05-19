@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex items-center justify-center bg-black relative text-gray-800">
-    <!-- 🔙 Tombol Back Berwarna Merah -->
+    <!-- 🔙 Tombol Back -->
     <button
       @click="goBack"
       class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
@@ -8,43 +8,60 @@
       ← Back
     </button>
 
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
+    <!-- Kotak Form -->
+    <div class="bg-gray-200 rounded-2xl shadow-md px-8 py-6 w-full max-w-3xl">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Upgrade</h2>
-        <h2 class="text-2xl font-bold">{{ currentRound }}</h2>
+        <h2 class="text-base font-medium text-gray-600">Round {{ currentRound }}</h2>
       </div>
 
-      <!-- Select Team -->
-      <div class="mb-4">
-        <label class="text-sm font-semibold">Select team</label>
-        <select v-model="selectedTeam" class="w-full p-2 border rounded-lg bg-white">
-          <option value="">Select Team</option>
-          <option v-for="team in teams" :key="team" :value="team">{{ team }}</option>
-        </select>
-      </div>
+      <!-- Form -->
+      <form @submit.prevent="submitUpgrade">
+        <!-- Blok Input -->
+        <div class="flex flex-col sm:flex-row gap-4 pb-4">
+          <!-- Select Team (Dropdown dari backend) -->
+          <div class="flex flex-col w-full sm:w-1/2">
+            <label class="text-sm font-semibold mb-1">Team Name</label>
+            <select
+              v-model="selectedTeam"
+              class="p-2 border rounded-lg bg-white w-full"
+            >
+              <option value="">Select Team</option>
+              <option
+                v-for="team in teams"
+                :key="team"
+                :value="team"
+              >
+                {{ team }}
+              </option>
+            </select>
+          </div>
 
-      <!-- Upgrade Facilities Cost -->
-      <div class="mb-4">
-        <label class="text-sm font-semibold">Upgrade Facility</label>
-        <input
-          v-model.number="upFacilitiesCost"
-          type="number"
-          placeholder="Upgrade Facility Cost"
-          class="w-full p-2 border rounded-lg bg-white"
-        />
-      </div>
+          <!-- Upgrade Cost -->
+          <div class="flex flex-col w-full sm:w-1/2">
+            <label class="text-sm font-semibold mb-1">Upgrade Facility</label>
+            <input
+              v-model.number="upFacilitiesCost"
+              type="number"
+              placeholder="Upgrade Facility Cost"
+              class="p-2 border rounded-lg bg-white w-full"
+            />
+          </div>
+        </div>
 
-      <!-- Submit Button -->
-      <div class="mt-6 flex justify-center py-4">
-        <button
-          @click="submitUpgrade"
-          class="bg-black text-white text-lg font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition flex items-center gap-2"
-          :disabled="isLoading || !selectedTeam"
-        >
-          <span v-if="isLoading" class="loading-spinner"></span>
-          <span>{{ isLoading ? "Processing..." : "Submit" }}</span>
-        </button>
-      </div>
+        <!-- Tombol Submit -->
+        <div class="flex justify-center mt-6">
+          <button
+            type="submit"
+            class="bg-black text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition flex items-center gap-2"
+            :disabled="isLoading || !selectedTeam"
+          >
+            <span v-if="isLoading" class="loading-spinner"></span>
+            <span>{{ isLoading ? 'Processing...' : 'Submit' }}</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -64,12 +81,10 @@ export default {
     const isLoading = ref(false);
     const gameCode = localStorage.getItem("gameCode");
 
-    // ✅ Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // ✅ Fetch Round Now
     const fetchRoundNow = async () => {
       try {
         const response = await fetch(
@@ -82,7 +97,6 @@ export default {
       }
     };
 
-    // ✅ Fetch Team Names
     const fetchTeams = async () => {
       try {
         const response = await fetch(
@@ -95,22 +109,22 @@ export default {
       }
     };
 
-    // ✅ Submit Upgrade Facilities Cost
     const submitUpgrade = async () => {
       if (!selectedTeam.value || upFacilitiesCost.value === null) {
         alert("Please select a team and enter the upgrade cost.");
         return;
       }
 
+      // Validasi tetap dilakukan (opsional karena pakai <select>)
+      const isTeamValid = teams.value.includes(selectedTeam.value);
+      if (!isTeamValid) {
+        alert("Invalid team name. Please select a valid team.");
+        return;
+      }
+
       isLoading.value = true;
 
       try {
-        console.log("Submitting upgrade with data:", {
-          gameCode,
-          teamName: selectedTeam.value,
-          upFacilitiesCost: upFacilitiesCost.value,
-        });
-
         const response = await fetch("https://api-fastify-pi.vercel.app/team/upfacility", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -122,8 +136,6 @@ export default {
         });
 
         const result = await response.json();
-        console.log("API Response:", result);
-
         if (!response.ok) {
           throw new Error(result.message || "Failed to submit upgrade.");
         }
@@ -137,7 +149,6 @@ export default {
       }
     };
 
-    // 🔄 Fetch data saat halaman dimuat
     onMounted(() => {
       fetchRoundNow();
       fetchTeams();
@@ -157,7 +168,6 @@ export default {
 </script>
 
 <style>
-/* 🔥 Animasi Loading Spinner */
 .loading-spinner {
   border: 3px solid white;
   border-top: 3px solid transparent;

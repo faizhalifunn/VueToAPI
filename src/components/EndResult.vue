@@ -18,10 +18,7 @@
       <div class="flex overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20">
         <button
           @click="activeTab = 'summary'"
-          :class="[
-            'px-4 py-2 font-medium rounded-t-lg mr-1',
-            activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400'
-          ]"
+          :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
         >
           End Summary
         </button>
@@ -30,10 +27,7 @@
           v-for="round in availableRounds"
           :key="round"
           @click="activeTab = round"
-          :class="[
-            'px-4 py-2 font-medium rounded-t-lg mr-1',
-            activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400'
-          ]"
+          :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
         >
           {{ round }}
         </button>
@@ -41,7 +35,6 @@
 
       <!-- Summary Content -->
       <div v-if="activeTab === 'summary'">
-        <!-- Table -->
         <div class="border-t border-black">
           <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
             <span>Rank</span>
@@ -57,7 +50,7 @@
             class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 items-center py-2 border-b border-black text-center"
           >
             <span class="font-semibold">{{ index + 1 }}</span>
-            <span class="font-medium">{{ team.team || "N/A" }}</span>
+            <span class="font-medium">{{ team.team || 'N/A' }}</span>
             <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionPoint) }}</span>
             <span class="font-mono">{{ formatNumber(team.endResult.TotalBintang) }}</span>
             <span class="font-mono font-bold">{{ formatNumber(team.endResult.TotalScore) }}</span>
@@ -72,43 +65,72 @@
 
       <!-- Round Details -->
       <div v-else-if="gameData" class="max-h-screen overflow-y-auto">
-        <div
-          v-for="(teamData, teamName) in teamRoundData"
-          :key="teamName"
-          class="mb-8"
-        >
-          <!-- Sticky & top-14 dihapus di sini -->
-          <h3 class="text-xl font-bold bg-gray-300 p-2 rounded mb-4">
+        <div v-for="(teamData, teamName) in teamRoundData" :key="teamName" class="mb-8">
+          <h3 class="text-xl font-bold bg-gray-300 p-2 rounded mb-2">
             {{ teamName }}
           </h3>
 
+          <!-- Interest + Biaya + Bintang Table -->
           <div class="overflow-x-auto mb-4 rounded shadow">
             <table class="w-full border-collapse bg-white">
               <thead>
                 <tr>
-                  <th
-                    v-for="(_, key) in getFinancialMetrics(teamData)"
-                    :key="key"
-                    class="p-2 border border-gray-400 text-left bg-gray-100 whitespace-nowrap"
-                  >
-                    {{ formatMetricName(key) }}
-                  </th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Pro Interest</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Con Interest</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Head Interest</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Out Interest</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Promote Cost</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Up Facilities Cost</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Bintang</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td
-                    v-for="(value, key) in getFinancialMetrics(teamData)"
-                    :key="key"
-                    class="p-2 border border-gray-400 whitespace-nowrap"
-                  >
-                    {{ formatValue(value, key) }}
-                  </td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.ProInterest) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.ConInterest) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.HeadInterest) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.OutInterest) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PromoteCost) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.UpFacilitiesCost) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.TotalBintang) }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
+          <!-- Keuangan Table -->
+          <div class="overflow-x-auto mb-4 rounded shadow">
+            <table class="w-full border-collapse bg-white">
+              <thead>
+                <tr>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Asuransi</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Kredit Produktif</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Pinjaman Pusat</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Kredit Konsumtif</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Kartu Kredit</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Pendapatan Fee Based</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Total Salary</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Giro</th>
+                  <th class="p-2 border border-gray-400 bg-gray-100">Penempatan Pusat</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.Asuransi) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KreditProduktif) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PinjamanPusat) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KreditKonsumtif) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KartuKredit) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.TotalSalary) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.Giro) }}</td>
+                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PenempatanPusat) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Employees Table -->
           <div v-if="teamData.Employees" class="mb-4">
             <h4 class="font-semibold mb-2 bg-gray-100 p-2 rounded">Employees</h4>
             <div class="overflow-x-auto rounded shadow">
@@ -144,13 +166,12 @@
           @click="exportToExcel"
           class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
         >
-          📥 Export to Excel
+          📅 Export to Excel
         </button>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
