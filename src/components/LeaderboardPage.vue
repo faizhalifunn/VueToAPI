@@ -215,223 +215,203 @@
 }
 </style>
 
-<script>
+<script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
 
-export default {
-  name: 'AdminControlPage',
-  setup() {
-    const router = useRouter();
-    const round = ref(1);
-    const leaderboard = ref([]);
-    const isProcessing = ref(false);
-    const isRefreshing = ref(true);
-    const gameCode = localStorage.getItem('gameCode');
-    const chartCanvas = ref(null);
-    let chartInstance = null;
-    const isChartLoading = ref(true);
-    const hasChartData = ref(false);
+const router = useRouter();
+const round = ref(1);
+const leaderboard = ref([]);
+const isProcessing = ref(false);
+const isRefreshing = ref(true);
+const gameCode = localStorage.getItem('gameCode');
+const chartCanvas = ref(null);
+let chartInstance = null;
+const isChartLoading = ref(true);
+isChartLoading.value = true;
+const hasChartData = ref(false);
 
-    const showConfirmEndRoundModal = ref(false);
-    const showConfirmEndGameModal = ref(false);
-    const showInterestFormModal = ref(false);
+const showConfirmEndRoundModal = ref(false);
+const showConfirmEndGameModal = ref(false);
+const showInterestFormModal = ref(false);
 
-    const interest = ref({
-      gameCode,
-      ConInterest: null,
-      ProInterest: null,
-      HeadInterest: null,
-      OutInterest: null,
-    });
+const interest = ref({
+  gameCode,
+  ConInterest: null,
+  ProInterest: null,
+  HeadInterest: null,
+  OutInterest: null,
+});
 
-    const goBack = () => router.go(-1);
+const goBack = () => router.go(-1);
 
-    const fetchRoundData = async () => {
-      if (!gameCode) return;
-      try {
-        const res = await fetch(`https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode}`);
-        const data = await res.json();
-        if (data.message === 'Highest rounds retrieved successfully.') {
-          round.value = data.rounds[0]?.round || 1;
-          leaderboard.value = data.rounds;
-        }
-      } catch (err) {
-        console.error('❌ Error fetchRoundData:', err);
-      } finally {
-        isRefreshing.value = false;
-      }
-    };
-
-    const openInterestForm = () => {
-      showConfirmEndRoundModal.value = false;
-      showInterestFormModal.value = true;
-    };
-
-    const submitInterest = async () => {
-      const { ConInterest, ProInterest, HeadInterest, OutInterest } = interest.value;
-      if (
-        ConInterest < 0 || ProInterest < 0 || HeadInterest < 0 || OutInterest < 0
-      ) {
-        alert("Nilai bunga tidak boleh negatif.");
-        return;
-      }
-      isProcessing.value = true;
-      try {
-        await fetch('https://api-fastify-pi.vercel.app/game/addinterest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(interest.value),
-        });
-        showInterestFormModal.value = false;
-        await confirmEndRound();
-      } catch (err) {
-        console.error('❌ Error submitInterest:', err);
-      } finally {
-        isProcessing.value = false;
-      }
-    };
-
-    const confirmEndRound = async () => {
-      isProcessing.value = true;
-      try {
-        await fetch('https://api-fastify-pi.vercel.app/round/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gameCode }),
-        });
-        location.reload();
-      } catch (err) {
-        console.error('❌ Error confirmEndRound:', err);
-      } finally {
-        isProcessing.value = false;
-      }
-    };
-
-    const confirmEndGame = async () => {
-      isProcessing.value = true;
-      try {
-        await fetch('https://api-fastify-pi.vercel.app/Game/End', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gameCode }),
-        });
-        router.push('/endResult');
-      } catch (err) {
-        console.error('❌ Error confirmEndGame:', err);
-      } finally {
-        isProcessing.value = false;
-      }
-    };
-
-    const closeModals = () => {
-      showConfirmEndRoundModal.value = false;
-      showConfirmEndGameModal.value = false;
-      showInterestFormModal.value = false;
-    };
-
-    const fetchChartData = async () => {
-      try {
-        const res = await fetch(`https://api-fastify-pi.vercel.app/game/result?gameCode=${gameCode}`);
-        const data = await res.json();
-        console.log("📦 DATA TEAMS:", data.teams);
-
-        const valid = data.message === 'End result retrieved successfully.' &&
-                      data.teams.length &&
-                      data.teams[0].rounds?.length;
-
-        if (valid) {
-          hasChartData.value = true;
-          await nextTick();
-          renderChart(data.teams);
-        } else {
-          console.warn("❌ Tidak ada data yang valid untuk chart");
-        }
-      } catch (err) {
-        console.error("❌ Error fetchChartData:", err);
-      } finally {
-        isChartLoading.value = false;
-      }
-    };
-
-    const renderChart = (teams) => {
-      console.log("🎯 chartCanvas.value =", chartCanvas.value);
-      if (!teams.length || !teams[0].rounds || !teams[0].rounds.length) {
-        console.warn("❌ Tidak ada data rounds valid untuk chart.");
-        return;
-      }
-      if (!chartCanvas.value) {
-        console.error("❌ Canvas belum tersedia!");
-        return;
-      }
-      if (chartInstance) chartInstance.destroy();
-
-      const ctx = chartCanvas.value.getContext('2d');
-      const datasets = teams.map(t => ({
-        label: t.team,
-        data: t.rounds.map(r => Number(r.ContributionPoint) || 0),
-        borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
-        fill: false,
-        tension: 0.3,
-      }));
-
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: teams[0]?.rounds.map(r => r.round) || [],
-          datasets,
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: true },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: { display: true, text: 'Contribution Points' },
-            },
-            x: {
-              title: { display: true, text: 'Rounds' },
-            },
-          },
-        },
-      });
-
-      console.log("✅ Chart berhasil dirender!");
-    };
-
-    onMounted(() => {
-      fetchRoundData();
-      fetchChartData();
-    });
-
-    onBeforeUnmount(() => {
-      if (chartInstance) chartInstance.destroy();
-    });
-
-    return {
-      hasChartData,
-      round,
-      sortedLeaderboard: computed(() => leaderboard.value),
-      formatNumber: num => num || 0,
-      goBack,
-      isProcessing,
-      isRefreshing,
-      showConfirmEndRoundModal,
-      showConfirmEndGameModal,
-      showInterestFormModal,
-      openInterestForm,
-      submitInterest,
-      confirmEndGame,
-      closeModals,
-      interest,
-      gameCode,
-      chartCanvas,
-      isChartLoading,
-    };
-  },
+const fetchRoundData = async () => {
+  if (!gameCode) return;
+  try {
+    const res = await fetch(`https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode}`);
+    const data = await res.json();
+    if (data.message === 'Highest rounds retrieved successfully.') {
+      round.value = data.rounds[0]?.round || 1;
+      leaderboard.value = data.rounds;
+    }
+  } catch (err) {
+    console.error('❌ Error fetchRoundData:', err);
+  } finally {
+    isRefreshing.value = false;
+  }
 };
+
+const fetchChartData = async () => {
+  try {
+    const res = await fetch(`https://api-fastify-pi.vercel.app/game/result?gameCode=${gameCode}`);
+    const data = await res.json();
+    const teams = data.teams;
+    console.log("📦 DATA TEAMS:", teams);
+    console.log("🧪 LABELS", teams[0]?.rounds?.map(r => r.round));
+    console.log("🧪 POINTS", teams[0]?.rounds?.map(r => r.ContributionPoint));
+
+    const hasValidData = Array.isArray(teams) && teams.length > 0 && Array.isArray(teams[0].rounds) && teams[0].rounds.length > 0;
+
+    if (hasValidData) {
+      hasChartData.value = true;
+      await nextTick();
+      setTimeout(() => renderChart(teams), 0);
+    } else {
+      hasChartData.value = false;
+      console.warn("⚠️ Chart tidak bisa ditampilkan: data kosong.");
+    }
+  } catch (err) {
+    console.error("❌ Error fetchChartData:", err);
+  } finally {
+    isChartLoading.value = false;
+  }
+};
+
+const renderChart = (teams) => {
+  console.log("🎯 chartCanvas.value =", chartCanvas.value);
+  if (!chartCanvas.value) {
+    console.error("❌ Canvas belum tersedia!");
+    return;
+  }
+
+  if (!teams.length || !teams[0].rounds || !teams[0].rounds.length) {
+    console.warn("❌ Tidak ada data rounds valid untuk chart.");
+    return;
+  }
+
+  if (chartInstance) chartInstance.destroy();
+
+  const ctx = chartCanvas.value.getContext('2d');
+  const datasets = teams.map(t => ({
+    label: t.team,
+    data: t.rounds.map(r => Number(r.ContributionPoint) || 0),
+    borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+    fill: false,
+    tension: 0.3,
+  }));
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: teams[0].rounds.map(r => `R${r.round}`),
+      datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Contribution Points' },
+        },
+        x: {
+          title: { display: true, text: 'Rounds' },
+        },
+      },
+    },
+  });
+
+  console.log("✅ Chart berhasil dirender!");
+};
+
+const openInterestForm = () => {
+  showConfirmEndRoundModal.value = false;
+  showInterestFormModal.value = true;
+};
+
+const submitInterest = async () => {
+  const { ConInterest, ProInterest, HeadInterest, OutInterest } = interest.value;
+  if (ConInterest < 0 || ProInterest < 0 || HeadInterest < 0 || OutInterest < 0) {
+    alert("Nilai bunga tidak boleh negatif.");
+    return;
+  }
+  isProcessing.value = true;
+  try {
+    await fetch('https://api-fastify-pi.vercel.app/game/addinterest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(interest.value),
+    });
+    showInterestFormModal.value = false;
+    await confirmEndRound();
+  } catch (err) {
+    console.error('❌ Error submitInterest:', err);
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+const confirmEndRound = async () => {
+  isProcessing.value = true;
+  try {
+    await fetch('https://api-fastify-pi.vercel.app/round/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameCode }),
+    });
+    location.reload();
+  } catch (err) {
+    console.error('❌ Error confirmEndRound:', err);
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+const confirmEndGame = async () => {
+  isProcessing.value = true;
+  try {
+    await fetch('https://api-fastify-pi.vercel.app/Game/End', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameCode }),
+    });
+    router.push('/endResult');
+  } catch (err) {
+    console.error('❌ Error confirmEndGame:', err);
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+const closeModals = () => {
+  showConfirmEndRoundModal.value = false;
+  showConfirmEndGameModal.value = false;
+  showInterestFormModal.value = false;
+};
+
+onMounted(() => {
+  fetchRoundData();
+  fetchChartData();
+});
+
+onBeforeUnmount(() => {
+  if (chartInstance) chartInstance.destroy();
+});
+
+const sortedLeaderboard = computed(() => leaderboard.value);
+const formatNumber = num => num || 0;
 </script>
