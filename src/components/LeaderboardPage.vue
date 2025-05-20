@@ -20,7 +20,7 @@
     <div v-else class="bg-white rounded-2xl shadow-md p-8 w-full max-w-5xl z-10 flex flex-col gap-10">
       <!-- Header -->
       <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg flex justify-between items-center">
-        <span>Round {{ round }}</span>
+        <span>{{ round }}</span>
         <span class="text-lg font-medium">{{ gameCode }}</span>
       </div>
 
