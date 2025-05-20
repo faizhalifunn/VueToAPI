@@ -271,13 +271,14 @@ export default {
 
 
       // 🔹 1. Kirim data ke endpoint /round/input
+    console.log("Payload yang dikirim:", payload); // ✅ Letakkan di sini
       const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
       if (!response.ok) {
         throw new Error("Failed to submit round data. Try again!");
