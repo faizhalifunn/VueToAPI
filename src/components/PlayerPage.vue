@@ -148,15 +148,21 @@ export default {
     const isLoading = ref(true);
 
     // Data dari front end
-    const formData = ref({
+      const formData = ref({
       KreditKonsumtif: 0,
       KreditProduktif: 0,
       KartuKredit: "",
       Asuransi: "",
-      DanaPihakKetiga: 0, // ini akan menjadi Giro di payload
-      PenempatanPusat: 0, // input Penempatan Pusat
-      PeminjamanPusat: 0,     // input Peminjaman Pusat
+      DanaPihakKetiga: 0,
+      PenempatanPusat: 0,
+      PeminjamanPusat: 0,
       Bintang: "",
+      TotalSalary: 0,
+      PromoteCost: 0,
+      upFacilitiesCost: 0,
+      BiayaOperasional: 0,
+      BiayaBunga: 0,
+      PendapatanBunga: 0,
     });
 
     // Kolom kiri/kanan untuk menampilkan label
@@ -246,16 +252,23 @@ export default {
 
       // 🔹 Buat payload dengan memastikan semua angka dikonversi ke Number
       const payload = {
-        gameCode: gameCode,
-        teamName: teamName,
-        KreditProduktif: Number(formData.value.KreditProduktif) || 0,
-        KreditKonsumtif: Number(formData.value.KreditKonsumtif) || 0,
-        Giro: Number(formData.value.DanaPihakKetiga) || 0, // DPK -> Giro
-        PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
-        Asuransi: Number(formData.value.Asuransi) || 0,
-        KartuKredit: Number(formData.value.KartuKredit) || 0,
-        Bintang: Number(formData.value.Bintang) || 0,
-      };
+      gameCode,
+      teamName,
+      KreditProduktif: Number(formData.value.KreditProduktif) || 0,
+      KreditKonsumtif: Number(formData.value.KreditKonsumtif) || 0,
+      Giro: Number(formData.value.DanaPihakKetiga) || 0,
+      PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
+      Asuransi: Number(formData.value.Asuransi) || 0,
+      KartuKredit: Number(formData.value.KartuKredit) || 0,
+      Bintang: Number(formData.value.Bintang) || 0,
+      TotalSalary: Number(formData.value.TotalSalary) || 0,
+      PromoteCost: Number(formData.value.PromoteCost) || 0,
+      upFacilitiesCost: Number(formData.value.upFacilitiesCost) || 0,
+      BiayaOperasional: Number(formData.value.BiayaOperasional) || 0,
+      BiayaBunga: Number(formData.value.BiayaBunga) || 0,
+      PendapatanBunga: Number(formData.value.PendapatanBunga) || 0,
+    };
+
 
       // 🔹 1. Kirim data ke endpoint /round/input
       const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
