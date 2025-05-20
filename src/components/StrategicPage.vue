@@ -29,7 +29,7 @@
         <select v-model="selectedHire" class="w-full p-2 border rounded-lg bg-white">
           <option value="">None</option>
           <option v-for="employee in hireEmployees" :key="employee.id" :value="employee.id">
-            {{ employee.id }}
+            {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
           </option>
         </select>
       </div>
@@ -40,7 +40,7 @@
         <select v-model="selectedTrain" class="w-full p-2 border rounded-lg bg-white">
           <option value="">None</option>
           <option v-for="employee in trainEmployees" :key="employee.id" :value="employee.id">
-            {{ employee.id }}
+            {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
           </option>
         </select>
       </div>
@@ -51,7 +51,7 @@
         <select v-model="selectedFire" class="w-full p-2 border rounded-lg bg-white">
           <option value="">None</option>
           <option v-for="employee in fireEmployees" :key="employee.id" :value="employee.id">
-            {{ employee.id }}
+            {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
           </option>
         </select>
       </div>
@@ -134,12 +134,21 @@ export default {
 
     const fetchEmployees = async () => {
       try {
-        const res = await fetch(`https://api-fastify-pi.vercel.app/game/getemployees`);
+        const res = await fetch("https://api-fastify-pi.vercel.app/game/getemployees");
         const data = await res.json();
-        hireEmployees.value = data.employees.filter(emp => emp.level === 1);
+        console.log("📦 EMPLOYEE DATA:", data);
+        hireEmployees.value = data.employees?.filter(emp => emp.level === 1) || [];
       } catch (err) {
         console.error("Error fetching employees:", err);
       }
+    };
+
+    const enrichWithName = (employees) => {
+      const nameMap = Object.fromEntries(hireEmployees.value.map(emp => [emp.id, emp.name]));
+      return employees.map(emp => ({
+        ...emp,
+        name: nameMap[emp.id] || emp.name || null
+      }));
     };
 
     const fetchTeamEmployees = async () => {
@@ -153,20 +162,24 @@ export default {
           `https://api-fastify-pi.vercel.app/team/getemployee?gameCode=${gameCode.value}&teamName=${selectedTeam.value}`
         );
         const data = await res.json();
-        trainEmployees.value = data.employees || [];
-        fireEmployees.value = data.employees || [];
+        console.log("📦 TEAM EMPLOYEES:", data.employees);
+        trainEmployees.value = enrichWithName(data.employees || []);
+        fireEmployees.value = enrichWithName(data.employees || []);
       } catch (err) {
         console.error("Error fetching team employees:", err);
       }
     };
 
-    watch(selectedTeam, fetchTeamEmployees);
+    watch(selectedTeam, async () => {
+  await fetchEmployees();
+  await fetchTeamEmployees();
+});
 
     const submitActions = async () => {
       isLoading.value = true;
       try {
         if (selectedHire.value) {
-          await fetch(`https://api-fastify-pi.vercel.app/team/hire`, {
+          await fetch("https://api-fastify-pi.vercel.app/team/hire", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -178,7 +191,7 @@ export default {
         }
 
         if (selectedTrain.value) {
-          await fetch(`https://api-fastify-pi.vercel.app/team/promote`, {
+          await fetch("https://api-fastify-pi.vercel.app/team/promote", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -190,7 +203,7 @@ export default {
         }
 
         if (selectedFire.value) {
-          await fetch(`https://api-fastify-pi.vercel.app/team/fireemployee`, {
+          await fetch("https://api-fastify-pi.vercel.app/team/fireemployee", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
