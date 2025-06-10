@@ -1,26 +1,27 @@
 <template>
-  <div>
-    <!-- ✅ Tombol Back tetap fixed di kiri atas -->
-    <button
-      @click="goBack"
-      class="fixed top-4 left-4 z-[9999] bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-lg"
-    >
-      ← Back
-    </button>
-
-    <!-- ✅ Konten utama diberi padding top agar tidak tertutup tombol -->
-    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 pt-20 pb-16">
+  <div class="relative">
+    <!-- ✅ Konten utama -->
+    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 pt-12 pb-16">
       <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
+
+        <!-- Header -->
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold">Game Results</h2>
           <h2 class="text-2xl font-bold">{{ gameCode }}</h2>
         </div>
 
-        <!-- Tab Navigation -->
-        <div class="flex overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20">
+        <!-- ✅ Tab Navigation (Sticky + Back Button) -->
+        <div class="flex items-center justify-start gap-2 overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20 px-4 pt-2">
+          <button
+            @click="goBack"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+          >
+            ← Back
+          </button>
+
           <button
             @click="activeTab = 'summary'"
-            :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
           >
             End Summary
           </button>
@@ -29,13 +30,13 @@
             v-for="round in availableRounds"
             :key="round"
             @click="activeTab = round"
-            :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
           >
             {{ round }}
           </button>
         </div>
 
-        <!-- Summary Tab -->
+        <!-- ✅ Summary Tab -->
         <div v-if="activeTab === 'summary'">
           <div class="border-t border-black">
             <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
@@ -63,7 +64,7 @@
           </div>
         </div>
 
-        <!-- Round Tab -->
+        <!-- ✅ Round Tab -->
         <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
           <div class="flex-overflow-container">
             <div
@@ -72,6 +73,8 @@
               class="card-container p-4"
             >
               <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
+
+              <!-- Tabel 1 -->
               <table class="w-full text-sm mb-4 border border-gray-300">
                 <thead class="bg-gray-100">
                   <tr>
@@ -97,6 +100,7 @@
                 </tbody>
               </table>
 
+              <!-- Tabel 2 -->
               <table class="w-full text-sm mb-4 border border-gray-300">
                 <thead class="bg-gray-100">
                   <tr>
@@ -133,7 +137,7 @@
           </div>
         </div>
 
-        <!-- Export Button -->
+        <!-- ✅ Export Button -->
         <div class="mt-6 flex justify-center gap-4">
           <button
             @click="exportToExcel"
@@ -238,90 +242,96 @@ async function fetchAllGameData() {
 
 function drawSummaryChart() {
   if (!summaryChart.value || !teams.value.length) return;
-  const ctx = summaryChart.value.getContext('2d');
-  if (summaryChartInstance.value) summaryChartInstance.value.destroy();
 
-  const allRounds = new Set();
-  teams.value.forEach((team) => (team.rounds || []).forEach((r) => allRounds.add(r.round)));
-  const sortedRounds = [...allRounds].sort();
+  requestAnimationFrame(() => {
+    const ctx = summaryChart.value.getContext('2d');
+    if (summaryChartInstance.value) summaryChartInstance.value.destroy();
 
-  const datasets = teams.value.map((team) => {
-    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-    return {
-      label: team.team,
-      data: sortedRounds.map((r) => {
-        const match = (team.rounds || []).find((x) => x.round === r);
-        return match ? match.ContributionPoint : 0;
-      }),
-      borderColor: color,
-      backgroundColor: color + '40',
-      fill: false,
-      tension: 0.3,
-    };
-  });
+    const allRounds = new Set();
+    teams.value.forEach((team) => (team.rounds || []).forEach((r) => allRounds.add(r.round)));
+    const sortedRounds = [...allRounds].sort();
 
-  summaryChartInstance.value = new Chart(ctx, {
-    type: 'line',
-    data: { labels: sortedRounds, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
-        x: { title: { display: true, text: 'Rounds' } },
-      },
-      plugins: {
-        legend: { position: 'bottom' },
-        tooltip: { mode: 'index', intersect: false },
-      },
-    }
+    const datasets = teams.value.map((team) => {
+      const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+      return {
+        label: team.team,
+        data: sortedRounds.map((r) => {
+          const match = (team.rounds || []).find((x) => x.round === r);
+          return match ? match.ContributionPoint : 0;
+        }),
+        borderColor: color,
+        backgroundColor: color + '40',
+        fill: false,
+        tension: 0.3,
+      };
+    });
+
+    summaryChartInstance.value = new Chart(ctx, {
+      type: 'line',
+      data: { labels: sortedRounds, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
+          x: { title: { display: true, text: 'Rounds' } },
+        },
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { mode: 'index', intersect: false },
+        },
+      }
+    });
   });
 }
 
 function drawRoundChart(roundKey) {
   if (!roundChart.value || !gameData.value?.teams) return;
-  const ctx = roundChart.value.getContext('2d');
-  if (roundChartInstance.value) roundChartInstance.value.destroy();
 
-  const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
-    const roundData = rounds[roundKey] || {};
-    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-    return {
-      label: teamName,
-      data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
-      borderColor: color,
-      backgroundColor: color + '40',
-      tension: 0.3,
-      fill: false,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-    };
-  });
+  requestAnimationFrame(() => {
+    const ctx = roundChart.value.getContext('2d');
+    if (roundChartInstance.value) roundChartInstance.value.destroy();
 
-  roundChartInstance.value = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: chartCategories,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          ticks: { maxRotation: 60, minRotation: 45 },
-          title: { display: true, text: 'Parameter' },
+    const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
+      const roundData = rounds[roundKey] || {};
+      const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+      return {
+        label: teamName,
+        data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
+        borderColor: color,
+        backgroundColor: color + '40',
+        tension: 0.3,
+        fill: false,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      };
+    });
+ 
+ roundChartInstance.value = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartCategories,
+        datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { maxRotation: 60, minRotation: 45 },
+            title: { display: true, text: 'Parameter' },
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Value' },
+          },
         },
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Value' },
+        plugins: {
+          tooltip: { mode: 'index', intersect: false },
+          legend: { position: 'bottom' },
         },
       },
-      plugins: {
-        tooltip: { mode: 'index', intersect: false },
-        legend: { position: 'bottom' },
-      },
-    },
+    });
   });
 }
 
@@ -354,11 +364,12 @@ async function exportToExcel() {
   align-items: center;
 }
 
-button.fixed {
+/* Hapus button.fixed, udah ga dipakai */
+
+.fixed {
   pointer-events: auto;
 }
 
-/* Tabel */
 th,
 td {
   border: 1px solid #ccc;
@@ -381,13 +392,11 @@ table {
   table-layout: fixed;
 }
 
-/* Canvas force full size */
 canvas {
   width: 100% !important;
   height: 100% !important;
 }
 
-/* Container scroll horizontal */
 .flex-overflow-container {
   display: flex;
   flex-wrap: nowrap;
@@ -396,7 +405,6 @@ canvas {
   gap: 1.5rem;
 }
 
-/* Kartu per tim */
 .card-container {
   flex: 0 0 auto;
   margin-bottom: 1rem;
@@ -408,7 +416,6 @@ canvas {
   border-radius: 0.75rem;
 }
 
-/* Responsif */
 @media (max-width: 768px) {
   .card-container {
     min-width: 90vw;
