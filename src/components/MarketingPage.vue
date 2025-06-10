@@ -40,11 +40,11 @@
 
           <!-- Upgrade Cost -->
           <div class="flex flex-col w-full sm:w-1/2">
-            <label class="text-sm font-semibold mb-1">Upgrade Facility</label>
+            <label class="text-sm font-semibold mb-1">MarketingCost</label>
             <input
-              v-model.number="upFacilitiesCost"
+              v-model.number="MarketingCost"
               type="number"
-              placeholder="Upgrade Facility Cost"
+              placeholder="Marketing Cost"
               class="p-2 border rounded-lg bg-white w-full"
             />
           </div>
@@ -77,7 +77,7 @@ export default {
     const currentRound = ref("Loading...");
     const teams = ref([]);
     const selectedTeam = ref("");
-    const upFacilitiesCost = ref(null);
+    const MarketingCost = ref(null);
     const isLoading = ref(false);
     const gameCode = localStorage.getItem("gameCode");
 
@@ -110,7 +110,7 @@ export default {
     };
 
     const submitUpgrade = async () => {
-      if (!selectedTeam.value || upFacilitiesCost.value === null) {
+      if (!selectedTeam.value || MarketingCost.value === null) {
         alert("Please select a team and enter the upgrade cost.");
         return;
       }
@@ -131,7 +131,7 @@ export default {
           body: JSON.stringify({
             gameCode,
             teamName: selectedTeam.value,
-            upFacilitiesCost: upFacilitiesCost.value,
+            MarketingCost: MarketingCost.value,
           }),
         });
 
@@ -158,7 +158,7 @@ export default {
       currentRound,
       teams,
       selectedTeam,
-      upFacilitiesCost,
+      MarketingCost,
       isLoading,
       submitUpgrade,
       goBack,

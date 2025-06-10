@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-black relative text-gray-800 py-16">
+  <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 py-16">
     <!-- Back Button -->
     <button
       @click="goBack"
@@ -8,7 +8,7 @@
       ← Back
     </button>
 
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-5xl mx-4">
+    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Game Results</h2>
         <h2 class="text-2xl font-bold">{{ gameCode }}</h2>
@@ -33,17 +33,16 @@
         </button>
       </div>
 
-      <!-- Summary Content -->
+      <!-- Summary Tab -->
       <div v-if="activeTab === 'summary'">
         <div class="border-t border-black">
           <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
             <span>Rank</span>
             <span>Team Name</span>
             <span>Contribution Point</span>
-            <span>Star</span>
+            <span>AchievementStar</span>
             <span>End Score</span>
           </div>
-
           <div
             v-for="(team, index) in sortedTeams"
             :key="index"
@@ -52,452 +51,293 @@
             <span class="font-semibold">{{ index + 1 }}</span>
             <span class="font-medium">{{ team.team || 'N/A' }}</span>
             <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionPoint) }}</span>
-            <span class="font-mono">{{ formatNumber(team.endResult.TotalBintang) }}</span>
+            <span class="font-mono">{{ formatNumber(team.endResult.TotalAchievementStar) }}</span>
             <span class="font-mono font-bold">{{ formatNumber(team.endResult.TotalScore) }}</span>
           </div>
         </div>
 
-        <!-- Chart Wrapper -->
         <div class="chart-container mt-6">
-          <canvas ref="chartCanvas"></canvas>
+          <canvas ref="summaryChart"></canvas>
         </div>
       </div>
 
-      <!-- Round Details -->
-      <div v-else-if="gameData" class="max-h-screen overflow-y-auto">
-        <div v-for="(teamData, teamName) in teamRoundData" :key="teamName" class="mb-8">
-          <h3 class="text-xl font-bold bg-gray-300 p-2 rounded mb-2">
-            {{ teamName }}
-          </h3>
-
-          <!-- Interest + Biaya + Bintang Table -->
-          <div class="overflow-x-auto mb-4 rounded shadow">
-            <table class="w-full border-collapse bg-white">
-              <thead>
-                <tr>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Pro Interest</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Con Interest</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Head Interest</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Out Interest</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Promote Cost</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Up Facilities Cost</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Bintang</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.ProInterest) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.ConInterest) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.HeadInterest) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.OutInterest) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PromoteCost) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.UpFacilitiesCost) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.TotalBintang) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Keuangan Table -->
-          <div class="overflow-x-auto mb-4 rounded shadow">
-            <table class="w-full border-collapse bg-white">
-              <thead>
-                <tr>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Asuransi</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Kredit Produktif</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Pinjaman Pusat</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Kredit Konsumtif</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Kartu Kredit</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Pendapatan Fee Based</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Total Salary</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Giro</th>
-                  <th class="p-2 border border-gray-400 bg-gray-100">Penempatan Pusat</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.Asuransi) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KreditProduktif) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PinjamanPusat) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KreditKonsumtif) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.KartuKredit) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.TotalSalary) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.Giro) }}</td>
-                  <td class="p-2 border border-gray-400">{{ formatNumber(teamData.PenempatanPusat) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Employees Table -->
-          <div v-if="teamData.Employees" class="mb-4">
-            <h4 class="font-semibold mb-2 bg-gray-100 p-2 rounded">Employees</h4>
-            <div class="overflow-x-auto rounded shadow">
-              <table class="w-full border-collapse bg-white">
-                <thead>
+      <!-- Round Tab -->
+      <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
+        <!-- Chart Bawah -->
+        <div class="overflow-x-auto">
+          <div class="flex justify-around space-x-6">
+            <div
+              v-for="(teamData, teamName) in teamRoundData"
+              :key="teamName"
+              class="w-[600px] min-w-[600px] bg-white shadow rounded-xl p-4"
+            >
+              <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
+              <table class="w-full text-sm mb-4 border border-gray-300">
+                <thead class="bg-gray-100">
                   <tr>
-                    <th class="p-2 border border-gray-400 text-left bg-gray-100">Name</th>
-                    <th class="p-2 border border-gray-400 text-left bg-gray-100">Level</th>
-                    <th class="p-2 border border-gray-400 text-left bg-gray-100">Salary</th>
+                    <th>Pro Interest</th>
+                    <th>Con Interest</th>
+                    <th>Head Interest</th>
+                    <th>Out Interest</th>
+                    <th>Development</th>
+                    <th>MarketingCost</th>
+                    <th>AchievementStar</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(employee, empName) in teamData.Employees" :key="empName">
-                    <td class="p-2 border border-gray-400">{{ employee.name }}</td>
-                    <td class="p-2 border border-gray-400 text-center">{{ employee.level }}</td>
-                    <td class="p-2 border border-gray-400 text-right">{{ formatNumber(employee.salary) }}</td>
+                  <tr>
+                    <td>{{ formatNumber(teamData.ProInterest) }}</td>
+                    <td>{{ formatNumber(teamData.ConInterest) }}</td>
+                    <td>{{ formatNumber(teamData.HeadInterest) }}</td>
+                    <td>{{ formatNumber(teamData.OutInterest) }}</td>
+                    <td>{{ formatNumber(teamData.Development) }}</td>
+                    <td>{{ formatNumber(teamData.MarketingCost) }}</td>
+                    <td>{{ formatNumber(teamData.TotalAchievementStar) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table class="w-full text-sm mb-4 border border-gray-300">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th>Insurance</th>
+                    <th>ProductiveLoan</th>
+                    <th>InterOfficeAccountBorrow</th>
+                    <th>ConsumptiveLoan</th>
+                    <th>CreditCard</th>
+                    <th>Pendapatan Fee Based</th>
+                    <th>Total Salary</th>
+                    <th>Fund</th>
+                    <th>InterOfficeAccountPlacement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ formatNumber(teamData.Insurance) }}</td>
+                    <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
+                    <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
+                    <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
+                    <td>{{ formatNumber(teamData.KartuKredit) }}</td>
+                    <td>{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
+                    <td>{{ formatNumber(teamData.TotalSalary) }}</td>
+                    <td>{{ formatNumber(teamData.Fund) }}</td>
+                    <td>{{ formatNumber(teamData.InterOfficeAccountPlacement) }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
+
+        <div class="chart-container mt-6">
+          <canvas ref="roundChart"></canvas>
+        </div>
       </div>
 
-      <!-- Loading Indicator -->
-      <div v-if="isLoading" class="text-center text-lg font-semibold mt-4">
-        Loading...
-      </div>
-
-      <!-- Export to Excel -->
-      <div class="mt-4 flex justify-center gap-4">
+      <!-- Export Button -->
+      <div class="mt-6 flex justify-center gap-4">
         <button
           @click="exportToExcel"
           class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
         >
-          📅 Export to Excel
+          🗓 Export to Excel
         </button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRouter } from 'vue-router';
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import Chart from 'chart.js/auto';
+import { useRouter } from 'vue-router';
 
-/**
- * Centralize your API base URL here so you can quickly
- * switch environments or update endpoints.
- */
 const API_BASE_URL = 'https://api-fastify-pi.vercel.app';
+const router = useRouter();
+const gameCode = localStorage.getItem('gameCode');
 
-export default {
-  name: 'GameResultsPage',
-  setup() {
-    // Constants
-    const SUMMARY_TAB = 'summary';
+const activeTab = ref('summary');
+const summaryChart = ref(null);
+const roundChart = ref(null);
+const summaryChartInstance = ref(null);
+const roundChartInstance = ref(null);
 
-    // Refs and State
-    const router = useRouter();
-    const gameCode = localStorage.getItem('gameCode');
-    const teams = ref([]);
-    const isLoading = ref(false);
-    const chartCanvas = ref(null);
-    const chartInstance = ref(null);
+const teams = ref([]);
+const isLoading = ref(false);
+const gameData = ref(null);
+const availableRounds = ref([]);
+const chartCategories = [
+  'Pro Interest', 'Con Interest', 'Head Interest', 'Out Interest',
+  'Development', 'MarketingCost', 'Insurance', 'ProductiveLoan',
+  'InterOfficeAccountBorrow', 'ConsumptiveLoan', 'CreditCard',
+  'Pendapatan Fee Based', 'Total Salary', 'Fund', 'InterOfficeAccountPlacement'
+];
 
-    // Tab handling
-    const activeTab = ref(SUMMARY_TAB);
+const formatNumber = (num) => isNaN(Number(num)) ? '0' : Number(num).toLocaleString('en-US');
+const goBack = () => router.go(-1);
 
-    // All game data from /game/allresult endpoint
-    const gameData = ref(null);
+const sortedTeams = computed(() =>
+  [...teams.value].sort((a, b) => (b.endResult?.TotalScore || 0) - (a.endResult?.TotalScore || 0))
+);
 
-    // Rounds available for display
-    const availableRounds = ref([]);
+const teamRoundData = computed(() => {
+  if (!gameData.value || activeTab.value === 'summary') return {};
+  const round = activeTab.value;
+  const result = {};
+  Object.entries(gameData.value.teams || {}).forEach(([team, rounds]) => {
+    if (rounds[round]) result[team] = rounds[round];
+  });
+  return result;
+});
 
-    // ---- LIFECYCLE HOOKS ----
-    onMounted(async () => {
-      if (!gameCode) {
-        handleError('No game code found. Redirecting...');
-        router.replace('/');
-        return;
-      }
-      await fetchEndResult();
-      await fetchAllGameData();
-    });
+watch(activeTab, async (val) => {
+  await nextTick();
+  if (val === 'summary') drawSummaryChart();
+  else if (availableRounds.value.includes(val)) drawRoundChart(val);
+});
 
-    // Ensure Chart.js instance is destroyed on unmount to avoid memory leaks
-    onBeforeUnmount(() => {
-      if (chartInstance.value) {
-        chartInstance.value.destroy();
-        chartInstance.value = null;
-      }
-    });
+onMounted(async () => {
+  if (!gameCode) return router.replace('/');
+  await fetchEndResult();
+  await fetchAllGameData();
+  if (availableRounds.value.length) {
+    activeTab.value = 'summary';
+    drawSummaryChart();
+  }
+});
 
-    // Redraw chart whenever we switch back to the summary tab
-    watch(activeTab, (newVal) => {
-      if (newVal === SUMMARY_TAB && chartCanvas.value) {
-        drawChart();
-      }
-    });
+onBeforeUnmount(() => {
+  if (summaryChartInstance.value) summaryChartInstance.value.destroy();
+  if (roundChartInstance.value) roundChartInstance.value.destroy();
+});
 
-    // ---- COMPUTED PROPERTIES ----
-    const sortedTeams = computed(() => {
-      return [...teams.value].sort((a, b) => {
-        const scoreA = a.endResult?.TotalScore || 0;
-        const scoreB = b.endResult?.TotalScore || 0;
-        return scoreB - scoreA;
-      });
-    });
+async function fetchEndResult() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/game/result?gameCode=${gameCode}`);
+    const data = await res.json();
+    if (data?.message?.includes('retrieved')) teams.value = data.teams || [];
+  } catch (err) {
+    alert(err.message);
+  }
+}
 
-    // For the currently selected round, build a map of
-    // { [teamName]: (roundData for that round) }
-    const teamRoundData = computed(() => {
-      if (!gameData.value || activeTab.value === SUMMARY_TAB) {
-        return {};
-      }
-      const roundName = activeTab.value;
-      const result = {};
-      Object.entries(gameData.value.teams || {}).forEach(([teamName, teamRounds]) => {
-        if (teamRounds[roundName]) {
-          result[teamName] = teamRounds[roundName];
-        }
-      });
-      return result;
-    });
-
-    // ---- DATA FETCHING ----
-    const fetchEndResult = async () => {
-      try {
-        isLoading.value = true;
-        const response = await fetch(`${API_BASE_URL}/game/result?gameCode=${gameCode}`);
-        const data = await response.json();
-
-        if (data?.message === 'End result retrieved successfully.') {
-          teams.value = data.teams || [];
-          drawChart();
-        } else {
-          handleError('Failed to fetch end result data.');
-        }
-      } catch (error) {
-        handleError(error.message || 'An error occurred while fetching end result.');
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-    const fetchAllGameData = async () => {
-      try {
-        isLoading.value = true;
-        const response = await fetch(`${API_BASE_URL}/game/allresult?gameCode=${gameCode}`);
-        const data = await response.json();
-
-        if (data?.message?.includes('retrieved successfully')) {
-          gameData.value = data.data;
-          extractAvailableRounds();
-        } else {
-          handleError('Failed to fetch game data.');
-        }
-      } catch (error) {
-        handleError(error.message || 'An error occurred while fetching game data.');
-      } finally {
-        isLoading.value = false;
-      }
-    };
-
-    // ---- HELPERS ----
-
-    function handleError(msg) {
-      console.error(msg);
-      // Replace this with your UI toast / modal / error display logic
-      alert(msg);
+async function fetchAllGameData() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/game/allresult?gameCode=${gameCode}`);
+    const data = await res.json();
+    if (data?.message?.includes('retrieved')) {
+      gameData.value = data.data;
+      const firstTeam = Object.values(data.data?.teams || {})[0];
+      const rounds = Object.keys(firstTeam).filter(k => k.startsWith('Round '));
+      availableRounds.value = rounds.sort((a, b) => parseInt(a.split(' ')[1]) - parseInt(b.split(' ')[1]));
     }
+  } catch (err) {
+    alert(err.message);
+  }
+}
 
-    function extractAvailableRounds() {
-      if (!gameData.value?.teams) return;
-      const allTeams = Object.values(gameData.value.teams);
-      if (!allTeams.length) return;
+function drawSummaryChart() {
+  if (!summaryChart.value || !teams.value.length) return;
+  const ctx = summaryChart.value.getContext('2d');
+  if (summaryChartInstance.value) summaryChartInstance.value.destroy();
 
-      // We assume each team has rounds labeled "Round X"
-      const firstTeam = allTeams[0];
-      const rounds = Object.keys(firstTeam).filter((key) => key.startsWith('Round '));
-      // Sort rounds in ascending order (Round 1, Round 2, etc.)
-      rounds.sort((a, b) => {
-        const numA = parseInt(a.replace('Round ', ''), 10);
-        const numB = parseInt(b.replace('Round ', ''), 10);
-        return numA - numB;
-      });
-      availableRounds.value = rounds;
-    }
+  const allRounds = new Set();
+  teams.value.forEach((team) => (team.rounds || []).forEach((r) => allRounds.add(r.round)));
+  const sortedRounds = [...allRounds].sort();
 
-    function drawChart() {
-      if (!chartCanvas.value) return;
-
-      // Destroy any existing chart instance
-      if (chartInstance.value) {
-        chartInstance.value.destroy();
-        chartInstance.value = null;
-      }
-
-      const ctx = chartCanvas.value.getContext('2d');
-      const allRounds = new Set();
-
-      // Gather all distinct rounds from each team
-      teams.value.forEach((team) => {
-        if (Array.isArray(team.rounds)) {
-          team.rounds.forEach((r) => allRounds.add(r.round));
-        }
-      });
-
-      const sortedRounds = [...allRounds].sort();
-
-      // Prepare the datasets for each team
-      const datasets = teams.value.map((team) => {
-        // Assign random color for each team
-        const color = getRandomColor();
-        return {
-          label: team.team,
-          data: sortedRounds.map((roundName) => {
-            const roundData = team.rounds.find((r) => r.round === roundName);
-            return roundData ? roundData.ContributionPoint : 0;
-          }),
-          borderColor: color,
-          borderWidth: 2,
-          fill: false,
-          tension: 0.3,
-        };
-      });
-
-      chartInstance.value = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: sortedRounds,
-          datasets,
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: { display: true, text: 'Contribution Points' },
-            },
-            x: {
-              title: { display: true, text: 'Rounds' },
-            },
-          },
-        },
-      });
-    }
-
-    // Get random color for chart lines
-    function getRandomColor() {
-      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-    }
-
-    // Format numeric values
-    function formatNumber(num) {
-      if (num === undefined || num === null) return '0';
-      return isNaN(Number(num)) ? num : Number(num).toLocaleString('en-US');
-    }
-
-    // Display-friendly metric key
-    function formatMetricName(key) {
-      return key
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase());
-    }
-
-    // Format table cell values
-    function formatValue(value, key) {
-      if (value === '' || value === undefined || value === null) return '-';
-      if (typeof value === 'number' || !isNaN(Number(value))) {
-        return formatNumber(value);
-      }
-      return value;
-    }
-
-    // Extract financial keys from a team's round data
-    function getFinancialMetrics(teamData) {
-      const financialKeys = [
-        'Asuransi',
-        'KreditProduktif',
-        'PinjamanPusat',
-        'KreditKonsumtif',
-        'KartuKredit',
-        'PendapatanFeeBased',
-        'TotalSalary',
-        'Giro',
-        'PenempatanPusat',
-        'BiayaBunga',
-        'ContributionPoint',
-        'BiayaOperasional',
-        'PendapatanBunga',
-      ];
-      const result = {};
-      financialKeys.forEach((key) => {
-        if (key in teamData) {
-          result[key] = teamData[key];
-        }
-      });
-      return result;
-    }
-
-    // Navigation helpers
-    function goBack() {
-      router.go(-1);
-    }
-
-    // Export data to Excel
-    async function exportToExcel() {
-      try {
-        if (!gameCode) {
-          handleError('No game code found!');
-          return;
-        }
-        const response = await fetch(`${API_BASE_URL}/game/Excelresult?gameCode=${gameCode}`, {
-          method: 'GET',
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch Excel file from the server.');
-        }
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `GameResults_${gameCode}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      } catch (error) {
-        handleError(error.message || 'Failed to export to Excel. Please try again.');
-      }
-    }
-
-    // ---- RETURN ----
+  const datasets = teams.value.map((team) => {
+    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
     return {
-      // Data/Refs
-      gameCode,
-      teams,
-      isLoading,
-      chartCanvas,
-      activeTab,
-      gameData,
-      availableRounds,
-
-      // Computed
-      sortedTeams,
-      teamRoundData,
-
-      // Methods
-      SUMMARY_TAB,
-      goBack,
-      exportToExcel,
-      formatNumber,
-      formatMetricName,
-      formatValue,
-      getFinancialMetrics,
+      label: team.team,
+      data: sortedRounds.map((r) => {
+        const match = (team.rounds || []).find((x) => x.round === r);
+        return match ? match.ContributionPoint : 0;
+      }),
+      borderColor: color,
+      backgroundColor: color + '40',
+      fill: false,
+      tension: 0.3,
     };
-  },
-};
+  });
+
+  summaryChartInstance.value = new Chart(ctx, {
+    type: 'line',
+    data: { labels: sortedRounds, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
+        x: { title: { display: true, text: 'Rounds' } },
+      },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { mode: 'index', intersect: false },
+      },
+    }
+  });
+}
+
+function drawRoundChart(roundKey) {
+  if (!roundChart.value || !gameData.value?.teams) return;
+  const ctx = roundChart.value.getContext('2d');
+  if (roundChartInstance.value) roundChartInstance.value.destroy();
+
+  const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
+    const roundData = rounds[roundKey] || {};
+    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    return {
+      label: teamName,
+      data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
+      backgroundColor: color + '80',
+      borderColor: color,
+      borderWidth: 1
+    };
+  });
+
+  roundChartInstance.value = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: chartCategories, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: { maxRotation: 60, minRotation: 45 },
+          title: { display: true, text: 'Parameter' },
+        },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Value' },
+        },
+      },
+      plugins: {
+        tooltip: { mode: 'index', intersect: false },
+        legend: { position: 'bottom' },
+      },
+    },
+  });
+}
+
+async function exportToExcel() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/game/Excelresult?gameCode=${gameCode}`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `GameResults_${gameCode}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  }
+}
 </script>
 
-<style>
+<style scoped>
 .chart-container {
   width: 100%;
   max-width: 700px;
@@ -507,8 +347,64 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: normal;
+  word-break: break-word;
+}
+
+th {
+  font-weight: 600;
+  font-size: 0.6rem;
+  background-color: #f5f5f5;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
 canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.flex.space-x-6 {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  gap: 1.5rem;
+}
+
+.w-\[600px\] {
+  flex: 0 0 auto;
+  margin-bottom: 1rem;
+  min-width: 750px;
+  max-width: 750px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .w-\[600px\] {
+    min-width: 90vw;
+    max-width: 90vw;
+  }
+  th,
+  td {
+    font-size: 0.75rem;
+    padding: 6px;
+  }
+  h3 {
+    font-size: 1rem;
+  }
 }
 </style>

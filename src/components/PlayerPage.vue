@@ -63,7 +63,7 @@
         <div class="mb-5">
           <p class="font-bold text-black">Penempatan Pusat</p>
           <input
-            v-model="formData.PenempatanPusat"
+            v-model="formData.InterOfficeAccountPlacement"
             type="number"
             class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
             :class="{'bg-gray-300 cursor-not-allowed': !isPenempatanEnabled || isLoading}"
@@ -75,7 +75,7 @@
         </div>
 
         <div>
-          <p class="font-bold text-black">Peminjaman Pusat</p>
+          <p class="font-bold text-black">InterOfficeAccountBorrow</p>
           <input
             v-model="formData.PinjamPusat"
             type="number"
@@ -88,11 +88,11 @@
           </p>
         </div>
       </div>
-      <!-- Input Kartu Kredit, Asuransi, Bintang -->
+      <!-- Input Kartu Kredit, Insurance, Bintang -->
       <div class="mt-6">
-        <p class="font-bold text-black">Kartu Kredit</p>
+        <p class="font-bold text-black">CreditCard</p>
         <input
-          v-model="formData.KartuKredit"
+          v-model="formData.CreditCard"
           type="text"
           class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
           :disabled="isLoading"
@@ -100,9 +100,9 @@
       </div>
 
       <div class="mt-6">
-        <p class="font-bold text-black">Asuransi</p>
+        <p class="font-bold text-black">Insurance</p>
         <input
-          v-model="formData.Asuransi"
+          v-model="formData.Insurance"
           type="text"
           class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
           :disabled="isLoading"
@@ -110,9 +110,9 @@
       </div>
 
       <div class="mt-6">
-        <p class="font-bold text-black">Bintang</p>
+        <p class="font-bold text-black">AchievementStar</p>
         <input
-          v-model="formData.Bintang"
+          v-model="formData.AchievementStar"
           type="text"
           class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
           :disabled="isLoading"
@@ -149,26 +149,26 @@ export default {
 
     // Data dari front end
       const formData = ref({
-      KreditKonsumtif: 0,
-      KreditProduktif: 0,
-      KartuKredit: "",
-      Asuransi: "",
+      ConsumptiveLoan: 0,
+      ProductiveLoan: 0,
+      CreditCard: "",
+      Insurance: "",
       DanaPihakKetiga: 0,
-      PenempatanPusat: 0,
-      PeminjamanPusat: 0,
-      Bintang: "",
+      InterOfficeAccountPlacement: 0,
+      InterOfficeAccountBorrow: 0,
+      AchievementStar: "",
       TotalSalary: 0,
-      PromoteCost: 0,
-      upFacilitiesCost: 0,
+      Development: 0,
+      MarketingCost: 0,
       BiayaOperasional: 0,
-      BiayaBunga: 0,
+      InterestCost: 0,
       PendapatanBunga: 0,
     });
 
     // Kolom kiri/kanan untuk menampilkan label
     const leftInputs = {
-      KreditKonsumtif: { text: "Kredit Konsumtif" },
-      KreditProduktif: { text: "Kredit Produktif" },
+      ConsumptiveLoan: { text: "ConsumptiveLoan" },
+      ProductiveLoan: { text: "ProductiveLoan" },
     };
 
     const rightInputs = {
@@ -177,7 +177,7 @@ export default {
 
     // totalKredit => untuk memutuskan Penempatan / Peminjaman
     const totalKredit = computed(() => {
-      return Number(formData.value.KreditKonsumtif) + Number(formData.value.KreditProduktif);
+      return Number(formData.value.ConsumptiveLoan) + Number(formData.value.ProductiveLoan);
     });
 
     // Jika DPK < total kredit => Penempatan aktif
@@ -192,9 +192,9 @@ export default {
 
     // Styling input
     const getInputClass = (key) => {
-      if (key === "KreditKonsumtif") {
+      if (key === "ConsumptiveLoan") {
         return "bg-red-100 focus:ring-red-600 border-red-400";
-      } else if (key === "KreditProduktif") {
+      } else if (key === "ProductiveLoan") {
         return "bg-green-100 focus:ring-green-600 border-green-400";
       } else {
         return "bg-gray-100 focus:ring-gray-600 border-gray-400";
@@ -245,7 +245,7 @@ export default {
       // Tentukan mana yang dipakai => Penempatan / Peminjaman
       let penempatanAtauPeminjamanValue = 0;
       if (isPenempatanEnabled.value) {
-        penempatanAtauPeminjamanValue = Number(formData.value.PenempatanPusat) || 0;
+        penempatanAtauPeminjamanValue = Number(formData.value.InterOfficeAccountPlacement) || 0;
       } else if (isPeminjamanEnabled.value) {
         penempatanAtauPeminjamanValue = Number(formData.value.PinjamPusat) || 0;
       }
@@ -254,24 +254,24 @@ export default {
       const payload = {
       gameCode,
       teamName,
-      KreditProduktif: Number(formData.value.KreditProduktif) || 0,
-      KreditKonsumtif: Number(formData.value.KreditKonsumtif) || 0,
-      Giro: Number(formData.value.DanaPihakKetiga) || 0,
+      ProductiveLoan: Number(formData.value.ProductiveLoan) || 0,
+      ConsumptiveLoan: Number(formData.value.ConsumptiveLoan) || 0,
+      Fund: Number(formData.value.DanaPihakKetiga) || 0,
       PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
-      Asuransi: Number(formData.value.Asuransi) || 0,
-      KartuKredit: Number(formData.value.KartuKredit) || 0,
-      Bintang: Number(formData.value.Bintang) || 0,
+      Insurance: Number(formData.value.Insurance) || 0,
+      CreditCard: Number(formData.value.CreditCard) || 0,
+      AchievementStar: Number(formData.value.AchievementStar) || 0,
       TotalSalary: Number(formData.value.TotalSalary) || 0,
-      PromoteCost: Number(formData.value.PromoteCost) || 0,
-      upFacilitiesCost: Number(formData.value.upFacilitiesCost) || 0,
+      Development: Number(formData.value.Development) || 0,
+      MarketingCost: Number(formData.value.MarketingCost) || 0,
       BiayaOperasional: Number(formData.value.BiayaOperasional) || 0,
-      BiayaBunga: Number(formData.value.BiayaBunga) || 0,
+      InterestCost: Number(formData.value.InterestCost) || 0,
       PendapatanBunga: Number(formData.value.PendapatanBunga) || 0,
     };
 
 
       // 🔹 1. Kirim data ke endpoint /round/input
-    console.log("Payload yang dikirim:", payload); // ✅ Letakkan di sini
+      console.log("Payload yang dikirim:", payload); // ✅ Letakkan di sini
       const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
       method: "POST",
       headers: {
@@ -305,14 +305,14 @@ export default {
 
       // 🔹 Reset form setelah submit
       formData.value = {
-        KreditProduktif: "",
-        KreditKonsumtif: "",
-        PenempatanPusat: "",
-        Giro: "",
+        ProductiveLoan: "",
+        ConsumptiveLoan: "",
+        InterOfficeAccountPlacement: "",
+        Fund: "",
         PinjamanPusat: "",
-        Asuransi: "",
-        KartuKredit: "",
-        Bintang: "",
+        Insurance: "",
+        CreditCard: "",
+        AchievementStar: "",
       };
 
     } catch (error) {
