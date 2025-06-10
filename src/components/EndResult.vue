@@ -3,7 +3,7 @@
     <!-- Back Button -->
     <button
       @click="goBack"
-      class="fixed top-4 left-4 z-10 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="fixed top-4 left-4 z-[999] bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
