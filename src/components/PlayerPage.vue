@@ -160,9 +160,9 @@ export default {
       TotalSalary: 0,
       Development: 0,
       MarketingCost: 0,
-      BiayaOperasional: 0,
+      OperationalCost: 0,
       InterestCost: 0,
-      PendapatanBunga: 0,
+      NetInterestIncome: 0,
     });
 
     // Kolom kiri/kanan untuk menampilkan label
@@ -264,9 +264,9 @@ export default {
       TotalSalary: Number(formData.value.TotalSalary) || 0,
       Development: Number(formData.value.Development) || 0,
       MarketingCost: Number(formData.value.MarketingCost) || 0,
-      BiayaOperasional: Number(formData.value.BiayaOperasional) || 0,
+      OperationalCost: Number(formData.value.OperationalCost) || 0,
       InterestCost: Number(formData.value.InterestCost) || 0,
-      PendapatanBunga: Number(formData.value.PendapatanBunga) || 0,
+      NetInterestIncome: Number(formData.value.NetInterestIncome) || 0,
     };
 
 

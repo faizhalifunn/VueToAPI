@@ -1,15 +1,15 @@
 <template>
   <div>
-    <!-- ✅ Tombol Back di luar container utama -->
+    <!-- ✅ Tombol Back tetap fixed di kiri atas -->
     <button
       @click="goBack"
-      class="fixed top-4 left-4 z-[999] bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="fixed top-4 left-4 z-[9999] bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-lg"
     >
       ← Back
     </button>
 
-    <!-- Container konten utama -->
-    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 py-16">
+    <!-- ✅ Konten utama diberi padding top agar tidak tertutup tombol -->
+    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 pt-20 pb-16">
       <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold">Game Results</h2>
@@ -65,68 +65,66 @@
 
         <!-- Round Tab -->
         <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
-          <div class="overflow-x-auto">
-            <div class="flex justify-around space-x-6">
-              <div
-                v-for="(teamData, teamName) in teamRoundData"
-                :key="teamName"
-                class="w-[600px] min-w-[600px] bg-white shadow rounded-xl p-4"
-              >
-                <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
-                <table class="w-full text-sm mb-4 border border-gray-300">
-                  <thead class="bg-gray-100">
-                    <tr>
-                      <th>Pro Interest</th>
-                      <th>Con Interest</th>
-                      <th>Head Interest</th>
-                      <th>Out Interest</th>
-                      <th>Development</th>
-                      <th>MarketingCost</th>
-                      <th>AchievementStar</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{{ formatNumber(teamData.ProInterest) }}</td>
-                      <td>{{ formatNumber(teamData.ConInterest) }}</td>
-                      <td>{{ formatNumber(teamData.HeadInterest) }}</td>
-                      <td>{{ formatNumber(teamData.OutInterest) }}</td>
-                      <td>{{ formatNumber(teamData.Development) }}</td>
-                      <td>{{ formatNumber(teamData.MarketingCost) }}</td>
-                      <td>{{ formatNumber(teamData.TotalAchievementStar) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+          <div class="flex-overflow-container">
+            <div
+              v-for="(teamData, teamName) in teamRoundData"
+              :key="teamName"
+              class="card-container p-4"
+            >
+              <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
+              <table class="w-full text-sm mb-4 border border-gray-300">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th>Pro Interest</th>
+                    <th>Con Interest</th>
+                    <th>Head Interest</th>
+                    <th>Out Interest</th>
+                    <th>Development</th>
+                    <th>MarketingCost</th>
+                    <th>AchievementStar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ formatNumber(teamData.ProInterest) }}</td>
+                    <td>{{ formatNumber(teamData.ConInterest) }}</td>
+                    <td>{{ formatNumber(teamData.HeadInterest) }}</td>
+                    <td>{{ formatNumber(teamData.OutInterest) }}</td>
+                    <td>{{ formatNumber(teamData.Development) }}</td>
+                    <td>{{ formatNumber(teamData.MarketingCost) }}</td>
+                    <td>{{ formatNumber(teamData.TotalAchievementStar) }}</td>
+                  </tr>
+                </tbody>
+              </table>
 
-                <table class="w-full text-sm mb-4 border border-gray-300">
-                  <thead class="bg-gray-100">
-                    <tr>
-                      <th>Insurance</th>
-                      <th>ProductiveLoan</th>
-                      <th>InterOfficeAccountBorrow</th>
-                      <th>ConsumptiveLoan</th>
-                      <th>CreditCard</th>
-                      <th>Pendapatan Fee Based</th>
-                      <th>Total Salary</th>
-                      <th>Fund</th>
-                      <th>InterOfficeAccountPlacement</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{{ formatNumber(teamData.Insurance) }}</td>
-                      <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
-                      <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
-                      <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
-                      <td>{{ formatNumber(teamData.KartuKredit) }}</td>
-                      <td>{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
-                      <td>{{ formatNumber(teamData.TotalSalary) }}</td>
-                      <td>{{ formatNumber(teamData.Fund) }}</td>
-                      <td>{{ formatNumber(teamData.InterOfficeAccountPlacement) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <table class="w-full text-sm mb-4 border border-gray-300">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th>Insurance</th>
+                    <th>ProductiveLoan</th>
+                    <th>InterOfficeAccountBorrow</th>
+                    <th>ConsumptiveLoan</th>
+                    <th>CreditCard</th>
+                    <th>Pendapatan Fee Based</th>
+                    <th>Total Salary</th>
+                    <th>Fund</th>
+                    <th>InterOfficeAccountPlacement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ formatNumber(teamData.Insurance) }}</td>
+                    <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
+                    <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
+                    <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
+                    <td>{{ formatNumber(teamData.KartuKredit) }}</td>
+                    <td>{{ formatNumber(teamData.FeeBasedIncome) }}</td>
+                    <td>{{ formatNumber(teamData.TotalSalary) }}</td>
+                    <td>{{ formatNumber(teamData.Fund) }}</td>
+                    <td>{{ formatNumber(teamData.InterOfficeAccountPlacement) }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -348,14 +346,19 @@ async function exportToExcel() {
 <style scoped>
 .chart-container {
   width: 100%;
-  max-width: 700px;
+  min-width: 700px;
   height: 450px;
-  margin: 0 auto;
+  overflow-x: auto;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+button.fixed {
+  pointer-events: auto;
+}
+
+/* Tabel */
 th,
 td {
   border: 1px solid #ccc;
@@ -378,19 +381,23 @@ table {
   table-layout: fixed;
 }
 
+/* Canvas force full size */
 canvas {
   width: 100% !important;
   height: 100% !important;
 }
 
-.flex.space-x-6 {
+/* Container scroll horizontal */
+.flex-overflow-container {
+  display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
   padding-bottom: 1rem;
   gap: 1.5rem;
 }
 
-.w-\[600px\] {
+/* Kartu per tim */
+.card-container {
   flex: 0 0 auto;
   margin-bottom: 1rem;
   min-width: 750px;
@@ -401,16 +408,19 @@ canvas {
   border-radius: 0.75rem;
 }
 
+/* Responsif */
 @media (max-width: 768px) {
-  .w-\[600px\] {
+  .card-container {
     min-width: 90vw;
     max-width: 90vw;
   }
+
   th,
   td {
     font-size: 0.75rem;
     padding: 6px;
   }
+
   h3 {
     font-size: 1rem;
   }
