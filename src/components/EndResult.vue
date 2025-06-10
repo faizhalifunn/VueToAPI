@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 py-16">
-    <!-- Back Button -->
+  <div>
+    <!-- ✅ Tombol Back di luar container utama -->
     <button
       @click="goBack"
       class="fixed top-4 left-4 z-[999] bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
@@ -8,140 +8,142 @@
       ← Back
     </button>
 
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Game Results</h2>
-        <h2 class="text-2xl font-bold">{{ gameCode }}</h2>
-      </div>
+    <!-- Container konten utama -->
+    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 py-16">
+      <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold">Game Results</h2>
+          <h2 class="text-2xl font-bold">{{ gameCode }}</h2>
+        </div>
 
-      <!-- Tab Navigation -->
-      <div class="flex overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20">
-        <button
-          @click="activeTab = 'summary'"
-          :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
-        >
-          End Summary
-        </button>
-
-        <button
-          v-for="round in availableRounds"
-          :key="round"
-          @click="activeTab = round"
-          :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
-        >
-          {{ round }}
-        </button>
-      </div>
-
-      <!-- Summary Tab -->
-      <div v-if="activeTab === 'summary'">
-        <div class="border-t border-black">
-          <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
-            <span>Rank</span>
-            <span>Team Name</span>
-            <span>Contribution Point</span>
-            <span>AchievementStar</span>
-            <span>End Score</span>
-          </div>
-          <div
-            v-for="(team, index) in sortedTeams"
-            :key="index"
-            class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 items-center py-2 border-b border-black text-center"
+        <!-- Tab Navigation -->
+        <div class="flex overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20">
+          <button
+            @click="activeTab = 'summary'"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
           >
-            <span class="font-semibold">{{ index + 1 }}</span>
-            <span class="font-medium">{{ team.team || 'N/A' }}</span>
-            <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionPoint) }}</span>
-            <span class="font-mono">{{ formatNumber(team.endResult.TotalAchievementStar) }}</span>
-            <span class="font-mono font-bold">{{ formatNumber(team.endResult.TotalScore) }}</span>
-          </div>
+            End Summary
+          </button>
+
+          <button
+            v-for="round in availableRounds"
+            :key="round"
+            @click="activeTab = round"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg mr-1', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
+          >
+            {{ round }}
+          </button>
         </div>
 
-        <div class="chart-container mt-6">
-          <canvas ref="summaryChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Round Tab -->
-      <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
-        <!-- Chart Bawah -->
-        <div class="overflow-x-auto">
-          <div class="flex justify-around space-x-6">
+        <!-- Summary Tab -->
+        <div v-if="activeTab === 'summary'">
+          <div class="border-t border-black">
+            <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
+              <span>Rank</span>
+              <span>Team Name</span>
+              <span>Contribution Point</span>
+              <span>AchievementStar</span>
+              <span>End Score</span>
+            </div>
             <div
-              v-for="(teamData, teamName) in teamRoundData"
-              :key="teamName"
-              class="w-[600px] min-w-[600px] bg-white shadow rounded-xl p-4"
+              v-for="(team, index) in sortedTeams"
+              :key="index"
+              class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 items-center py-2 border-b border-black text-center"
             >
-              <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
-              <table class="w-full text-sm mb-4 border border-gray-300">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th>Pro Interest</th>
-                    <th>Con Interest</th>
-                    <th>Head Interest</th>
-                    <th>Out Interest</th>
-                    <th>Development</th>
-                    <th>MarketingCost</th>
-                    <th>AchievementStar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ formatNumber(teamData.ProInterest) }}</td>
-                    <td>{{ formatNumber(teamData.ConInterest) }}</td>
-                    <td>{{ formatNumber(teamData.HeadInterest) }}</td>
-                    <td>{{ formatNumber(teamData.OutInterest) }}</td>
-                    <td>{{ formatNumber(teamData.Development) }}</td>
-                    <td>{{ formatNumber(teamData.MarketingCost) }}</td>
-                    <td>{{ formatNumber(teamData.TotalAchievementStar) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <table class="w-full text-sm mb-4 border border-gray-300">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th>Insurance</th>
-                    <th>ProductiveLoan</th>
-                    <th>InterOfficeAccountBorrow</th>
-                    <th>ConsumptiveLoan</th>
-                    <th>CreditCard</th>
-                    <th>Pendapatan Fee Based</th>
-                    <th>Total Salary</th>
-                    <th>Fund</th>
-                    <th>InterOfficeAccountPlacement</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{{ formatNumber(teamData.Insurance) }}</td>
-                    <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
-                    <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
-                    <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
-                    <td>{{ formatNumber(teamData.KartuKredit) }}</td>
-                    <td>{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
-                    <td>{{ formatNumber(teamData.TotalSalary) }}</td>
-                    <td>{{ formatNumber(teamData.Fund) }}</td>
-                    <td>{{ formatNumber(teamData.InterOfficeAccountPlacement) }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <span class="font-semibold">{{ index + 1 }}</span>
+              <span class="font-medium">{{ team.team || 'N/A' }}</span>
+              <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionPoint) }}</span>
+              <span class="font-mono">{{ formatNumber(team.endResult.TotalAchievementStar) }}</span>
+              <span class="font-mono font-bold">{{ formatNumber(team.endResult.TotalScore) }}</span>
             </div>
           </div>
+
+          <div class="chart-container mt-6">
+            <canvas ref="summaryChart"></canvas>
+          </div>
         </div>
 
-        <div class="chart-container mt-6">
-          <canvas ref="roundChart"></canvas>
-        </div>
-      </div>
+        <!-- Round Tab -->
+        <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
+          <div class="overflow-x-auto">
+            <div class="flex justify-around space-x-6">
+              <div
+                v-for="(teamData, teamName) in teamRoundData"
+                :key="teamName"
+                class="w-[600px] min-w-[600px] bg-white shadow rounded-xl p-4"
+              >
+                <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
+                <table class="w-full text-sm mb-4 border border-gray-300">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th>Pro Interest</th>
+                      <th>Con Interest</th>
+                      <th>Head Interest</th>
+                      <th>Out Interest</th>
+                      <th>Development</th>
+                      <th>MarketingCost</th>
+                      <th>AchievementStar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ formatNumber(teamData.ProInterest) }}</td>
+                      <td>{{ formatNumber(teamData.ConInterest) }}</td>
+                      <td>{{ formatNumber(teamData.HeadInterest) }}</td>
+                      <td>{{ formatNumber(teamData.OutInterest) }}</td>
+                      <td>{{ formatNumber(teamData.Development) }}</td>
+                      <td>{{ formatNumber(teamData.MarketingCost) }}</td>
+                      <td>{{ formatNumber(teamData.TotalAchievementStar) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-      <!-- Export Button -->
-      <div class="mt-6 flex justify-center gap-4">
-        <button
-          @click="exportToExcel"
-          class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
-        >
-          🗓 Export to Excel
-        </button>
+                <table class="w-full text-sm mb-4 border border-gray-300">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th>Insurance</th>
+                      <th>ProductiveLoan</th>
+                      <th>InterOfficeAccountBorrow</th>
+                      <th>ConsumptiveLoan</th>
+                      <th>CreditCard</th>
+                      <th>Pendapatan Fee Based</th>
+                      <th>Total Salary</th>
+                      <th>Fund</th>
+                      <th>InterOfficeAccountPlacement</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ formatNumber(teamData.Insurance) }}</td>
+                      <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
+                      <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
+                      <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
+                      <td>{{ formatNumber(teamData.KartuKredit) }}</td>
+                      <td>{{ formatNumber(teamData.PendapatanFeeBased) }}</td>
+                      <td>{{ formatNumber(teamData.TotalSalary) }}</td>
+                      <td>{{ formatNumber(teamData.Fund) }}</td>
+                      <td>{{ formatNumber(teamData.InterOfficeAccountPlacement) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container mt-6">
+            <canvas ref="roundChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Export Button -->
+        <div class="mt-6 flex justify-center gap-4">
+          <button
+            @click="exportToExcel"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-500 transition hover:scale-105 shadow-md"
+          >
+            🗓 Export to Excel
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -289,15 +291,21 @@ function drawRoundChart(roundKey) {
     return {
       label: teamName,
       data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
-      backgroundColor: color + '80',
       borderColor: color,
-      borderWidth: 1
+      backgroundColor: color + '40',
+      tension: 0.3,
+      fill: false,
+      pointRadius: 4,
+      pointHoverRadius: 6,
     };
   });
 
   roundChartInstance.value = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: chartCategories, datasets },
+    type: 'line',
+    data: {
+      labels: chartCategories,
+      datasets,
+    },
     options: {
       responsive: true,
       maintainAspectRatio: false,
