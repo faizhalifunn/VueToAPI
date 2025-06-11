@@ -89,9 +89,9 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{{ formatNumber(teamData.ProInterest) }}</td>
-                    <td>{{ formatNumber(teamData.ConInterest) }}</td>
-                    <td>{{ formatNumber(teamData.HeadInterest) }}</td>
+                    <td>{{ formatNumber(teamData.ProductiveInterest) }}</td>
+                    <td>{{ formatNumber(teamData.ConsumptiveInterest) }}</td>
+                    <td>{{ formatNumber(teamData.InterOfficeInterest) }}</td>
                     <td>{{ formatNumber(teamData.OutInterest) }}</td>
                     <td>{{ formatNumber(teamData.Development) }}</td>
                     <td>{{ formatNumber(teamData.MarketingCost) }}</td>

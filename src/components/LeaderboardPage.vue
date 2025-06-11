@@ -120,8 +120,8 @@
               <input
                 type="number"
                 min="0"
-                v-model.number="interest.ConInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.ConInterest < 0 ? 'border-red-500' : '']"
+                v-model.number="interest.ConsumptiveInterest"
+                :class="['w-full px-3 py-2 border rounded', interest.ConsumptiveInterest < 0 ? 'border-red-500' : '']"
                 placeholder="Masukkan bunga konsumtif"
                 required
               />
@@ -131,8 +131,8 @@
               <input
                 type="number"
                 min="0"
-                v-model.number="interest.ProInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.ProInterest < 0 ? 'border-red-500' : '']"
+                v-model.number="interest.ProductiveInterest"
+                :class="['w-full px-3 py-2 border rounded', interest.ProductiveInterest < 0 ? 'border-red-500' : '']"
                 placeholder="Masukkan bunga produktif"
                 required
               />
@@ -142,8 +142,8 @@
               <input
                 type="number"
                 min="0"
-                v-model.number="interest.HeadInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.HeadInterest < 0 ? 'border-red-500' : '']"
+                v-model.number="interest.InterOfficeInterest"
+                :class="['w-full px-3 py-2 border rounded', interest.InterOfficeInterest < 0 ? 'border-red-500' : '']"
                 placeholder="Masukkan bunga kantor pusat"
                 required
               />
@@ -154,7 +154,7 @@
                 type="number"
                 min="0"
                 v-model.number="interest.OutInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.OutInterest < 0 ? 'border-red-500' : '']"
+                :class="['w-full px-3 py-2 border rounded', interest.FundInterest < 0 ? 'border-red-500' : '']"
                 placeholder="Masukkan bunga pihak ketiga"
                 required
               />
@@ -238,9 +238,9 @@ const showInterestFormModal = ref(false);
 
 const interest = ref({
   gameCode,
-  ConInterest: null,
-  ProInterest: null,
-  HeadInterest: null,
+  ConsumptiveInterest: null,
+  ProductiveInterest: null,
+  InterOfficeInterest: null,
   OutInterest: null,
 });
 
@@ -344,8 +344,8 @@ const openInterestForm = () => {
 };
 
 const submitInterest = async () => {
-  const { ConInterest, ProInterest, HeadInterest, OutInterest } = interest.value;
-  if (ConInterest < 0 || ProInterest < 0 || HeadInterest < 0 || OutInterest < 0) {
+  const { ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, FundInterest } = interest.value;
+  if (ConsumptiveInterest < 0 || ProductiveInterest < 0 || InterOfficeInterest < 0 || FundInterest < 0) {
     alert("Nilai bunga tidak boleh negatif.");
     return;
   }

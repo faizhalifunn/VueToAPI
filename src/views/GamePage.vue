@@ -97,10 +97,10 @@ const interest = ref({
 })
 
 const interestLabels = {
-  conInterest: 'ConInterest (Bunga Konsumtif)',
-  proInterest: 'ProInterest (Bunga Produktif)',
-  headInterest: 'HeadInterest (Bunga Kantor Pusat)',
-  outInterest: 'OutInterest (Bunga Pihak Ketiga)',
+  ConsumptiveInterest: 'ConsumptiveInterest (Bunga Konsumtif)',
+  ProductiveInterest: 'ProductiveInterest (Bunga Produktif)',
+ InterOfficeInterest: 'InterOfficeInterest (Bunga Kantor Pusat)',
+  FundInterest: 'FundInterest (Bunga Pihak Ketiga)',
 }
 
 onMounted(() => {
@@ -134,9 +134,9 @@ const submitInterest = async () => {
   try {
     await axios.post('https://api-fastify-pi.vercel.app/game/addinterest', {
       gameCode: gameCode.value,
-      ConInterest: interest.value.conInterest,
-      ProInterest: interest.value.proInterest,
-      HeadInterest: interest.value.headInterest,
+      ConsumptiveInterest: interest.value.conInterest,
+      ProductiveInterest: interest.value.proInterest,
+      InterOfficeInterest: interest.value.InterOfficeInterest,
       OutInterest: interest.value.outInterest
     })
 

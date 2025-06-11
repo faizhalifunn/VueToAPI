@@ -80,12 +80,12 @@ const joinGame = async () => {
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] font-sans px-4 py-10 relative">
     <!-- Back Button -->
-    <button
+    <!-- <button
       @click="goBack"
       class="absolute top-4 left-4 bg-[#00A8C6] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2C3E68] transition hover:scale-105 shadow-md"
     >
       ← Back
-    </button>
+    </button> -->
 
     <!-- Logo -->
     <div class="flex flex-col items-center animate-fade-in -mt-60 mb-44 z-10">
