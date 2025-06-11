@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex flex-col items-center justify-center bg-[#F5FAFC] relative">
+  <div class="h-screen flex flex-col items-center justify-center bg-[#F5FAFC] relative font-sans">
     <!-- 🔙 Tombol Back -->
     <button
       @click="goBack"
@@ -8,8 +8,14 @@
       ← Back
     </button>
 
+    <!-- Ilustrasi & Header -->
+    <div class="flex flex-col items-center mb-8 animate-fade-in">
+      <img src="https://placehold.co/100x100/2C3E68/FFFFFF?text=%F0%9F%94%AC" alt="Mascot" class="w-24 h-24 mb-2 rounded-full shadow-md" />
+      <h1 class="text-3xl font-extrabold text-[#2C3E68] tracking-wide">Welcome to nuPMK</h1>
+    </div>
+
     <!-- Container Utama -->
-    <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6 w-96">
+    <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6 w-96 animate-fade-in">
       <!-- Tombol Play Now -->
       <button
         @click="openJoinForm"
@@ -28,7 +34,7 @@
 
     <!-- Form Join Game (Modal) -->
     <div v-if="showPlayerForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
-      <div class="bg-white rounded-xl shadow-xl p-6 w-80">
+      <div class="bg-white rounded-xl shadow-xl p-6 w-80 animate-fade-in">
         <h2 class="text-xl font-semibold text-center mb-4 text-[#2C3E68]">🎮 Join Game</h2>
         <input
           v-model="joinGameCode"
@@ -143,3 +149,19 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+</style>
