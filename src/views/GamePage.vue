@@ -25,21 +25,11 @@
           </div>
         </div>
 
-        <!-- Action Links -->
-        <div class="flex justify-center items-center gap-57 mt-4">
-          <span
-            @click="removeRound"
-            :class="[
-              'text-sm font-medium cursor-pointer transition text-red-400',
-              forecastRounds.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-red-500'
-            ]"
-          >
+        <div class="flex justify-center items-center gap-10 mt-6">
+          <span @click="removeRound" :class="['text-sm font-medium cursor-pointer transition text-red-400', forecastRounds.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-red-500']">
             Remove Round
           </span>
-          <span
-            @click="addRound"
-            class="text-green-400 text-sm font-medium cursor-pointer hover:text-green-500 transition"
-          >
+          <span @click="addRound" class="text-green-400 text-sm font-medium cursor-pointer hover:text-green-500 transition">
             Add Round
           </span>
         </div>
@@ -69,12 +59,7 @@
           <div class="space-y-4">
             <div v-for="(label, key) in interestLabels" :key="key">
               <label class="block text-sm font-medium mb-1">{{ label }}</label>
-              <input
-                v-model="interest[key]"
-                type="text"
-                placeholder="Masukkan nilai"
-                class="w-full border border-gray-300 px-3 py-2 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
-              />
+              <input v-model="interest[key]" type="text" placeholder="Masukkan nilai" class="w-full border border-gray-300 px-3 py-2 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]" />
             </div>
           </div>
           <div class="flex justify-end mt-6">
@@ -88,81 +73,79 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-const router = useRouter()
-const gameCode = ref('')
-const forecastRounds = ref([{ value: '' }])
-const milestoneRounds = ref([{ value: '' }])
-const isProcessing = ref(false)
-const showConfirm = ref(false)
-const showInterest = ref(false)
+const router = useRouter();
+const gameCode = ref('');
+const forecastRounds = ref([{ value: '' }]);
+const milestoneRounds = ref([{ value: '' }]);
+const isProcessing = ref(false);
+const showConfirm = ref(false);
+const showInterest = ref(false);
 
 const interest = ref({
-  conInterest: '',
-  proInterest: '',
-  headInterest: '',
-  outInterest: '',
-})
+  ConsumptiveInterest: '',
+  ProductiveInterest: '',
+  InterOfficeInterest: '',
+  FundInterest: '',
+});
 
 const interestLabels = {
   ConsumptiveInterest: 'ConsumptiveInterest (Bunga Konsumtif)',
   ProductiveInterest: 'ProductiveInterest (Bunga Produktif)',
   InterOfficeInterest: 'InterOfficeInterest (Bunga Kantor Pusat)',
   FundInterest: 'FundInterest (Bunga Pihak Ketiga)',
-}
+};
 
 onMounted(() => {
-  const code = localStorage.getItem('gameCode')
-  if (code) gameCode.value = code
-  else alert('gameCode not found')
-})
+  const code = localStorage.getItem('gameCode');
+  if (code) gameCode.value = code;
+  else alert('gameCode not found');
+});
 
 const addRound = () => {
-  forecastRounds.value.push({ value: '' })
-  milestoneRounds.value.push({ value: '' })
-}
+  forecastRounds.value.push({ value: '' });
+  milestoneRounds.value.push({ value: '' });
+};
 
 const removeRound = () => {
   if (forecastRounds.value.length > 1) {
-    forecastRounds.value.pop()
-    milestoneRounds.value.pop()
+    forecastRounds.value.pop();
+    milestoneRounds.value.pop();
   }
-}
+};
 
-const openConfirm = () => showConfirm.value = true
-const cancelConfirm = () => showConfirm.value = false
+const openConfirm = () => (showConfirm.value = true);
+const cancelConfirm = () => (showConfirm.value = false);
 const openInterestForm = () => {
-  showConfirm.value = false
-  showInterest.value = true
-}
-const cancelInterest = () => showInterest.value = false
+  showConfirm.value = false;
+  showInterest.value = true;
+};
+const cancelInterest = () => (showInterest.value = false);
 
 const submitInterest = async () => {
-  isProcessing.value = true
+  isProcessing.value = true;
   try {
     await axios.post('https://api-fastify-pi.vercel.app/game/addinterest', {
       gameCode: gameCode.value,
-      ConsumptiveInterest: interest.value.conInterest,
-      ProductiveInterest: interest.value.proInterest,
-      InterOfficeInterest: interest.value.headInterest,
-      OutInterest: interest.value.outInterest
-    })
+      ...interest.value,
+    });
 
-    const started = await startGame()
-    if (!started) throw new Error('Belum ada tim yang join. Silakan tunggu sebelum memulai game.')
+    const started = await startGame();
+    if (!started)
+      throw new Error('Belum ada tim yang join. Silakan tunggu sebelum memulai game.');
 
-    showInterest.value = false
-    await submitData()
+    showInterest.value = false;
+    await submitData();
   } catch (e) {
-    console.error(e)
-    alert('Error: ' + (e.message || 'Unknown'))
+    console.error(e);
+    alert('Error: ' + (e.message || 'Unknown'));
   } finally {
-    isProcessing.value = false
+    isProcessing.value = false;
   }
-}
+};
 
 const startGame = async () => {
   try {
@@ -170,50 +153,50 @@ const startGame = async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameCode: gameCode.value }),
-    })
-    return response.ok
+    });
+    return response.ok;
   } catch (error) {
-    console.error('Error starting the game:', error)
-    return false
+    console.error('Error starting the game:', error);
+    return false;
   }
-}
+};
 
 const submitData = async () => {
-  const fp = {}
-  const mp = {}
+  const fp = {};
+  const mp = {};
 
   forecastRounds.value.forEach((item, idx) => {
-    if (item.value.trim()) fp[`Round ${idx + 1}`] = item.value.trim()
-  })
+    if (item.value.trim()) fp[`Round ${idx + 1}`] = item.value.trim();
+  });
   milestoneRounds.value.forEach((item, idx) => {
-    if (item.value.trim()) mp[`Round ${idx + 1}`] = item.value.trim()
-  })
+    if (item.value.trim()) mp[`Round ${idx + 1}`] = item.value.trim();
+  });
 
   try {
-    const requests = []
+    const requests = [];
     if (Object.keys(fp).length) {
       requests.push(
         axios.post('https://api-fastify-pi.vercel.app/game/addforecast', {
           gameCode: gameCode.value,
-          ...fp
+          ...fp,
         })
-      )
+      );
     }
     if (Object.keys(mp).length) {
       requests.push(
         axios.post('https://api-fastify-pi.vercel.app/game/addAchievement', {
           gameCode: gameCode.value,
-          ...mp
+          ...mp,
         })
-      )
+      );
     }
-    await Promise.all(requests)
-    router.push({ path: `/admin/${gameCode.value}` })
+    await Promise.all(requests);
+    router.push({ path: `/admin/${gameCode.value}` });
   } catch (e) {
-    console.error(e)
-    alert('Error: ' + (e.message || 'Unknown'))
+    console.error(e);
+    alert('Error: ' + (e.message || 'Unknown'));
   }
-}
+};
 </script>
 
 <style scoped>
@@ -221,4 +204,3 @@ input:focus {
   outline: none;
 }
 </style>
-
