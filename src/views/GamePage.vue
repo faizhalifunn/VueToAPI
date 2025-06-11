@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <div class="flex justify-center items-center gap-56 mt-6">
+        <div class="flex justify-center items-center gap-56 mt-4">
           <span @click="removeRound" :class="['text-sm font-medium cursor-pointer transition text-red-400', forecastRounds.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-red-500']">
             Remove Round
           </span>
@@ -42,19 +42,21 @@
         </button>
       </div>
 
-      <div v-if="showConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-[#0D1B2A]">
+      <!-- Confirm Modal -->
+      <div v-if="showConfirm" class="fixed inset-0 flex items-center justify-center p-4 z-50 bg-gradient-to-br from-[#2C3E68]/80 to-[#0D1B2A]/80">
+        <div class="bg-white/90 backdrop-blur-xl text-[#0D1B2A] rounded-2xl shadow-xl p-6 w-full max-w-sm border border-white/20">
           <h2 class="text-lg font-semibold mb-4 text-center">Confirm Submit</h2>
           <p class="mb-6 text-center">Submit interest before starting the game?</p>
-          <div class="flex justify-between">
-            <button @click="cancelConfirm" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
-            <button @click="openInterestForm" class="px-4 py-2 bg-[#00A8C6] text-white rounded-lg hover:bg-[#2C3E68]">Yes</button>
+          <div class="flex justify-center gap-6">
+            <button @click="cancelConfirm" class="px-4 py-2 bg-gray-300 text-[#0D1B2A] font-medium rounded-xl">Cancel</button>
+            <button @click="openInterestForm" class="px-4 py-2 bg-gradient-to-r from-[#00A8C6] to-[#78FFE4] text-white font-medium rounded-xl hover:scale-105 transition">Yes</button>
           </div>
         </div>
       </div>
 
-      <div v-if="showInterest" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md text-[#0D1B2A]">
+      <!-- Interest Modal -->
+      <div v-if="showInterest" class="fixed inset-0 flex items-center justify-center p-4 z-50 bg-gradient-to-br from-[#2C3E68]/80 to-[#0D1B2A]/80">
+        <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg p-6 w-full max-w-md text-[#0D1B2A] border border-white/20">
           <h2 class="text-lg font-semibold mb-4 text-center">Submit Interest</h2>
           <div class="space-y-4">
             <div v-for="(label, key) in interestLabels" :key="key">
@@ -68,6 +70,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
