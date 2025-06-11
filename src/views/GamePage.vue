@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <div class="flex justify-center items-center gap-10 mt-6">
+        <div class="flex justify-center items-center gap-56 mt-6">
           <span @click="removeRound" :class="['text-sm font-medium cursor-pointer transition text-red-400', forecastRounds.length <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-red-500']">
             Remove Round
           </span>
