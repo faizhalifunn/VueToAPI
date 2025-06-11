@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] font-sans px-4 py-10 relative">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] px-4 font-sans relative">
     <!-- Tombol Back -->
     <button
       @click="goBack"
@@ -8,42 +8,39 @@
       ← Back
     </button>
 
-    <!-- Kontainer Utama -->
-    <div class="flex flex-col items-center space-y-6">
-      <!-- Tombol Create Game -->
-      <button
-        @click="resetAndCreateGame"
-        :disabled="isProcessing"
-        class="bg-[#00A8C6] text-white text-lg font-semibold px-8 py-4 rounded-full hover:bg-[#2C3E68] active:scale-95 transition shadow-xl hover:shadow-2xl duration-300 disabled:opacity-50"
-      >
-        <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-        <span>{{ isProcessing ? "Processing..." : "CREATE ROOM" }}</span>
-      </button>
-
-      <!-- Separator -->
-      <span class="text-white text-lg font-medium">Or</span>
-
-      <!-- Form Join Game -->
-  <!-- Join Game Form -->
-    <div class="bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-3xl shadow-xl p-8 w-[340px] flex flex-col items-center">
-      <h2 class="text-xl font-bold mb-4">Join Game</h2>
+    <!-- Panel Utama -->
+    <div class="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl px-10 py-10 flex flex-col items-center space-y-12 animate-fade-in">
       
-      <input
-        v-model="joinGameCode"
-        type="text"
-        placeholder="Enter Code"
-        class="w-full px-4 py-2 text-center bg-white text-[#1C2541] rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8C6] transition mb-3"
-      />
+      <!-- Create Room -->
+      <div class="flex flex-col items-center w-full space-y-3">
+        <h2 class="text-white text-xl font-bold">Create Room</h2>
+        <button
+          @click="resetAndCreateGame"
+          :disabled="isProcessing"
+          class="bg-gradient-to-r from-[#00A8C6] to-[#78FFE4] text-[#0D1B2A] font-semibold px-6 py-2 rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-200 disabled:opacity-50"
+        >
+          {{ isProcessing ? "Processing..." : "Start New Game" }}
+        </button>
+      </div>
 
-     <button
-        @click="joinGame"
-        :disabled="isProcessing"
-        class="bg-gradient-to-r from-[#00A8C6] to-[#78FFE4] text-[#0D1B2A] px-6 py-2 rounded-full text-sm font-semibold tracking-wide shadow-md hover:shadow-xl hover:scale-[1.03] transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-        <span>{{ isProcessing ? "Processing..." : "Enter" }}</span>
-      </button>
-    </div>
+      <!-- Join Game -->
+      <div class="flex flex-col items-center w-full space-y-3">
+        <h2 class="text-white text-xl font-bold">Join Game</h2>
+        <input
+          v-model="joinGameCode"
+          type="text"
+          placeholder="Enter Code"
+          class="w-full px-4 py-2 text-center bg-white text-[#1C2541] rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00A8C6] transition"
+        />
+        <span
+          @click="joinGame"
+          v-if="!isProcessing"
+          class="text-sm text-white font-medium cursor-pointer hover:text-[#78FFE4] transition duration-200"
+        >
+          Enter
+        </span>
+        <span v-else class="text-sm text-gray-300">Loading...</span>
+      </div>
     </div>
   </div>
 </template>
@@ -56,23 +53,16 @@ export default {
   name: "CreateGameButton",
   setup() {
     const router = useRouter();
-    const isProcessing = ref(false); // State untuk animasi loading
-    const joinGameCode = ref(""); // State untuk input gameCode
+    const isProcessing = ref(false);
+    const joinGameCode = ref("");
 
-    // Fungsi kembali ke halaman sebelumnya
-    const goBack = () => {
-      router.go(-1);
-    };
+    const goBack = () => router.go(-1);
 
-    // Fungsi untuk mereset localStorage dan membuat game baru
     const resetAndCreateGame = async () => {
-      if (isProcessing.value) return; // Cegah klik ganda
-      isProcessing.value = true; // Set tombol ke status loading
-
-      // Bersihkan localStorage
+      if (isProcessing.value) return;
+      isProcessing.value = true;
       localStorage.clear();
 
-      // Buat game baru
       try {
         const response = await fetch("https://api-fastify-pi.vercel.app/game/creategame", {
           method: "POST",
@@ -81,85 +71,79 @@ export default {
 
         if (result.message === "Game created successfully") {
           const gameCode = result.data.gameCode;
-
-          // Simpan gameCode ke LocalStorage
           localStorage.setItem("gameCode", gameCode);
-
-          // Redirect ke halaman baru dengan gameCode
           router.push({ name: "GamePage", params: { gameCode } });
         } else {
-          console.error("Failed to create game:", result);
+          alert("Failed to create game.");
         }
       } catch (error) {
         console.error("Error while creating game:", error);
+        alert("An error occurred.");
       } finally {
-        isProcessing.value = false; // Reset tombol ke status normal
+        isProcessing.value = false;
       }
     };
 
-    // Fungsi untuk Join Game
     const joinGame = async () => {
       if (isProcessing.value || !joinGameCode.value.trim()) {
         alert("Please enter a valid game code!");
         return;
       }
 
-      isProcessing.value = true; // Set tombol ke status loading
-
-      // Bersihkan localStorage
+      isProcessing.value = true;
       localStorage.clear();
 
       try {
         const response = await fetch(
-          `https://api-fastify-pi.vercel.app/game/getgame/${joinGameCode.value}`,
-          { method: "GET" }
+          `https://api-fastify-pi.vercel.app/game/getgame/${joinGameCode.value}`
         );
         const result = await response.json();
 
         if (result.message === "Game retrieved successfully") {
-          const status = result.data.gameData.status;
-          const gameCode = result.data.gameData.gameCode;
-
-          // Simpan gameCode ke LocalStorage
+          const { gameCode, status } = result.data.gameData;
           localStorage.setItem("gameCode", gameCode);
 
-          // Redirect berdasarkan status game
           if (status === "onGoing") {
             router.push({ name: "Adminpage", params: { gameCode } });
           } else if (status === "Waiting") {
             router.push({ name: "GamePage", params: { gameCode } });
           } else {
-            alert("This game has already ended. You can create or join a new one to continue playing.");
+            alert("This game has already ended.");
           }
         } else {
-          alert("Game not found. Please check the game code and try again.");
+          alert("Game not found.");
         }
       } catch (error) {
         console.error("Error while joining game:", error);
-        alert("An error occurred. Please try again.");
+        alert("An error occurred.");
       } finally {
-        isProcessing.value = false; // Reset tombol ke status normal
+        isProcessing.value = false;
       }
     };
 
-    return { resetAndCreateGame, joinGame, isProcessing, joinGameCode, goBack };
+    return {
+      resetAndCreateGame,
+      joinGame,
+      isProcessing,
+      joinGameCode,
+      goBack,
+    };
   },
 };
 </script>
 
 <style scoped>
-.loading-spinner {
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
 }
 </style>
