@@ -99,7 +99,12 @@ const joinGame = async () => {
     >
       ← Back
     </button>
-    
+
+    <!-- Ilustrasi -->
+    <div class="flex flex-col items-center animate-fade-in -mt-60 mb-44" style="z-index:10; position:relative;">
+      <img :src="logo" alt="nuPMK Logo" class="w-24 h-24 rounded-full shadow-md" />
+    </div>
+
     <!-- Container Utama -->
     <div class="bg-white/10 backdrop-blur-md text-white rounded-3xl shadow-2xl p-10 flex flex-col items-center space-y-6 max-w-md w-full animate-fade-in border border-white/20 relative z-10">
       <!-- Tombol Play Now -->
