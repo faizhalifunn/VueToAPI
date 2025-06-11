@@ -10,6 +10,7 @@
 
     <!-- Kotak Form -->
     <div class="bg-gray-200 rounded-2xl shadow-md px-8 py-6 w-full max-w-3xl">
+      <h2 class="text-2xl font-bold items-center">Marketing</h2>
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Upgrade</h2>
