@@ -61,7 +61,7 @@
       </div>
       <div class="grid grid-cols-2 gap-8 items-start mt-8">
         <div class="mb-5">
-          <p class="font-bold text-black">Penempatan Pusat</p>
+          <p class="font-bold text-black">Inter Office Account (Placement)</p>
           <input
             v-model="formData.InterOfficeAccountPlacement"
             type="number"
@@ -70,12 +70,12 @@
             :disabled="!isPenempatanEnabled || isLoading"
           />
           <p v-if="!isPenempatanEnabled" class="text-gray-600 text-sm mt-1">
-             Dana Pihak Ketiga lebih kecil dari Total Kredit
+            Fund < Total of Loans
           </p>
         </div>
 
         <div>
-          <p class="font-bold text-black">InterOfficeAccountBorrow</p>
+          <p class="font-bold text-black">Inter Office Account Borrow</p>
           <input
             v-model="formData.PinjamPusat"
             type="number"
@@ -84,13 +84,13 @@
             :disabled="!isPeminjamanEnabled || isLoading"
           />
           <p v-if="!isPeminjamanEnabled" class="text-gray-600 text-sm mt-1">
-             Dana Pihak Ketiga lebih besar dari Total Kredit
+            Fund > Total of Loans
           </p>
         </div>
       </div>
       <!-- Input Kartu Kredit, Insurance, Bintang -->
       <div class="mt-6">
-        <p class="font-bold text-black">CreditCard</p>
+        <p class="font-bold text-black">Credit Card</p>
         <input
           v-model="formData.CreditCard"
           type="text"
@@ -110,7 +110,7 @@
       </div>
 
       <div class="mt-6">
-        <p class="font-bold text-black">AchievementStar</p>
+        <p class="font-bold text-black">Achievement Star</p>
         <input
           v-model="formData.AchievementStar"
           type="text"
@@ -167,12 +167,12 @@ export default {
 
     // Kolom kiri/kanan untuk menampilkan label
     const leftInputs = {
-      ConsumptiveLoan: { text: "ConsumptiveLoan" },
-      ProductiveLoan: { text: "ProductiveLoan" },
+      ConsumptiveLoan: { text: "Consumptive Loan" },
+      ProductiveLoan: { text: "Productive Loan" },
     };
 
     const rightInputs = {
-      DanaPihakKetiga: { text: "Dana Pihak Ketiga (Fund)" },
+      DanaPihakKetiga: { text: "Fund" },
     };
 
     // totalKredit => untuk memutuskan Penempatan / Peminjaman
