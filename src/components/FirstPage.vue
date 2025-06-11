@@ -1,3 +1,7 @@
+<script setup>
+import logo from '@/assets/nupmk-logo.png';
+</script>
+
 <template>
   <div class="h-screen flex flex-col items-center justify-center bg-[#F5FAFC] relative font-sans">
     <!-- 🔙 Tombol Back -->
@@ -10,8 +14,8 @@
 
     <!-- Ilustrasi & Header -->
     <div class="flex flex-col items-center mb-8 animate-fade-in">
-      <img src="https://placehold.co/100x100/2C3E68/FFFFFF?text=%F0%9F%94%AC" alt="Mascot" class="w-24 h-24 mb-2 rounded-full shadow-md" />
-      <h1 class="text-3xl font-extrabold text-[#2C3E68] tracking-wide">Welcome to nuPMK</h1>
+      <img :src="logo" alt="nuPMK Logo" class="w-24 h-24 mb-2 rounded-full shadow-md" />
+      <!-- <h1 class="text-4xl font-bold text-[#2C3E68] tracking-tight font-serif">Welcome to nuPMK</h1> -->
     </div>
 
     <!-- Container Utama -->

@@ -190,7 +190,7 @@ const submitData = async () => {
     }
     if (Object.keys(mp).length) {
       requests.push(
-        axios.post('https://api-fastify-pi.vercel.app/game/addmilestone', {
+        axios.post('https://api-fastify-pi.vercel.app/game/addAchievement', {
           gameCode: gameCode.value,
           ...mp
         })
