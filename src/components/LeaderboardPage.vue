@@ -40,7 +40,7 @@
         >
           <span class="text-gray-800 text-left">{{ index + 1 }}</span>
           <span class="text-gray-800 text-left">{{ team.team || 'N/A' }}</span>
-          <span class="text-gray-800 text-right font-mono">{{ formatNumber(team.data.ContributionPoint) }}</span>
+          <span class="text-gray-800 text-right font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
           <span class="text-gray-800 text-right font-mono">{{ formatNumber(team.TotalBintang) }}</span>
           <button class="text-gray-500 hover:text-black transition font-bold text-center">•••</button>
         </div>
@@ -269,7 +269,7 @@ const fetchChartData = async () => {
     const teams = data.teams;
     console.log("📦 DATA TEAMS:", teams);
     console.log("🧪 LABELS", teams[0]?.rounds?.map(r => r.round));
-    console.log("🧪 POINTS", teams[0]?.rounds?.map(r => r.ContributionPoint));
+    console.log("🧪 POINTS", teams[0]?.rounds?.map(r => r.ContributionMargin));
 
     const hasValidData = Array.isArray(teams) && teams.length > 0 && Array.isArray(teams[0].rounds) && teams[0].rounds.length > 0;
 
@@ -305,7 +305,7 @@ const renderChart = (teams) => {
   const ctx = chartCanvas.value.getContext('2d');
   const datasets = teams.map(t => ({
     label: t.team,
-    data: t.rounds.map(r => Number(r.ContributionPoint) || 0),
+    data: t.rounds.map(r => Number(r.ContributionMargin) || 0),
     borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
     fill: false,
     tension: 0.3,

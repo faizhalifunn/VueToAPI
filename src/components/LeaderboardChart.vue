@@ -47,7 +47,7 @@
         const ctx = chartCanvas.value.getContext('2d');
         const datasets = teams.map(t => ({
           label: t.team,
-          data: t.rounds.map(r => r.ContributionPoint),
+          data: t.rounds.map(r => r.ContributionMargin),
           borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
           fill: false,
           tension: 0.3

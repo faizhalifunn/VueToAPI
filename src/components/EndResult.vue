@@ -53,7 +53,7 @@
             >
               <span class="font-semibold">{{ index + 1 }}</span>
               <span class="font-medium">{{ team.team || 'N/A' }}</span>
-              <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionPoint) }}</span>
+              <span class="font-mono">{{ formatNumber(team.endResult.TotalContributionMargin) }}</span>
               <span class="font-mono">{{ formatNumber(team.endResult.TotalAchievementStar) }}</span>
               <span class="font-mono font-bold">{{ formatNumber(team.endResult.TotalScore) }}</span>
             </div>
@@ -257,7 +257,7 @@ function drawSummaryChart() {
         label: team.team,
         data: sortedRounds.map((r) => {
           const match = (team.rounds || []).find((x) => x.round === r);
-          return match ? match.ContributionPoint : 0;
+          return match ? match.ContributionMargin : 0;
         }),
         borderColor: color,
         backgroundColor: color + '40',
