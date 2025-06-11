@@ -9,7 +9,7 @@
         <span class="text-xl tracking-widest font-mono">{{ gameCode }}</span>
       </div>
 
-      <!-- Forecast & Milestone Panels -->
+      <!-- Forecast & Achievement Panels -->
       <div class="mb-6">
         <div class="flex flex-col md:flex-row gap-6">
           <div class="flex-1">
@@ -20,10 +20,10 @@
             </div>
           </div>
           <div class="flex-1">
-            <h2 class="text-lg font-semibold mb-2 text-center">Milestone</h2>
+            <h2 class="text-lg font-semibold mb-2 text-center">Achievement</h2>
             <div v-for="(item, idx) in milestoneRounds" :key="idx" class="mb-3">
               <label class="text-sm block mb-1 text-center">Round {{ idx + 1 }}</label>
-              <input v-model="item.value" type="text" placeholder="Milestone..." class="w-full border border-gray-300 px-3 py-2 rounded-lg shadow-sm focus:ring focus:ring-indigo-300" />
+              <input v-model="item.value" type="text" placeholder="Achievement..." class="w-full border border-gray-300 px-3 py-2 rounded-lg shadow-sm focus:ring focus:ring-indigo-300" />
             </div>
           </div>
         </div>

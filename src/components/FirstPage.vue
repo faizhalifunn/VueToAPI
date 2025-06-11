@@ -1,62 +1,45 @@
 <template>
-  <div class="h-screen flex flex-col items-center justify-center bg-black relative">
+  <div class="h-screen flex flex-col items-center justify-center bg-[#F5FAFC] relative">
     <!-- 🔙 Tombol Back -->
     <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-[#2C3E68] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#00A8C6] transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
 
     <!-- Container Utama -->
-    <div class="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center space-y-8 w-96">
+    <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6 w-96">
       <!-- Tombol Play Now -->
       <button
         @click="openJoinForm"
-        class="bg-black text-white text-lg font-semibold px-8 py-4 rounded-full w-full hover:bg-gray-800 transition shadow-lg"
+        class="bg-[#2C3E68] text-white text-lg font-semibold px-8 py-4 rounded-full w-full hover:bg-[#00A8C6] active:scale-95 transition shadow-md"
       >
-        Play Now
+        🚀 Play Now
       </button>
 
       <!-- Pilihan Role (Admin, Strategic, Marketing) -->
-      <div class="flex justify-center gap-x-8 mt-6 pt-4">
-        <button @click="selectRole('Admin')" class="text-black text-sm font-medium hover:underline">Admin</button>
-        <button @click="selectRole('Strategic')" class="text-black text-sm font-medium hover:underline">
-          Strategic
-        </button>
-        <button @click="selectRole('Marketing')" class="text-black text-sm font-medium hover:underline">
-          Marketing
-        </button>
+      <div class="flex justify-center gap-x-6 mt-4">
+        <button @click="selectRole('Admin')" class="text-[#2C3E68] text-sm font-medium hover:text-[#00A8C6] transition">Admin</button>
+        <button @click="selectRole('Strategic')" class="text-[#2C3E68] text-sm font-medium hover:text-[#00A8C6] transition">Strategic</button>
+        <button @click="selectRole('Marketing')" class="text-[#2C3E68] text-sm font-medium hover:text-[#00A8C6] transition">Marketing</button>
       </div>
     </div>
 
     <!-- Form Join Game (Modal) -->
-    <div v-if="showPlayerForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-lg p-6 w-80">
-        <h2 class="text-lg font-semibold text-center mb-4 text-gray-900 pb-1">Join Game</h2>
+    <div v-if="showPlayerForm" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+      <div class="bg-white rounded-xl shadow-xl p-6 w-80">
+        <h2 class="text-xl font-semibold text-center mb-4 text-[#2C3E68]">🎮 Join Game</h2>
         <input
           v-model="joinGameCode"
           type="text"
           placeholder="Enter Code"
-          class="w-full px-4 py-2 border border-gray-300 text-black rounded-lg text-center mt-2"
+          class="w-full px-4 py-2 border border-gray-300 text-[#2C3E68] rounded-lg text-center mt-2 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
         />
-        <div class="flex justify-between mt-6 pt-1">
-          <span
-            @click="closeJoinForm"
-            class="text-gray-600 text-sm cursor-pointer hover:underline transition"
-          >
-            Close
-          </span>
-          <span
-            v-if="!isProcessing"
-            @click="joinGame"
-            class="text-black text-sm cursor-pointer hover:underline transition"
-          >
-            Enter
-          </span>
-          <span v-else class="text-black text-sm">
-            Loading...
-          </span>
+        <div class="flex justify-between mt-6">
+          <span @click="closeJoinForm" class="text-gray-500 text-sm cursor-pointer hover:text-[#00A8C6] transition">Close</span>
+          <span v-if="!isProcessing" @click="joinGame" class="text-[#2C3E68] text-sm font-medium cursor-pointer hover:text-[#00A8C6] transition">Enter</span>
+          <span v-else class="text-[#2C3E68] text-sm">Loading...</span>
         </div>
       </div>
     </div>
@@ -75,39 +58,34 @@ export default {
     const joinGameCode = ref("");
     const showPlayerForm = ref(false);
 
-    // Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // Fungsi buka form Join Game
     const openJoinForm = async () => {
       localStorage.setItem("userRole", "Player");
       await nextTick();
       showPlayerForm.value = true;
     };
 
-    // Fungsi menutup form Join Game
     const closeJoinForm = () => {
       showPlayerForm.value = false;
     };
 
-    // Fungsi memilih role (Strategic & Marketing diarahkan ke form masing-masing)
     const selectRole = async (role) => {
       localStorage.setItem("userRole", role);
       await nextTick();
       console.log("Role selected:", role);
-      
+
       if (role === "Admin") {
-        router.push("/admin"); // Admin ke halaman New Game
+        router.push("/admin");
       } else if (role === "Strategic") {
-        router.push("/Join"); // Strategic ke form input
+        router.push("/Join");
       } else if (role === "Marketing") {
-        router.push("/Join"); // Marketing ke form input
+        router.push("/Join");
       }
     };
 
-    // Fungsi untuk Join Game (Player, Strategic, dan Marketing sekarang bisa join)
     const joinGame = async () => {
       const userRole = localStorage.getItem("userRole")?.trim();
       console.log("User Role:", userRole);
