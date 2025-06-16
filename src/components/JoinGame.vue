@@ -1,34 +1,44 @@
 <template>
-  <div class="h-screen flex flex-col items-center justify-center bg-black relative">
-    <!-- 🔙 Tombol Back Berwarna Merah -->
-    <button
+  <div
+  class="h-screen w-screen bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] flex flex-col items-center justify-center relative"
+  >
+
+    <!-- Tombol Back -->
+      <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-[#00A8C6] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2C3E68] transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
 
-    <!-- Kotak Join Game -->
-    <div class="bg-white rounded-lg shadow-md px-6 py-6 flex flex-col items-center space-y-4 w-80">
-      <h2 class="text-black font-bold text-lg">Join Game</h2>
+    <!-- Logo -->
+    <div class="mb-6">
+      <img :src="logo" alt="logo" class="w-20 h-20 rounded-full shadow-lg" />
+    </div>
+
+    <!-- Box Join Game -->
+    <div
+      class="bg-white/10 backdrop-blur-md text-white rounded-3xl shadow-2xl p-10 flex flex-col items-center space-y-6 w-[340px] border border-white/20"
+    >
+
+      <!-- Judul -->
+      <h2 class="text-white text-lg font-semibold tracking-wide">Join Game</h2>
 
       <!-- Input Game Code -->
       <input
         v-model="joinGameCode"
         type="text"
         placeholder="Enter Code"
-        class="w-full px-4 py-2 border border-gray-300 text-black rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-gray-500"
+        class="w-full px-4 py-2 text-center rounded-full border border-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
-      <!-- Tombol Join -->
-      <button
+      <!-- Link Enter -->
+      <p
         @click="joinGame"
-        :disabled="isProcessing"
-        class="bg-black text-white font-medium text-lg px-6 py-2 rounded-full hover:bg-gray-800 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="text-white text-base font-medium cursor-pointer hover:text-[#56C1FF] transition hover:underline"
       >
-        <span v-if="isProcessing" class="loading-spinner"></span>
-        <span>{{ isProcessing ? "Processing..." : "Enter" }}</span>
-      </button>
+        {{ isProcessing ? "Processing..." : "Enter →" }}
+      </p>
     </div>
   </div>
 </template>
@@ -36,6 +46,7 @@
 <script>
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import logo from "@/assets/nupmk-logo.png"; // ✅ Logo di src/assets/
 
 export default {
   name: "JoinPage",
@@ -44,21 +55,17 @@ export default {
     const isProcessing = ref(false);
     const joinGameCode = ref("");
 
-    // ✅ Fungsi kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // ✅ Fungsi untuk Join Game
     const joinGame = async () => {
       if (isProcessing.value || !joinGameCode.value.trim()) {
         alert("Please enter a valid game code!");
         return;
       }
 
-      isProcessing.value = true; // Set tombol ke status loading
-
-      // Bersihkan localStorage sebelum menyimpan gameCode baru
+      isProcessing.value = true;
       localStorage.removeItem("gameCode");
 
       try {
@@ -70,12 +77,10 @@ export default {
 
         if (result.message === "Game retrieved successfully") {
           const gameCode = result.data.gameData.gameCode;
-          const userRole = localStorage.getItem("userRole"); // Ambil role dari localStorage
+          const userRole = localStorage.getItem("userRole");
 
-          // Simpan gameCode ke LocalStorage
           localStorage.setItem("gameCode", gameCode);
 
-          // Redirect berdasarkan role
           switch (userRole) {
             case "Admin":
               router.push({ name: "Adminpage", params: { gameCode } });
@@ -91,7 +96,7 @@ export default {
               break;
             default:
               alert("Invalid role. Please select a valid role before joining.");
-              router.push("/"); // Redirect ke halaman utama jika role tidak valid
+              router.push("/");
               break;
           }
         } else {
@@ -101,17 +106,22 @@ export default {
         console.error("Error while joining game:", error);
         alert("An error occurred. Please try again.");
       } finally {
-        isProcessing.value = false; // Reset tombol ke status normal
+        isProcessing.value = false;
       }
     };
 
-    return { joinGame, isProcessing, joinGameCode, goBack };
+    return {
+      joinGame,
+      isProcessing,
+      joinGameCode,
+      goBack,
+      logo,
+    };
   },
 };
 </script>
 
 <style>
-/* 🔥 Animasi Loading Spinner */
 .loading-spinner {
   display: inline-block;
   border: 3px solid white;
@@ -120,7 +130,6 @@ export default {
   width: 18px;
   height: 18px;
   animation: spin 0.8s linear infinite;
-  vertical-align: middle;
 }
 
 @keyframes spin {

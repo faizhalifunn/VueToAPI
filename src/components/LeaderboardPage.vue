@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center bg-black py-10 px-4 relative overflow-x-hidden">
+  <div class="min-h-screen flex flex-col items-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white py-10 px-4 relative overflow-x-hidden">
     <!-- Tombol Back -->
     <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-[#00A8C6] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2C3E68] transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
@@ -17,16 +17,16 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="bg-white rounded-2xl shadow-md p-8 w-full max-w-5xl z-10 flex flex-col gap-10">
+    <div v-else class="bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl p-10 w-full max-w-5xl z-10 flex flex-col gap-10 border border-white/20">
       <!-- Header -->
-      <div class="bg-black text-white text-2xl font-bold py-2 px-4 rounded-t-lg flex justify-between items-center">
+      <div class="bg-[#1C2541] text-white text-2xl font-bold py-2 px-4 rounded-t-lg flex justify-between items-center">
         <span>{{ round }}</span>
         <span class="text-lg font-medium">{{ gameCode }}</span>
       </div>
 
       <!-- Leaderboard Table -->
-      <div class="bg-gray-100 p-4 rounded-lg shadow-inner">
-        <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-white bg-gray-600 px-4 py-3 rounded-t-md">
+      <div class="bg-white/10 p-4 rounded-xl shadow-inner">
+        <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-white bg-[#00A8C6] px-4 py-3 rounded-t-md">
           <span class="text-left">Rank</span>
           <span class="text-left">Team Name</span>
           <span class="text-right">Contribution</span>
@@ -36,25 +36,25 @@
         <div
           v-for="(team, index) in sortedLeaderboard"
           :key="index"
-          class="grid grid-cols-5 gap-4 items-center bg-white px-4 py-2 border-b border-gray-200 hover:bg-gray-100"
+          class="grid grid-cols-5 gap-4 items-center bg-white text-[#1C2541] px-4 py-2 border-b border-gray-200 hover:bg-gray-100"
         >
-          <span class="text-gray-800 text-left">{{ index + 1 }}</span>
-          <span class="text-gray-800 text-left">{{ team.team || 'N/A' }}</span>
-          <span class="text-gray-800 text-right font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
-          <span class="text-gray-800 text-right font-mono">{{ formatNumber(team.TotalBintang) }}</span>
-          <button class="text-gray-500 hover:text-black transition font-bold text-center">•••</button>
+          <span class="text-left">{{ index + 1 }}</span>
+          <span class="text-left">{{ team.team || 'N/A' }}</span>
+          <span class="text-right font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
+          <span class="text-right font-mono">{{ formatNumber(team.TotalBintang) }}</span>
+          <button class="text-[#00A8C6] hover:text-[#2C3E68] font-bold text-center">...</button>
         </div>
       </div>
 
-      <!-- Chart -->
-      <div class="bg-gray-100 p-6 rounded-lg shadow-md overflow-hidden">
-  <div v-if="isChartLoading" class="text-center py-4 font-semibold text-gray-700">Loading chart...</div>
-  <div v-else>
-    <div v-if="!hasChartData" class="text-center py-4 text-gray-500">
-      Belum ada data kontribusi untuk ditampilkan pada chart.
-    </div>
-    <canvas v-else ref="chartCanvas" class="w-full h-72"></canvas>
-  </div>
+      <!-- Chart Section -->
+      <div class="bg-white/10 p-6 rounded-xl shadow-md overflow-hidden">
+        <div v-if="isChartLoading" class="text-center py-4 font-semibold text-white">Loading chart...</div>
+        <div v-else>
+          <div v-if="!hasChartData" class="text-center py-4 text-gray-300">
+            Belum ada data kontribusi untuk ditampilkan pada chart.
+          </div>
+          <canvas v-else ref="chartCanvas" class="w-full h-72"></canvas>
+        </div>
       </div>
 
       <!-- Action Buttons -->
@@ -62,27 +62,27 @@
         <button
           @click="showConfirmEndRoundModal = true"
           :disabled="isProcessing"
-          class="bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+          class="bg-[#00A8C6] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#2C3E68] shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-          <span>{{ isProcessing ? 'Processing...' : 'NEXT ROUND' }}</span>
+          <span>{{ isProcessing ? '' : 'NEXT ROUND' }}</span>
         </button>
         <button
           @click="showConfirmEndGameModal = true"
           :disabled="isProcessing"
-          class="text-white px-8 py-3 bg-red-700 rounded-lg font-semibold hover:bg-red-800 shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+          class="bg-red-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-          <span>{{ isProcessing ? 'Processing...' : 'END GAME' }}</span>
+          <span>{{ isProcessing ? '' : 'END GAME' }}</span>
         </button>
       </div>
     </div>
 
-    <!-- Confirm Next Round / End Game Modal -->
+    <!-- Confirm Modal -->
     <transition name="popup">
       <div v-if="showConfirmEndRoundModal || showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-gray-800 opacity-50"></div>
-        <div class="relative bg-white rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10 transform transition-all text-neutral-700">
+        <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10 transform transition-all">
           <h3 class="text-xl font-bold mb-3">
             {{ showConfirmEndRoundModal ? 'Konfirmasi Next Round' : 'Konfirmasi End Game' }}
           </h3>
@@ -97,123 +97,18 @@
             </button>
             <button
               @click="showConfirmEndRoundModal ? openInterestForm() : confirmEndGame()"
-              class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-2 text-sm bg-[#00A8C6] text-white rounded-md hover:bg-[#2C3E68] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
               :disabled="isProcessing"
             >
-              <span v-if="isProcessing && !showInterestFormModal" class="loading-spinner mr-2"></span>
-              <span>{{ isProcessing ? 'Processing...' : 'Ya' }}</span>
+              <span v-if="isProcessing && !showInterestFormModal" class="loading-spinner"></span>
+              <span v-if="!isProcessing">Ya</span>
             </button>
           </div>
         </div>
       </div>
     </transition>
-
-    <!-- Interest Form Modal -->
-    <transition name="popup">
-      <div v-if="showInterestFormModal" class="fixed inset-0 z-50 flex items-center justify-center">
-        <div class="absolute inset-0 bg-gray-800 opacity-50"></div>
-        <div class="relative bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6 z-10 transform transition-all text-neutral-600 space-y-4">
-          <h3 class="text-xl font-semibold">Submit Interest</h3>
-          <form @submit.prevent="submitInterest">
-            <div class="mb-3">
-              <label class="block text-sm font-medium mb-1">Bunga Konsumtif (%)</label>
-              <input
-                type="number"
-                min="0"
-                v-model.number="interest.ConsumptiveInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.ConsumptiveInterest < 0 ? 'border-red-500' : '']"
-                placeholder="Masukkan bunga konsumtif"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="block text-sm font-medium mb-1">Bunga Produktif (%)</label>
-              <input
-                type="number"
-                min="0"
-                v-model.number="interest.ProductiveInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.ProductiveInterest < 0 ? 'border-red-500' : '']"
-                placeholder="Masukkan bunga produktif"
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label class="block text-sm font-medium mb-1">Bunga Kantor Pusat (%)</label>
-              <input
-                type="number"
-                min="0"
-                v-model.number="interest.InterOfficeInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.InterOfficeInterest < 0 ? 'border-red-500' : '']"
-                placeholder="Masukkan bunga kantor pusat"
-                required
-              />
-            </div>
-            <div class="mb-4">
-              <label class="block text-sm font-medium mb-1">Bunga Pihak Ketiga (%)</label>
-              <input
-                type="number"
-                min="0"
-                v-model.number="interest.OutInterest"
-                :class="['w-full px-3 py-2 border rounded', interest.FundInterest < 0 ? 'border-red-500' : '']"
-                placeholder="Masukkan bunga pihak ketiga"
-                required
-              />
-            </div>
-            <div class="flex justify-end gap-3 mt-6">
-              <button
-                type="button"
-                @click="closeModals"
-                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
-                :disabled="isProcessing"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                :disabled="isProcessing"
-                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span v-if="isProcessing" class="loading-spinner mr-2"></span>
-                <span>{{ isProcessing ? 'Submitting...' : 'Submit' }}</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
-
-<style>
-.loading-spinner {
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.popup-enter-active,
-.popup-leave-active {
-  transition: all 200ms ease;
-}
-.popup-enter-from,
-.popup-leave-to {
-  opacity: 0;
-  transform: scale(0.9);
-}
-.popup-enter-to,
-.popup-leave-from {
-  opacity: 1;
-  transform: scale(1);
-}
-</style>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
@@ -224,14 +119,13 @@ const router = useRouter();
 const round = ref(1);
 const leaderboard = ref([]);
 const isProcessing = ref(false);
+isProcessing.value = false;
 const isRefreshing = ref(true);
 const gameCode = localStorage.getItem('gameCode');
 const chartCanvas = ref(null);
 let chartInstance = null;
 const isChartLoading = ref(true);
-isChartLoading.value = true;
 const hasChartData = ref(false);
-
 const showConfirmEndRoundModal = ref(false);
 const showConfirmEndGameModal = ref(false);
 const showInterestFormModal = ref(false);
@@ -267,41 +161,24 @@ const fetchChartData = async () => {
     const res = await fetch(`https://api-fastify-pi.vercel.app/game/result?gameCode=${gameCode}`);
     const data = await res.json();
     const teams = data.teams;
-    console.log("📦 DATA TEAMS:", teams);
-    console.log("🧪 LABELS", teams[0]?.rounds?.map(r => r.round));
-    console.log("🧪 POINTS", teams[0]?.rounds?.map(r => r.ContributionMargin));
-
     const hasValidData = Array.isArray(teams) && teams.length > 0 && Array.isArray(teams[0].rounds) && teams[0].rounds.length > 0;
-
     if (hasValidData) {
       hasChartData.value = true;
       await nextTick();
       setTimeout(() => renderChart(teams), 0);
     } else {
       hasChartData.value = false;
-      console.warn("⚠️ Chart tidak bisa ditampilkan: data kosong.");
     }
   } catch (err) {
-    console.error("❌ Error fetchChartData:", err);
+    console.error('❌ Error fetchChartData:', err);
   } finally {
     isChartLoading.value = false;
   }
 };
 
 const renderChart = (teams) => {
-  console.log("🎯 chartCanvas.value =", chartCanvas.value);
-  if (!chartCanvas.value) {
-    console.error("❌ Canvas belum tersedia!");
-    return;
-  }
-
-  if (!teams.length || !teams[0].rounds || !teams[0].rounds.length) {
-    console.warn("❌ Tidak ada data rounds valid untuk chart.");
-    return;
-  }
-
+  if (!chartCanvas.value) return;
   if (chartInstance) chartInstance.destroy();
-
   const ctx = chartCanvas.value.getContext('2d');
   const datasets = teams.map(t => ({
     label: t.team,
@@ -310,7 +187,6 @@ const renderChart = (teams) => {
     fill: false,
     tension: 0.3,
   }));
-
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -320,22 +196,13 @@ const renderChart = (teams) => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true },
-      },
+      plugins: { legend: { display: true } },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Contribution Points' },
-        },
-        x: {
-          title: { display: true, text: 'Rounds' },
-        },
+        y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
+        x: { title: { display: true, text: 'Rounds' } },
       },
     },
   });
-
-  console.log("✅ Chart berhasil dirender!");
 };
 
 const openInterestForm = () => {
@@ -344,8 +211,8 @@ const openInterestForm = () => {
 };
 
 const submitInterest = async () => {
-  const { ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, FundInterest } = interest.value;
-  if (ConsumptiveInterest < 0 || ProductiveInterest < 0 || InterOfficeInterest < 0 || FundInterest < 0) {
+  const { ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, OutInterest } = interest.value;
+  if ([ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, OutInterest].some(val => val < 0)) {
     alert("Nilai bunga tidak boleh negatif.");
     return;
   }
@@ -415,3 +282,34 @@ onBeforeUnmount(() => {
 const sortedLeaderboard = computed(() => leaderboard.value);
 const formatNumber = num => num || 0;
 </script>
+
+<style scoped>
+.loading-spinner {
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.popup-enter-active,
+.popup-leave-active {
+  transition: all 0.2s ease;
+}
+.popup-enter-from,
+.popup-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.popup-enter-to,
+.popup-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>
