@@ -1,8 +1,8 @@
 <template>
   <div class="relative">
     <!-- ✅ Konten utama -->
-    <div class="min-h-screen flex flex-col items-center justify-center bg-black text-gray-800 pt-12 pb-16">
-      <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-[95%]">
+    <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f1f4b] to-[#132b5c] text-white pt-12 pb-16">
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-6 w-full max-w-[95%] border border-white/10">
 
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
@@ -11,17 +11,17 @@
         </div>
 
         <!-- ✅ Tab Navigation (Sticky + Back Button) -->
-        <div class="flex items-center justify-start gap-2 overflow-x-auto pb-2 mb-4 border-b border-gray-400 sticky top-0 bg-gray-200 z-20 px-4 pt-2">
+        <div class="flex items-center justify-start gap-2 overflow-x-auto pb-2 mb-4 border-b border-white/30 sticky top-0 bg-white/5 z-20 px-4 pt-2">
           <button
             @click="goBack"
-            class="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+            class="bg-[#00A8C6] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2C3E68] transition hover:scale-105 shadow-md"
           >
             ← Back
           </button>
 
           <button
             @click="activeTab = 'summary'"
-            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === 'summary' ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === 'summary' ? 'bg-[#00A8C6] text-white' : 'bg-white/10 hover:bg-white/20']"
           >
             End Summary
           </button>
@@ -30,7 +30,7 @@
             v-for="round in availableRounds"
             :key="round"
             @click="activeTab = round"
-            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === round ? 'bg-blue-600 text-white' : 'bg-gray-300 hover:bg-gray-400']"
+            :class="[ 'px-4 py-2 font-medium rounded-t-lg', activeTab === round ? 'bg-[#00A8C6] text-white' : 'bg-white/10 hover:bg-white/20']"
           >
             {{ round }}
           </button>
@@ -38,8 +38,8 @@
 
         <!-- ✅ Summary Tab -->
         <div v-if="activeTab === 'summary'">
-          <div class="border-t border-black">
-            <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium text-gray-950 py-2 border-b border-black">
+          <div class="border-t border-white/30">
+            <div class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 text-sm font-medium py-2 border-b border-white/20">
               <span>Rank</span>
               <span>Team Name</span>
               <span>Contribution Point</span>
@@ -49,7 +49,7 @@
             <div
               v-for="(team, index) in sortedTeams"
               :key="index"
-              class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 items-center py-2 border-b border-black text-center"
+              class="grid grid-cols-[1fr_2fr_2fr_1fr_2fr] gap-2 items-center py-2 border-b border-white/10 text-center"
             >
               <span class="font-semibold">{{ index + 1 }}</span>
               <span class="font-medium">{{ team.team || 'N/A' }}</span>
@@ -65,18 +65,18 @@
         </div>
 
         <!-- ✅ Round Tab -->
-        <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length">
+        <div v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length" class="flex flex-col items-center">
           <div class="flex-overflow-container">
             <div
               v-for="(teamData, teamName) in teamRoundData"
               :key="teamName"
-              class="card-container p-4"
+              class="card-container p-4 bg-white text-black border border-gray-300 shadow-md"
             >
               <h3 class="text-xl font-bold text-center mb-2">{{ teamName }}</h3>
 
               <!-- Tabel 1 -->
-              <table class="w-full text-sm mb-4 border border-gray-300">
-                <thead class="bg-gray-100">
+              <table class="w-full text-sm mb-4">
+                <thead class="bg-gray-100 text-black">
                   <tr>
                     <th>Pro Interest</th>
                     <th>Con Interest</th>
@@ -101,8 +101,8 @@
               </table>
 
               <!-- Tabel 2 -->
-              <table class="w-full text-sm mb-4 border border-gray-300">
-                <thead class="bg-gray-100">
+              <table class="w-full text-sm mb-4">
+                <thead class="bg-gray-100 text-black">
                   <tr>
                     <th>Insurance</th>
                     <th>ProductiveLoan</th>
