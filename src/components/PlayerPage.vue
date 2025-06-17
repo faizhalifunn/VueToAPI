@@ -1,133 +1,132 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black p-6 relative">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] p-6 text-white font-sans relative">
     <!-- Overlay Loading Global -->
     <div
       v-if="isLoading"
-      class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50"
+      class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 backdrop-blur-md"
     >
-      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white"></div>
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#00A8C6]"></div>
       <span class="mt-4 text-white text-2xl font-bold">Loading...</span>
     </div>
 
     <!-- Tombol Back -->
     <button
       @click="goBack"
-      class="absolute top-6 left-6 bg-red-600 text-white py-2 px-4 rounded-md font-bold hover:bg-red-700 transition duration-300"
+      class="absolute top-6 left-6 bg-blue-600 text-white py-2 px-4 rounded-xl font-bold hover:bg-red-500 transition duration-300 shadow-md"
     >
       ← Back
     </button>
 
-    <!-- Form Pengisian Data -->
+    <!-- Form Container -->
     <div
-      class="bg-white text-black rounded-xl shadow-lg p-8 w-full max-w-3xl border border-gray-600"
+      class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-4xl border border-white/20"
       :class="{'pointer-events-none': isLoading}"
     >
-      <!-- Grid 2 kolom -->
       <div class="grid grid-cols-2 gap-8 items-start">
         <!-- Kolom Kiri -->
         <div>
-          <h2 class="text-3xl font-bold mb-6 text-black">Input Data</h2>
+          <h2 class="text-3xl font-bold mb-6">Input Data</h2>
           <div v-for="(label, key) in leftInputs" :key="key" class="mb-5">
-            <p class="text-left font-bold text-black">{{ label.text }}</p>
+            <p class="text-left font-semibold">{{ label.text }}</p>
             <input
               v-model="formData[key]"
               type="number"
-              class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
-              :class="getInputClass(key)"
+              :placeholder="label.text"
+              class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
               :disabled="isLoading"
             />
-            <!-- Contoh validasi sederhana -->
-            <p v-if="formData[key] === ''" class="text-red-600 text-sm mt-1">Harap isi field ini</p>
+            <p v-if="formData[key] === ''" class="text-red-400 text-sm mt-1">Harap isi field ini</p>
           </div>
         </div>
 
         <!-- Kolom Kanan -->
         <div>
-          <h2 class="text-3xl font-bold mb-6 text-right text-black">
-            <span v-if="isLoading">Loading...</span>
-            <span v-else>{{ currentRound }}</span>
-          </h2>
+          <h2 class="text-3xl font-bold mb-6 text-right">{{ isLoading ? "Loading..." : currentRound }}</h2>
           <div v-for="(label, key) in rightInputs" :key="key" class="mb-5">
-            <p class="text-left font-bold text-black">{{ label.text }}</p>
+            <p class="text-left font-semibold">{{ label.text }}</p>
             <input
               v-model="formData[key]"
               type="number"
-              class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
+              :placeholder="label.text"
+              class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
               :disabled="isLoading"
             />
-            <p v-if="formData[key] === ''" class="text-red-600 text-sm mt-1">Harap isi field ini</p>
+            <p v-if="formData[key] === ''" class="text-red-400 text-sm mt-1">Harap isi field ini</p>
           </div>
         </div>
       </div>
+
+      <!-- Penempatan / Peminjaman -->
       <div class="grid grid-cols-2 gap-8 items-start mt-8">
         <div class="mb-5">
-          <p class="font-bold text-black">Inter Office Account (Placement)</p>
+          <p class="font-semibold">Inter Office Account (Placement)</p>
           <input
             v-model="formData.InterOfficeAccountPlacement"
             type="number"
-            class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
-            :class="{'bg-gray-300 cursor-not-allowed': !isPenempatanEnabled || isLoading}"
+            placeholder="Placement"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            :class="{'bg-white/20 cursor-not-allowed': !isPenempatanEnabled || isLoading}"
             :disabled="!isPenempatanEnabled || isLoading"
           />
-          <p v-if="!isPenempatanEnabled" class="text-gray-600 text-sm mt-1">
-            Fund < Total of Loans
-          </p>
+          <p v-if="!isPenempatanEnabled" class="text-white/60 text-sm mt-1">Fund &lt; Total of Loans</p>
         </div>
 
         <div>
-          <p class="font-bold text-black">Inter Office Account Borrow</p>
+          <p class="font-semibold">Inter Office Account Borrow</p>
           <input
             v-model="formData.PinjamPusat"
             type="number"
-            class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
-            :class="{'bg-gray-300 cursor-not-allowed': !isPeminjamanEnabled || isLoading}"
+            placeholder="Borrow"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            :class="{'bg-white/20 cursor-not-allowed': !isPeminjamanEnabled || isLoading}"
             :disabled="!isPeminjamanEnabled || isLoading"
           />
-          <p v-if="!isPeminjamanEnabled" class="text-gray-600 text-sm mt-1">
-            Fund > Total of Loans
-          </p>
+          <p v-if="!isPeminjamanEnabled" class="text-white/60 text-sm mt-1">Fund &gt; Total of Loans</p>
         </div>
       </div>
-      <!-- Input Kartu Kredit, Insurance, Bintang -->
-      <div class="mt-6">
-        <p class="font-bold text-black">Credit Card</p>
-        <input
-          v-model="formData.CreditCard"
-          type="text"
-          class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
-          :disabled="isLoading"
-        />
-      </div>
 
-      <div class="mt-6">
-        <p class="font-bold text-black">Insurance</p>
-        <input
-          v-model="formData.Insurance"
-          type="text"
-          class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
-          :disabled="isLoading"
-        />
-      </div>
+      <!-- Tambahan Input -->
+      <div class="mt-6 space-y-6">
+        <div>
+          <p class="font-semibold">Credit Card</p>
+          <input
+            v-model="formData.CreditCard"
+            type="text"
+            placeholder="Credit Card"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            :disabled="isLoading"
+          />
+        </div>
 
-      <div class="mt-6">
-        <p class="font-bold text-black">Achievement Star</p>
-        <input
-          v-model="formData.AchievementStar"
-          type="text"
-          class="w-full p-3 rounded-md border border-gray-400 font-bold shadow-sm focus:outline-none focus:ring-2 bg-gray-100"
-          :disabled="isLoading"
-        />
-      </div>
+        <div>
+          <p class="font-semibold">Insurance</p>
+          <input
+            v-model="formData.Insurance"
+            type="text"
+            placeholder="Insurance"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            :disabled="isLoading"
+          />
+        </div>
 
-      <!-- Bagian Penempatan Pusat & Peminjaman Pusat -->
-      
+        <div>
+          <p class="font-semibold">Achievement Star</p>
+          <input
+            v-model="formData.AchievementStar"
+            type="text"
+            placeholder="Achievement Star"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            :disabled="isLoading"
+          />
+        </div>
+      </div>
 
       <!-- Tombol Submit -->
       <div class="flex justify-center mt-10 pt-4">
         <button
           @click="submitForm"
           :disabled="isLoading"
-          class="bg-black text-white text-xl font-bold py-3 px-12 rounded-md hover:bg-gray-800 transition duration-300 shadow-lg"
+          class="bg-[#00A8C6] text-white text-xl font-bold py-3 px-12 rounded-xl hover:brightness-110 transition duration-300 shadow-lg"
         >
           <span v-if="isLoading">Loading...</span>
           <span v-else>Submit</span>
