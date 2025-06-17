@@ -1,3 +1,4 @@
+
 <template>
   <div class="min-h-screen flex flex-col items-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white py-10 px-4 relative overflow-x-hidden">
     <!-- Tombol Back -->
@@ -23,6 +24,7 @@
         <span>{{ round }}</span>
         <span class="text-lg font-medium">{{ gameCode }}</span>
       </div>
+
       <!-- Leaderboard Table -->
       <div class="bg-white/10 p-4 rounded-xl shadow-inner">
         <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-white bg-[#00A8C6] px-4 py-3 rounded-t-md">
@@ -56,10 +58,10 @@
         </div>
       </div>
 
-           <!-- Action Buttons -->
+      <!-- Action Buttons -->
       <div class="flex justify-center flex-wrap gap-6">
         <button
-          @click="confirmEndRound"
+          @click="showConfirmEndRoundModal = true"
           :disabled="isProcessing"
           class="bg-[#00A8C6] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#2C3E68] shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
@@ -77,24 +79,68 @@
       </div>
     </div>
 
-    <!-- Confirm End Game Modal -->
+    <!-- Confirm Modal -->
     <transition name="popup">
-      <div v-if="showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div v-if="showConfirmEndRoundModal || showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-gray-800 opacity-50"></div>
         <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10 transform transition-all">
-          <h3 class="text-xl font-bold mb-3">Konfirmasi End Game</h3>
-          <p class="mb-6 text-sm">Apakah Anda yakin ingin mengakhiri game sekarang?</p>
+          <h3 class="text-xl font-bold mb-3">
+            {{ showConfirmEndRoundModal ? 'Konfirmasi Next Round' : 'Konfirmasi End Game' }}
+          </h3>
+          <p class="mb-6 text-sm">
+            {{ showConfirmEndRoundModal
+              ? 'Apakah Anda yakin ingin melanjutkan ke ronde berikutnya?'
+              : 'Apakah Anda yakin ingin mengakhiri game sekarang?' }}
+          </p>
           <div class="flex justify-end gap-3 mt-6">
             <button @click="closeModals" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
               Batal
             </button>
             <button
-              @click="confirmEndGame"
+              @click="showConfirmEndRoundModal ? confirmEndRound() : confirmEndGame()"
               class="px-4 py-2 text-sm bg-[#00A8C6] text-white rounded-md hover:bg-[#2C3E68] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
               :disabled="isProcessing"
             >
               <span v-if="isProcessing" class="loading-spinner"></span>
-              <span v-else>Ya</span>
+              <span v-if="!isProcessing">Ya</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Active Customer Input Modal -->
+    <transition name="popup">
+      <div v-if="showInputCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black opacity-60 backdrop-blur-md"></div>
+        <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10">
+          <h3 class="text-xl font-bold mb-4 text-center">Input Active Customer</h3>
+          <div class="mb-4">
+            <label class="block font-semibold mb-1">Team Name</label>
+            <input
+              v-model="teamName"
+              type="text"
+              placeholder="Team name"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block font-semibold mb-1">Active Customer</label>
+            <input
+              v-model.number="activeCustomer"
+              type="number"
+              placeholder="Enter number"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            />
+          </div>
+          <div class="flex justify-end gap-3">
+            <button @click="closeModals" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+            <button
+              @click="submitCustomer"
+              class="px-4 py-2 bg-[#00A8C6] text-white rounded hover:bg-[#2C3E68] disabled:opacity-50"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? 'Submitting...' : 'Submit' }}
             </button>
           </div>
         </div>
