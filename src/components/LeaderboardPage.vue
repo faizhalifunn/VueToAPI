@@ -164,7 +164,14 @@ const chartCanvas = ref(null);
 let chartInstance = null;
 const isChartLoading = ref(true);
 const hasChartData = ref(false);
+
+// ✅ Tambahan yang sebelumnya hilang
+const showConfirmEndRoundModal = ref(false);
 const showConfirmEndGameModal = ref(false);
+const showInputCustomerModal = ref(false);
+const teamName = ref('');
+const activeCustomer = ref(null);
+const isSubmitting = ref(false);
 
 const goBack = () => router.go(-1);
 
@@ -233,20 +240,23 @@ const renderChart = (teams) => {
   });
 };
 
-
 const confirmEndRound = async () => {
+  console.log('🔁 Memulai end round...');
   isProcessing.value = true;
   try {
-    await fetch('https://api-fastify-pi.vercel.app/round/add', {
+    const res = await fetch('https://api-fastify-pi.vercel.app/round/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameCode }),
     });
-    location.reload(); // reload untuk menampilkan data terbaru
+    const data = await res.json();
+    console.log('✅ Response end round:', data);
+    location.reload();
   } catch (err) {
     console.error('❌ Error confirmEndRound:', err);
   } finally {
     isProcessing.value = false;
+    closeModals();
   }
 };
 
@@ -263,6 +273,24 @@ const confirmEndGame = async () => {
     console.error('❌ Error confirmEndGame:', err);
   } finally {
     isProcessing.value = false;
+    closeModals();
+  }
+};
+
+const submitCustomer = async () => {
+  isSubmitting.value = true;
+  try {
+    await fetch('https://api-fastify-pi.vercel.app/game/inputCustomer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameCode, team: teamName.value, activeCustomer: activeCustomer.value }),
+    });
+    location.reload();
+  } catch (err) {
+    console.error('❌ Error submitCustomer:', err);
+  } finally {
+    isSubmitting.value = false;
+    closeModals();
   }
 };
 
@@ -271,7 +299,6 @@ const closeModals = () => {
   showConfirmEndRoundModal.value = false;
   showInputCustomerModal.value = false;
 };
-
 
 onMounted(() => {
   fetchRoundData();
