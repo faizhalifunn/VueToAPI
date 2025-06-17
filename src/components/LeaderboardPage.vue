@@ -23,7 +23,6 @@
         <span>{{ round }}</span>
         <span class="text-lg font-medium">{{ gameCode }}</span>
       </div>
-
       <!-- Leaderboard Table -->
       <div class="bg-white/10 p-4 rounded-xl shadow-inner">
         <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-white bg-[#00A8C6] px-4 py-3 rounded-t-md">
@@ -57,10 +56,10 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
+           <!-- Action Buttons -->
       <div class="flex justify-center flex-wrap gap-6">
         <button
-          @click="showConfirmEndRoundModal = true"
+          @click="confirmEndRound"
           :disabled="isProcessing"
           class="bg-[#00A8C6] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#2C3E68] shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
@@ -78,30 +77,24 @@
       </div>
     </div>
 
-    <!-- Confirm Modal -->
+    <!-- Confirm End Game Modal -->
     <transition name="popup">
-      <div v-if="showConfirmEndRoundModal || showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div v-if="showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-gray-800 opacity-50"></div>
         <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10 transform transition-all">
-          <h3 class="text-xl font-bold mb-3">
-            {{ showConfirmEndRoundModal ? 'Konfirmasi Next Round' : 'Konfirmasi End Game' }}
-          </h3>
-          <p class="mb-6 text-sm">
-            {{ showConfirmEndRoundModal
-              ? 'Apakah Anda yakin ingin melanjutkan ke ronde berikutnya?'
-              : 'Apakah Anda yakin ingin mengakhiri game sekarang?' }}
-          </p>
+          <h3 class="text-xl font-bold mb-3">Konfirmasi End Game</h3>
+          <p class="mb-6 text-sm">Apakah Anda yakin ingin mengakhiri game sekarang?</p>
           <div class="flex justify-end gap-3 mt-6">
             <button @click="closeModals" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
               Batal
             </button>
             <button
-              @click="showConfirmEndRoundModal ? openInterestForm() : confirmEndGame()"
+              @click="confirmEndGame"
               class="px-4 py-2 text-sm bg-[#00A8C6] text-white rounded-md hover:bg-[#2C3E68] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
               :disabled="isProcessing"
             >
-              <span v-if="isProcessing && !showInterestFormModal" class="loading-spinner"></span>
-              <span v-if="!isProcessing">Ya</span>
+              <span v-if="isProcessing" class="loading-spinner"></span>
+              <span v-else>Ya</span>
             </button>
           </div>
         </div>
@@ -119,24 +112,13 @@ const router = useRouter();
 const round = ref(1);
 const leaderboard = ref([]);
 const isProcessing = ref(false);
-isProcessing.value = false;
 const isRefreshing = ref(true);
 const gameCode = localStorage.getItem('gameCode');
 const chartCanvas = ref(null);
 let chartInstance = null;
 const isChartLoading = ref(true);
 const hasChartData = ref(false);
-const showConfirmEndRoundModal = ref(false);
 const showConfirmEndGameModal = ref(false);
-const showInterestFormModal = ref(false);
-
-const interest = ref({
-  gameCode,
-  ConsumptiveInterest: null,
-  ProductiveInterest: null,
-  InterOfficeInterest: null,
-  OutInterest: null,
-});
 
 const goBack = () => router.go(-1);
 
@@ -205,32 +187,6 @@ const renderChart = (teams) => {
   });
 };
 
-const openInterestForm = () => {
-  showConfirmEndRoundModal.value = false;
-  showInterestFormModal.value = true;
-};
-
-const submitInterest = async () => {
-  const { ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, OutInterest } = interest.value;
-  if ([ConsumptiveInterest, ProductiveInterest, InterOfficeInterest, OutInterest].some(val => val < 0)) {
-    alert("Nilai bunga tidak boleh negatif.");
-    return;
-  }
-  isProcessing.value = true;
-  try {
-    await fetch('https://api-fastify-pi.vercel.app/game/addinterest', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(interest.value),
-    });
-    showInterestFormModal.value = false;
-    await confirmEndRound();
-  } catch (err) {
-    console.error('❌ Error submitInterest:', err);
-  } finally {
-    isProcessing.value = false;
-  }
-};
 
 const confirmEndRound = async () => {
   isProcessing.value = true;
@@ -240,7 +196,7 @@ const confirmEndRound = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameCode }),
     });
-    location.reload();
+    location.reload(); // reload untuk menampilkan data terbaru
   } catch (err) {
     console.error('❌ Error confirmEndRound:', err);
   } finally {
@@ -265,9 +221,7 @@ const confirmEndGame = async () => {
 };
 
 const closeModals = () => {
-  showConfirmEndRoundModal.value = false;
   showConfirmEndGameModal.value = false;
-  showInterestFormModal.value = false;
 };
 
 onMounted(() => {
