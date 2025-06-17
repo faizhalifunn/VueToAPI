@@ -1,19 +1,20 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black text-gray-800">
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-md">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white font-sans p-6">
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 w-full max-w-md border border-white/20">
+
       <!-- Header -->
       <div class="flex justify-center items-center mb-4">
         <h1 class="text-3xl font-bold">Strategic</h1>
       </div>
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Round {{ currentRound }}</h2>
+        <h2 class="text-2xl font-bold">{{ currentRound }}</h2>
         <span class="text-xl font-bold">{{ gameCode }}</span>
       </div>
 
       <!-- Select Team -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Select Team</label>
-        <select v-model="selectedTeam" class="w-full p-2 border rounded-lg bg-white">
+        <select v-model="selectedTeam" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option disabled value="">
             {{ teams.length === 0 ? "Loading teams..." : "Select Team" }}
           </option>
@@ -26,7 +27,7 @@
       <!-- Hire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Hire</label>
-        <select v-model="selectedHire" class="w-full p-2 border rounded-lg bg-white">
+        <select v-model="selectedHire" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in hireEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
@@ -37,7 +38,7 @@
       <!-- Train -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Train</label>
-        <select v-model="selectedTrain" class="w-full p-2 border rounded-lg bg-white">
+        <select v-model="selectedTrain" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in trainEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
@@ -48,7 +49,7 @@
       <!-- Fire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Fire</label>
-        <select v-model="selectedFire" class="w-full p-2 border rounded-lg bg-white">
+        <select v-model="selectedFire" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in fireEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
@@ -60,13 +61,14 @@
       <div class="mt-6 flex justify-center py-2">
         <button
           @click="submitActions"
-          class="bg-black text-white text-lg font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition flex items-center"
+          class="bg-[#00A8C6] text-white text-lg font-semibold py-2 px-6 rounded-xl hover:brightness-110 transition flex items-center shadow-md"
           :disabled="isLoading || (!selectedHire && !selectedTrain && !selectedFire)"
         >
           <span v-if="isLoading" class="loading-spinner"></span>
           {{ isLoading ? "Processing..." : "Submit" }}
         </button>
       </div>
+
     </div>
   </div>
 </template>
@@ -92,9 +94,7 @@ export default {
 
     const fetchRoundNow = async () => {
       try {
-        const res = await fetch(
-          `https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode.value}`
-        );
+        const res = await fetch(`https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode.value}`);
         const data = await res.json();
         currentRound.value = data.rounds?.[0]?.round || "Unknown";
       } catch (err) {
@@ -104,9 +104,7 @@ export default {
 
     const fetchTeams = async () => {
       try {
-        const res = await fetch(
-          `https://api-fastify-pi.vercel.app/team/getteamnames?gameCode=${gameCode.value}`
-        );
+        const res = await fetch(`https://api-fastify-pi.vercel.app/team/getteamnames?gameCode=${gameCode.value}`);
         const data = await res.json();
         teams.value = Array.isArray(data) ? data : [];
       } catch (err) {
@@ -119,13 +117,9 @@ export default {
       const roundNum = typeof currentRound.value === 'string' ? currentRound.value.match(/\d+/)?.[0] : currentRound.value;
       for (const team of teams.value) {
         try {
-          const res = await fetch(
-            `https://firestore.googleapis.com/v1/projects/boardtest-48f8e/databases/(default)/documents/games/${gameCode.value}/${team}/Round ${roundNum}`
-          );
+          const res = await fetch(`https://firestore.googleapis.com/v1/projects/boardtest-48f8e/databases/(default)/documents/games/${gameCode.value}/${team}/Round ${roundNum}`);
           const data = await res.json();
-          if (!data.error) {
-            submittedTeams.value.push(team);
-          }
+          if (!data.error) submittedTeams.value.push(team);
         } catch (err) {
           console.error(`Error checking team ${team}:`, err);
         }
@@ -136,7 +130,6 @@ export default {
       try {
         const res = await fetch("https://api-fastify-pi.vercel.app/game/getemployees");
         const data = await res.json();
-        console.log("📦 EMPLOYEE DATA:", data);
         hireEmployees.value = data.employees?.filter(emp => emp.level === 1) || [];
       } catch (err) {
         console.error("Error fetching employees:", err);
@@ -158,11 +151,8 @@ export default {
         return;
       }
       try {
-        const res = await fetch(
-          `https://api-fastify-pi.vercel.app/team/getemployee?gameCode=${gameCode.value}&teamName=${selectedTeam.value}`
-        );
+        const res = await fetch(`https://api-fastify-pi.vercel.app/team/getemployee?gameCode=${gameCode.value}&teamName=${selectedTeam.value}`);
         const data = await res.json();
-        console.log("📦 TEAM EMPLOYEES:", data.employees);
         trainEmployees.value = enrichWithName(data.employees || []);
         fireEmployees.value = enrichWithName(data.employees || []);
       } catch (err) {
@@ -171,9 +161,9 @@ export default {
     };
 
     watch(selectedTeam, async () => {
-  await fetchEmployees();
-  await fetchTeamEmployees();
-});
+      await fetchEmployees();
+      await fetchTeamEmployees();
+    });
 
     const submitActions = async () => {
       isLoading.value = true;
@@ -182,11 +172,7 @@ export default {
           await fetch("https://api-fastify-pi.vercel.app/team/hire", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              gameCode: gameCode.value,
-              teamName: selectedTeam.value,
-              employeeId: selectedHire.value,
-            }),
+            body: JSON.stringify({ gameCode: gameCode.value, teamName: selectedTeam.value, employeeId: selectedHire.value }),
           });
         }
 
@@ -194,11 +180,7 @@ export default {
           await fetch("https://api-fastify-pi.vercel.app/team/promote", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              gameCode: gameCode.value,
-              teamName: selectedTeam.value,
-              employeeId: selectedTrain.value,
-            }),
+            body: JSON.stringify({ gameCode: gameCode.value, teamName: selectedTeam.value, employeeId: selectedTrain.value }),
           });
         }
 
@@ -206,11 +188,7 @@ export default {
           await fetch("https://api-fastify-pi.vercel.app/team/fireemployee", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              gameCode: gameCode.value,
-              teamName: selectedTeam.value,
-              employeeId: selectedFire.value,
-            }),
+            body: JSON.stringify({ gameCode: gameCode.value, teamName: selectedTeam.value, employeeId: selectedFire.value }),
           });
         }
 
@@ -252,15 +230,14 @@ export default {
 
 <style>
 .loading-spinner {
-  border: 3px solid white;
-  border-top: 3px solid transparent;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #00A8C6;
   border-radius: 50%;
   width: 18px;
   height: 18px;
   animation: spin 0.8s linear infinite;
   margin-right: 8px;
 }
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
