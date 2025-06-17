@@ -1,32 +1,31 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black relative text-gray-800">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] relative text-white font-sans p-6">
     <!-- 🔙 Tombol Back -->
     <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-red-500 transition hover:scale-105 shadow-md"
     >
       ← Back
     </button>
 
     <!-- Kotak Form -->
-    <div class="bg-gray-200 rounded-2xl shadow-md px-8 py-6 w-full max-w-3xl">
-      <h2 class="text-2xl font-bold items-center">Marketing</h2>
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl px-8 py-6 w-full max-w-3xl border border-white/20">
       <!-- Header -->
+      <h2 class="text-3xl font-bold mb-2 text-center">Marketing</h2>
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Upgrade</h2>
-        <h2 class="text-base font-medium text-gray-600">Round {{ currentRound }}</h2>
+        <h2 class="text-2xl font-semibold">Upgrade</h2>
+        <h2 class="text-base font-medium text-white/70">Round {{ currentRound }}</h2>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="submitUpgrade">
-        <!-- Blok Input -->
         <div class="flex flex-col sm:flex-row gap-4 pb-4">
-          <!-- Select Team (Dropdown dari backend) -->
+          <!-- Select Team -->
           <div class="flex flex-col w-full sm:w-1/2">
             <label class="text-sm font-semibold mb-1">Team Name</label>
             <select
               v-model="selectedTeam"
-              class="p-2 border rounded-lg bg-white w-full"
+              class="p-3 rounded-lg bg-white/10 backdrop-blur-sm text-black border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             >
               <option value="">Select Team</option>
               <option
@@ -39,14 +38,14 @@
             </select>
           </div>
 
-          <!-- Upgrade Cost -->
+          <!-- Marketing Cost -->
           <div class="flex flex-col w-full sm:w-1/2">
-            <label class="text-sm font-semibold mb-1">MarketingCost</label>
+            <label class="text-sm font-semibold mb-1">Marketing Cost</label>
             <input
               v-model.number="MarketingCost"
               type="number"
               placeholder="Marketing Cost"
-              class="p-2 border rounded-lg bg-white w-full"
+              class="p-3 rounded-lg bg-white/10 backdrop-blur-sm text-white border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             />
           </div>
         </div>
@@ -55,7 +54,7 @@
         <div class="flex justify-center mt-6">
           <button
             type="submit"
-            class="bg-black text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-800 transition flex items-center gap-2"
+            class="bg-[#00A8C6] text-white font-bold text-lg py-2 px-8 rounded-xl hover:brightness-110 transition flex items-center gap-2 shadow-lg"
             :disabled="isLoading || !selectedTeam"
           >
             <span v-if="isLoading" class="loading-spinner"></span>
@@ -116,7 +115,6 @@ export default {
         return;
       }
 
-      // Validasi tetap dilakukan (opsional karena pakai <select>)
       const isTeamValid = teams.value.includes(selectedTeam.value);
       if (!isTeamValid) {
         alert("Invalid team name. Please select a valid team.");
@@ -170,14 +168,13 @@ export default {
 
 <style>
 .loading-spinner {
-  border: 3px solid white;
-  border-top: 3px solid transparent;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #00A8C6;
   border-radius: 50%;
   width: 18px;
   height: 18px;
   animation: spin 0.8s linear infinite;
 }
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
