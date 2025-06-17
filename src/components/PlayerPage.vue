@@ -28,14 +28,17 @@
           <h2 class="text-3xl font-bold mb-6">Input Data</h2>
           <div v-for="(label, key) in leftInputs" :key="key" class="mb-5">
             <p class="text-left font-semibold">{{ label.text }}</p>
-            <input
-              v-model="formData[key]"
-              type="number"
-              :placeholder="label.text"
-              class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
-              :class="getInputClass(key)"
-              :disabled="isLoading"
-            />
+           <input
+            v-model="formData[key]"
+            type="number"
+            :placeholder="label.text"
+            class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
+            :class="[
+              getInputClass(key),
+              key === 'ConsumptiveLoan' || key === 'ProductiveLoan' ? 'text-black' : ''
+            ]"
+            :disabled="isLoading"
+          />
             <p v-if="formData[key] === ''" class="text-red-400 text-sm mt-1">Harap isi field ini</p>
           </div>
         </div>
@@ -252,14 +255,15 @@ export default {
       }
 
       const getInputClass = (key) => {
-        if (key === "ConsumptiveLoan") {
-          return "bg-red-100 text-red-900 border-red-400 focus:ring-red-500"
-        } else if (key === "ProductiveLoan") {
-          return "bg-green-100 text-green-900 border-green-400 focus:ring-green-500"
-        } else {
-          return "bg-white/10 text-white border-white/30 placeholder-white/60 focus:ring-[#00A8C6]"
-        }
+      if (key === "ConsumptiveLoan") {
+        return "bg-red-100 text-black focus:ring-red-600 border-red-400";
+      } else if (key === "ProductiveLoan") {
+        return "bg-green-100 text-black focus:ring-green-600 border-green-400";
+      } else {
+        return "bg-gray-100 text-white focus:ring-gray-600 border-gray-400";
       }
+    };
+
       // 🔹 Buat payload dengan memastikan semua angka dikonversi ke Number
       const payload = {
       gameCode,
