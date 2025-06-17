@@ -268,7 +268,10 @@ const confirmEndGame = async () => {
 
 const closeModals = () => {
   showConfirmEndGameModal.value = false;
+  showConfirmEndRoundModal.value = false;
+  showInputCustomerModal.value = false;
 };
+
 
 onMounted(() => {
   fetchRoundData();
