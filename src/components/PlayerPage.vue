@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] p-6 text-white font-sans relative">
-    <!-- Overlay Loading Global -->
+    <!-- Loading Overlay -->
     <div
       v-if="isLoading"
       class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 backdrop-blur-md"
@@ -9,7 +9,7 @@
       <span class="mt-4 text-white text-2xl font-bold">Loading...</span>
     </div>
 
-    <!-- Tombol Back -->
+    <!-- Back Button -->
     <button
       @click="goBack"
       class="absolute top-6 left-6 bg-blue-600 text-white py-2 px-4 rounded-xl font-bold hover:bg-red-500 transition duration-300 shadow-md"
@@ -17,13 +17,13 @@
       ← Back
     </button>
 
-    <!-- Form Container -->
+    <!-- Main Form -->
     <div
       class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-4xl border border-white/20"
-      :class="{'pointer-events-none': isLoading}"
+      :class="{ 'pointer-events-none': isLoading }"
     >
       <div class="grid grid-cols-2 gap-8 items-start">
-        <!-- Kolom Kiri -->
+        <!-- Left Column -->
         <div>
           <h2 class="text-3xl font-bold mb-6">Input Data</h2>
           <div v-for="(label, key) in leftInputs" :key="key" class="mb-5">
@@ -32,14 +32,15 @@
               v-model="formData[key]"
               type="number"
               :placeholder="label.text"
-              class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+              class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
+              :class="getInputClass(key)"
               :disabled="isLoading"
             />
             <p v-if="formData[key] === ''" class="text-red-400 text-sm mt-1">Harap isi field ini</p>
           </div>
         </div>
 
-        <!-- Kolom Kanan -->
+        <!-- Right Column -->
         <div>
           <h2 class="text-3xl font-bold mb-6 text-right">{{ isLoading ? "Loading..." : currentRound }}</h2>
           <div v-for="(label, key) in rightInputs" :key="key" class="mb-5">
@@ -56,16 +57,16 @@
         </div>
       </div>
 
-      <!-- Penempatan / Peminjaman -->
-      <div class="grid grid-cols-2 gap-8 items-start mt-8">
-        <div class="mb-5">
+      <!-- Placement & Borrow -->
+      <div class="grid grid-cols-2 gap-8 mt-8">
+        <div>
           <p class="font-semibold">Inter Office Account (Placement)</p>
           <input
             v-model="formData.InterOfficeAccountPlacement"
             type="number"
             placeholder="Placement"
             class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
-            :class="{'bg-white/20 cursor-not-allowed': !isPenempatanEnabled || isLoading}"
+            :class="{ 'bg-white/20 cursor-not-allowed': !isPenempatanEnabled || isLoading }"
             :disabled="!isPenempatanEnabled || isLoading"
           />
           <p v-if="!isPenempatanEnabled" class="text-white/60 text-sm mt-1">Fund &lt; Total of Loans</p>
@@ -78,14 +79,14 @@
             type="number"
             placeholder="Borrow"
             class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
-            :class="{'bg-white/20 cursor-not-allowed': !isPeminjamanEnabled || isLoading}"
+            :class="{ 'bg-white/20 cursor-not-allowed': !isPeminjamanEnabled || isLoading }"
             :disabled="!isPeminjamanEnabled || isLoading"
           />
           <p v-if="!isPeminjamanEnabled" class="text-white/60 text-sm mt-1">Fund &gt; Total of Loans</p>
         </div>
       </div>
 
-      <!-- Tambahan Input -->
+      <!-- Extra Fields -->
       <div class="mt-6 space-y-6">
         <div>
           <p class="font-semibold">Credit Card</p>
@@ -121,7 +122,7 @@
         </div>
       </div>
 
-      <!-- Tombol Submit -->
+      <!-- Submit -->
       <div class="flex justify-center mt-10 pt-4">
         <button
           @click="submitForm"
@@ -135,6 +136,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, computed, onMounted } from "vue";
@@ -249,6 +251,15 @@ export default {
         penempatanAtauPeminjamanValue = Number(formData.value.PinjamPusat) || 0;
       }
 
+      const getInputClass = (key) => {
+        if (key === "ConsumptiveLoan") {
+          return "bg-red-100 text-red-900 border-red-400 focus:ring-red-500"
+        } else if (key === "ProductiveLoan") {
+          return "bg-green-100 text-green-900 border-green-400 focus:ring-green-500"
+        } else {
+          return "bg-white/10 text-white border-white/30 placeholder-white/60 focus:ring-[#00A8C6]"
+        }
+      }
       // 🔹 Buat payload dengan memastikan semua angka dikonversi ke Number
       const payload = {
       gameCode,
