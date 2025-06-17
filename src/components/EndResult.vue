@@ -167,7 +167,6 @@ const summaryChartInstance = ref(null);
 const roundChartInstance = ref(null);
 
 const teams = ref([]);
-const isLoading = ref(false);
 const gameData = ref(null);
 const availableRounds = ref([]);
 const chartCategories = [
@@ -242,96 +241,94 @@ async function fetchAllGameData() {
 
 function drawSummaryChart() {
   if (!summaryChart.value || !teams.value.length) return;
+  const ctx = summaryChart.value.getContext('2d');
+  if (!ctx) return;
 
-  requestAnimationFrame(() => {
-    const ctx = summaryChart.value.getContext('2d');
-    if (summaryChartInstance.value) summaryChartInstance.value.destroy();
+  if (summaryChartInstance.value) summaryChartInstance.value.destroy();
 
-    const allRounds = new Set();
-    teams.value.forEach((team) => (team.rounds || []).forEach((r) => allRounds.add(r.round)));
-    const sortedRounds = [...allRounds].sort();
+  const allRounds = new Set();
+  teams.value.forEach((team) => (team.rounds || []).forEach((r) => allRounds.add(r.round)));
+  const sortedRounds = [...allRounds].sort();
 
-    const datasets = teams.value.map((team) => {
-      const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-      return {
-        label: team.team,
-        data: sortedRounds.map((r) => {
-          const match = (team.rounds || []).find((x) => x.round === r);
-          return match ? match.ContributionMargin : 0;
-        }),
-        borderColor: color,
-        backgroundColor: color + '40',
-        fill: false,
-        tension: 0.3,
-      };
-    });
+  const datasets = teams.value.map((team) => {
+    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    return {
+      label: team.team,
+      data: sortedRounds.map((r) => {
+        const match = (team.rounds || []).find((x) => x.round === r);
+        return match ? match.ContributionMargin : 0;
+      }),
+      borderColor: color,
+      backgroundColor: color + '40',
+      fill: false,
+      tension: 0.3,
+    };
+  });
 
-    summaryChartInstance.value = new Chart(ctx, {
-      type: 'line',
-      data: { labels: sortedRounds, datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
-          x: { title: { display: true, text: 'Rounds' } },
-        },
-        plugins: {
-          legend: { position: 'bottom' },
-          tooltip: { mode: 'index', intersect: false },
-        },
-      }
-    });
+  summaryChartInstance.value = new Chart(ctx, {
+    type: 'line',
+    data: { labels: sortedRounds, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
+        x: { title: { display: true, text: 'Rounds' } },
+      },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { mode: 'index', intersect: false },
+      },
+    }
   });
 }
 
 function drawRoundChart(roundKey) {
   if (!roundChart.value || !gameData.value?.teams) return;
+  const ctx = roundChart.value.getContext('2d');
+  if (!ctx) return;
 
-  requestAnimationFrame(() => {
-    const ctx = roundChart.value.getContext('2d');
-    if (roundChartInstance.value) roundChartInstance.value.destroy();
+  if (roundChartInstance.value) roundChartInstance.value.destroy();
 
-    const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
-      const roundData = rounds[roundKey] || {};
-      const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-      return {
-        label: teamName,
-        data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
-        borderColor: color,
-        backgroundColor: color + '40',
-        tension: 0.3,
-        fill: false,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      };
-    });
- 
- roundChartInstance.value = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: chartCategories,
-        datasets,
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            ticks: { maxRotation: 60, minRotation: 45 },
-            title: { display: true, text: 'Parameter' },
-          },
-          y: {
-            beginAtZero: true,
-            title: { display: true, text: 'Value' },
-          },
+  const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
+    const roundData = rounds[roundKey] || {};
+    const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+    return {
+      label: teamName,
+      data: chartCategories.map(label => Number(roundData[label.replace(/\s/g, '')]) || 0),
+      borderColor: color,
+      backgroundColor: color + '40',
+      tension: 0.3,
+      fill: false,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    };
+  });
+
+  roundChartInstance.value = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartCategories,
+      datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: { maxRotation: 60, minRotation: 45 },
+          title: { display: true, text: 'Parameter' },
         },
-        plugins: {
-          tooltip: { mode: 'index', intersect: false },
-          legend: { position: 'bottom' },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Value' },
         },
       },
-    });
+      plugins: {
+        tooltip: { mode: 'index', intersect: false },
+        legend: { position: 'bottom' },
+      },
+    },
   });
 }
 
@@ -364,10 +361,10 @@ async function exportToExcel() {
   align-items: center;
 }
 
-/* Hapus button.fixed, udah ga dipakai */
-
-.fixed {
-  pointer-events: auto;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th,
@@ -376,20 +373,18 @@ td {
   padding: 10px;
   text-align: center;
   vertical-align: middle;
-  white-space: normal;
   word-break: break-word;
 }
 
 th {
   font-weight: 600;
-  font-size: 0.6rem;
-  background-color: #f5f5f5;
+  font-size: 0.65rem;
+  background-color: #f0f0f0;
+  color: #111;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
+td {
+  font-size: 0.75rem;
 }
 
 canvas {
@@ -403,16 +398,13 @@ canvas {
   overflow-x: auto;
   padding-bottom: 1rem;
   gap: 1.5rem;
+  justify-content: center;
 }
 
 .card-container {
   flex: 0 0 auto;
-  margin-bottom: 1rem;
-  min-width: 750px;
-  max-width: 750px;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 720px;
+  max-width: 720px;
   border-radius: 0.75rem;
 }
 
@@ -424,7 +416,7 @@ canvas {
 
   th,
   td {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     padding: 6px;
   }
 

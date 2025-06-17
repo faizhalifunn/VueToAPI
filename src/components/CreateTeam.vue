@@ -1,63 +1,64 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-black relative">
-    <!-- 🔙 Tombol Back Berwarna Merah -->
+  <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] font-sans px-4 py-10 relative">
+    <!-- 🔙 Tombol Back -->
     <button
       @click="goBack"
-      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-500 transition hover:scale-105 shadow-md"
+      class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-red-500 transition hover:scale-105 shadow-lg"
     >
       ← Back
     </button>
 
-    <div class="bg-gray-200 rounded-2xl shadow-md p-6 w-full max-w-sm">
-      
-      <h2 class="text-lg font-semibold text-black mb-2">
+    <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-8 w-full max-w-sm text-white">
+      <h2 class="text-xl font-bold text-center mb-4">
         {{ savedTeamName ? "Reconnect to Team" : "Enter Team Name" }}
       </h2>
 
-      <!-- Jika ada teamName tersimpan, tampilkan opsi reconnect -->
+      <!-- Jika ada teamName tersimpan -->
       <div v-if="savedTeamName">
-        <p class="text-gray-700 text-center mb-4 pb-1">You were in team <strong>{{ savedTeamName }}</strong></p>
+        <p class="text-center mb-4">You were in team <strong>{{ savedTeamName }}</strong></p>
         <button
           @click="reconnectTeam"
           :disabled="loading"
-          class="w-full bg-black text-white text-lg font-semibold py-2 rounded-lg hover:bg-gray-800 transition"
+          class="w-full bg-[#00A8C6] text-white text-lg font-semibold py-2 rounded-xl hover:brightness-110 transition"
         >
-          <span v-if="loading" class="loading-spinner mr-2"></span>
+          <span v-if="loading" class="loading-spinner-white mr-2"></span>
           <span>{{ loading ? "Reconnecting..." : "Reconnect" }}</span>
         </button>
         <button
           @click="resetTeam"
-          class="text-gray-600 mt-2 text-sm underline w-full text-center block pt-1"
+          class="text-white/70 mt-3 text-sm underline w-full text-center block"
         >
           Join with a different team
         </button>
       </div>
 
-      <!-- Jika tidak ada teamName, tampilkan input untuk memasukkan team baru -->
-      <div v-else >
-        <label class="block text-lg font-semibold text-black mb-2 pb-2">Team Name:</label>
-        <input
-          v-model="teamName"
-          type="text"
-          placeholder="Enter team name"
-          class="w-full p-2 rounded-lg border text-gray-700 border-gray-300 focus:outline-none focus:ring-2 pb-2 focus:ring-gray-500"
-        />
-        <button
-          @click="joinGame"
-          :disabled="loading"
-          class="bg-black w-full text-white text-lg font-semibold py-2 rounded-lg hover:bg-gray-800 transition mt-4"
-        >
-          <span v-if="loading" class="loading-spinner mr-2"></span>
-          <span>{{ loading ? "Joining..." : "Join Game" }}</span>
-        </button>
-      </div>
+      <!-- Jika tidak ada teamName -->
+      <div v-else>
+        <label class="block text-lg font-semibold mb-2">Team Name:</label>
+       <input
+        v-model="teamName"
+        type="text"
+        placeholder="Enter team name"
+        class="w-full p-3 rounded-xl border border-white/30 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+      />
 
+       <!-- Versi tulisan Join Game, bukan button -->
+      <div class="mt-4 text-center">
+        <span
+          @click="joinGame"
+          class="inline-block text-[#00A8C6] text-lg font-semibold underline hover:opacity-80 cursor-pointer transition"
+        >
+          {{ loading ? "Joining..." : "Join Game" }}
+        </span>
+        <span v-if="loading" class="loading-spinner-white ml-2 align-middle"></span>
+      </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 export default {
@@ -66,14 +67,12 @@ export default {
     const teamName = ref("");
     const loading = ref(false);
     const router = useRouter();
-    const savedTeamName = ref(localStorage.getItem("teamName")); // Cek apakah ada teamName tersimpan
+    const savedTeamName = ref(localStorage.getItem("teamName"));
 
-    // ✅ Fungsi untuk kembali ke halaman sebelumnya
     const goBack = () => {
       router.go(-1);
     };
 
-    // ✅ Fungsi untuk Reconnect Team
     const reconnectTeam = async () => {
       const gameCode = localStorage.getItem("gameCode");
       if (!gameCode || !savedTeamName.value) {
@@ -84,14 +83,12 @@ export default {
       loading.value = true;
 
       try {
-        // 🔹 Validasi apakah team masih ada di dalam game
         const response = await fetch(
           `https://api-fastify-pi.vercel.app/team/getteamnames?gameCode=${gameCode}`
         );
         const teams = await response.json();
 
         if (teams.includes(savedTeamName.value)) {
-          // ✅ Jika team masih ada, langsung masuk ke /player/wait
           alert(`Reconnected to team: ${savedTeamName.value}`);
           router.push("/player/wait");
         } else {
@@ -106,7 +103,6 @@ export default {
       }
     };
 
-    // ✅ Fungsi untuk Join dengan Team Baru
     const joinGame = async () => {
       if (!teamName.value.trim()) {
         alert("Team name is required!");
@@ -139,11 +135,9 @@ export default {
           throw new Error("Failed to join game. Try again!");
         }
 
-        // Simpan teamName ke localStorage
         localStorage.setItem("teamName", teamName.value);
         savedTeamName.value = teamName.value;
 
-        // Redirect ke /player/wait
         router.push("/player/wait");
       } catch (error) {
         alert(error.message);
@@ -152,20 +146,27 @@ export default {
       }
     };
 
-    // ✅ Fungsi untuk Reset Team (Ganti team)
     const resetTeam = () => {
       localStorage.removeItem("teamName");
       savedTeamName.value = null;
     };
 
-    return { teamName, joinGame, reconnectTeam, resetTeam, loading, savedTeamName, goBack };
+    return {
+      teamName,
+      joinGame,
+      reconnectTeam,
+      resetTeam,
+      loading,
+      savedTeamName,
+      goBack,
+    };
   },
 };
 </script>
 
 <style>
-/* 🔥 Spinner Animasi */
-.loading-spinner {
+/* Spinner Putih */
+.loading-spinner-white {
   border: 2px solid transparent;
   border-top: 2px solid white;
   border-radius: 50%;
