@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] relative text-white font-sans p-6">
-    <!-- 🔙 Tombol Back -->
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] relative text-gray-900 font-sans p-6">
+    <!-- 🔙 Back Button -->
     <button
       @click="goBack"
       class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-red-500 transition hover:scale-105 shadow-md"
@@ -8,16 +8,16 @@
       ← Back
     </button>
 
-    <!-- Kotak Form -->
-    <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl px-8 py-6 w-full max-w-3xl border border-white/20">
-      <!-- Header -->
+    <!-- 🧾 Form Card -->
+    <div class="bg-white backdrop-blur-lg rounded-2xl shadow-xl px-8 py-6 w-full max-w-3xl border border-white/20">
+      <!-- 🧠 Header -->
       <h2 class="text-3xl font-bold mb-2 text-center">Marketing</h2>
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-semibold">Upgrade</h2>
-        <h2 class="text-base font-medium text-white/70">Round {{ currentRound }}</h2>
+        <h2 class="text-2xl font-semibold text-gray-900">{{ currentRound }}</h2>
       </div>
 
-      <!-- Form -->
+      <!-- 🔧 Form Input -->
       <form @submit.prevent="submitUpgrade">
         <div class="flex flex-col sm:flex-row gap-4 pb-4">
           <!-- Select Team -->
@@ -25,32 +25,33 @@
             <label class="text-sm font-semibold mb-1">Team Name</label>
             <select
               v-model="selectedTeam"
-              class="p-3 rounded-lg bg-white/10 backdrop-blur-sm text-black border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+              class="shadow-md p-3 rounded-lg bg-white/10 backdrop-blur-sm text-black border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             >
               <option value="">Select Team</option>
-              <option
-                v-for="team in teams"
-                :key="team"
-                :value="team"
-              >
-                {{ team }}
-              </option>
+              <option v-for="team in teams" :key="team" :value="team">{{ team }}</option>
             </select>
           </div>
 
-          <!-- Marketing Cost -->
           <div class="flex flex-col w-full sm:w-1/2">
-            <label class="text-sm font-semibold mb-1">Marketing Cost</label>
-            <input
-              v-model.number="MarketingCost"
-              type="number"
-              placeholder="Marketing Cost"
-              class="p-3 rounded-lg bg-white/10 backdrop-blur-sm text-white border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
-            />
-          </div>
+  <label class="text-sm font-semibold mb-1">Marketing Cost</label>
+  <select
+    v-model.number="MarketingCost"
+    class="shadow-md p-3 rounded-lg bg-white/10 backdrop-blur-sm text-gray-700 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+  >
+    <option disabled value="">Select Cost</option>
+    <option v-for="cost in [0, 100, 200, 300, 400, 500]" :key="cost" :value="cost">
+      {{ cost }}
+    </option>
+  </select>
+</div>
         </div>
 
-        <!-- Tombol Submit -->
+        <!-- 🟡 Note -->
+        <div class="flex justify-between mt-4 bg-yellow-600/20 p-4 rounded-lg shadow-md text-gray-600">
+          <h3>Refresh Page untuk menampilkan data round terbaru !</h3>
+        </div>
+
+        <!-- 🚀 Submit Button -->
         <div class="flex justify-center mt-6">
           <button
             type="submit"
@@ -109,6 +110,11 @@ export default {
       }
     };
 
+    const resetForm = () => {
+      selectedTeam.value = "";
+      MarketingCost.value = null;
+    };
+
     const submitUpgrade = async () => {
       if (!selectedTeam.value || MarketingCost.value === null) {
         alert("Please select a team and enter the upgrade cost.");
@@ -140,6 +146,9 @@ export default {
         }
 
         alert("Upgrade submitted successfully!");
+        resetForm();           // reset form setelah submit
+        await fetchTeams();    // refresh list team
+        await fetchRoundNow(); // refresh round
       } catch (error) {
         alert(`Error: ${error.message}`);
         console.error("Error submitting upgrade:", error);

@@ -18,7 +18,7 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl p-10 w-full max-w-5xl z-10 flex flex-col gap-10 border border-white/20">
+    <div v-else class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-10 w-full max-w-5xl z-10 flex flex-col gap-10 border border-white/20">
       <!-- Header -->
       <div class="bg-[#1C2541] text-white text-2xl font-bold py-2 px-4 rounded-t-lg flex justify-between items-center">
         <span>{{ round }}</span>
@@ -26,29 +26,35 @@
       </div>
 
       <!-- Leaderboard Table -->
-      <div class="bg-white/10 p-4 rounded-xl shadow-inner">
-        <div class="grid grid-cols-5 gap-4 text-sm font-semibold text-white bg-[#00A8C6] px-4 py-3 rounded-t-md">
-          <span class="text-left">Rank</span>
-          <span class="text-left">Team Name</span>
-          <span class="text-right">Contribution</span>
-          <span class="text-right">Total Bintang</span>
-          <span class="text-center">Action</span>
+      <div class="bg-white/10 p-2 rounded-xl shadow-md inset-shadow-2xs overflow-hidden">
+        <div class="grid grid-cols-7 gap-3 items-stretch text-sm font-semibold text-white bg-[#00A8C6] px-1 py-2 rounded-t-md">
+          <span class="text-center">No.</span>
+          <span class="text-center">Team Name</span>
+          <span class="text-center">Fund</span>
+          <span class="text-center">Fee Based Income</span>
+          <span class="text-center">Net Interest Income</span>
+          <span class="text-center">Contribution Margin</span>
+          <span class="text-center">Achievement Stars (total)</span>
         </div>
         <div
           v-for="(team, index) in sortedLeaderboard"
           :key="index"
-          class="grid grid-cols-5 gap-4 items-center bg-white text-[#1C2541] px-4 py-2 border-b border-gray-200 hover:bg-gray-100"
+          class="grid grid-cols-7 gap-3 items-stretch bg-white text-[#1C2541] px-1 py-2 border-b border-gray-200 rounded-t-md hover:bg-gray-100"
         >
-          <span class="text-left">{{ index + 1 }}</span>
-          <span class="text-left">{{ team.team || 'N/A' }}</span>
-          <span class="text-right font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
-          <span class="text-right font-mono">{{ formatNumber(team.TotalBintang) }}</span>
-          <button class="text-[#00A8C6] hover:text-[#2C3E68] font-bold text-center">...</button>
+          <span class="text-center">{{ index + 1 }}</span>
+          <span class="text-center">{{ team.team || 'N/A' }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.Fund) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.FeeBasedIncome) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.NetInterestIncome) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.TotalAchievementStar) }}</span>
         </div>
       </div>
 
+      
+
       <!-- Chart Section -->
-      <div class="bg-white/10 p-6 rounded-xl shadow-md overflow-hidden">
+      <div class="bg-white/10 p-6 rounded-xl inset-shadow-xs shadow-md overflow-hidden">
         <div v-if="isChartLoading" class="text-center py-4 font-semibold text-white">Loading chart...</div>
         <div v-else>
           <div v-if="!hasChartData" class="text-center py-4 text-gray-300">
@@ -58,6 +64,11 @@
         </div>
       </div>
 
+      <div class="text-center text-gray-600/60 mt-4 bg-yellow-600/20 p-4 rounded-lg shadow-md">
+        <h3>
+          Refresh Page untuk menampilkan data team terbaru !
+        </h3>
+      </div>
       <!-- Action Buttons -->
       <div class="flex justify-center flex-wrap gap-6">
         <button
@@ -69,7 +80,7 @@
           <span>{{ isProcessing ? '' : 'NEXT ROUND' }}</span>
         </button>
         <button
-          @click="showConfirmEndGameModal = true"
+        @click="prepareActiveCustomerInput"
           :disabled="isProcessing"
           class="bg-red-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
@@ -81,36 +92,36 @@
 
     <!-- Confirm Modal -->
     <transition name="popup">
-      <div v-if="showConfirmEndRoundModal || showConfirmEndGameModal" class="fixed inset-0 z-50 flex items-center justify-center">
-        <div class="absolute inset-0 bg-gray-800 opacity-50"></div>
-        <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10 transform transition-all">
-          <h3 class="text-xl font-bold mb-3">
-            {{ showConfirmEndRoundModal ? 'Konfirmasi Next Round' : 'Konfirmasi End Game' }}
-          </h3>
-          <p class="mb-6 text-sm">
-            {{ showConfirmEndRoundModal
-              ? 'Apakah Anda yakin ingin melanjutkan ke ronde berikutnya?'
-              : 'Apakah Anda yakin ingin mengakhiri game sekarang?' }}
-          </p>
-          <div class="flex justify-end gap-3 mt-6">
-            <button @click="closeModals" class="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300">
-              Batal
-            </button>
-            <button
-              @click="showConfirmEndRoundModal ? confirmEndRound() : confirmEndGame()"
-              class="px-4 py-2 text-sm bg-[#00A8C6] text-white rounded-md hover:bg-[#2C3E68] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
-              :disabled="isProcessing"
-            >
-              <span v-if="isProcessing" class="loading-spinner"></span>
-              <span v-if="!isProcessing">Ya</span>
-            </button>
-          </div>
-        </div>
+  <div v-if="showInputCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black opacity-60 backdrop-blur-md"></div>
+    <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-2xl p-6 z-10 overflow-y-auto max-h-[80vh]">
+      <h3 class="text-xl font-bold mb-4 text-center">Input Active Customers</h3>
+      <div v-for="(team, index) in teamInputs" :key="index" class="mb-4">
+        <label class="block font-semibold mb-1">{{ team.teamName }}</label>
+        <input
+          v-model.number="teamInputs[index].activeCustomer"
+          type="number"
+          placeholder="Jumlah Active Customers"
+          class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+        />
       </div>
-    </transition>
+      <div class="flex justify-end gap-3 mt-4">
+        <button @click="closeModals" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <button
+          @click="submitAllCustomers"
+          class="px-4 py-2 bg-[#00A8C6] text-white rounded hover:bg-[#2C3E68] disabled:opacity-50"
+          :disabled="isSubmitting"
+        >
+          {{ isSubmitting ? 'Submitting...' : 'Submit & End Game' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</transition>
+
 
     <!-- Active Customer Input Modal -->
-    <transition name="popup">
+    <!-- <transition name="popup">
       <div v-if="showInputCustomerModal" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black opacity-60 backdrop-blur-md"></div>
         <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10">
@@ -127,7 +138,7 @@
           <div class="mb-4">
             <label class="block font-semibold mb-1">Active Customer</label>
             <input
-              v-model.number="activeCustomer"
+              v-model.number="activeCustomers"
               type="number"
               placeholder="Enter number"
               class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
@@ -145,7 +156,7 @@
           </div>
         </div>
       </div>
-    </transition>
+    </transition> -->
   </div>
 </template>
 
@@ -164,16 +175,26 @@ const chartCanvas = ref(null);
 let chartInstance = null;
 const isChartLoading = ref(true);
 const hasChartData = ref(false);
+const teamInputs = ref([]);
 
 // ✅ Tambahan yang sebelumnya hilang
 const showConfirmEndRoundModal = ref(false);
 const showConfirmEndGameModal = ref(false);
 const showInputCustomerModal = ref(false);
 const teamName = ref('');
-const activeCustomer = ref(null);
+const activeCustomers = ref(null);
 const isSubmitting = ref(false);
 
 const goBack = () => router.go(-1);
+
+const prepareActiveCustomerInput = () => {
+  teamInputs.value = leaderboard.value.map(team => ({
+    teamName: team.team,
+    activeCustomer: 0
+  }));
+  showInputCustomerModal.value = true;
+};
+
 
 const fetchRoundData = async () => {
   if (!gameCode) return;
@@ -225,7 +246,7 @@ const renderChart = (teams) => {
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: teams[0].rounds.map(r => `R${r.round}`),
+      labels: teams[0].rounds.map(r => `${r.round}`),
       datasets,
     },
     options: {
@@ -233,7 +254,7 @@ const renderChart = (teams) => {
       maintainAspectRatio: false,
       plugins: { legend: { display: true } },
       scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Contribution Points' } },
+        y: { beginAtZero: true, title: { display: true, text: 'Contribution Margin' } },
         x: { title: { display: true, text: 'Rounds' } },
       },
     },
@@ -263,7 +284,7 @@ const confirmEndRound = async () => {
 const confirmEndGame = async () => {
   isProcessing.value = true;
   try {
-    await fetch('https://api-fastify-pi.vercel.app/Game/End', {
+    await fetch('https://api-fastify-pi.vercel.app/Game/NewEnd', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameCode }),
@@ -277,10 +298,34 @@ const confirmEndGame = async () => {
   }
 };
 
+const submitAllCustomers = async () => {
+  isSubmitting.value = true;
+  try {
+    for (const input of teamInputs.value) {
+      await fetch('https://api-fastify-pi.vercel.app/game/addActiveCustomers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameCode,
+          teamName: input.teamName,
+          ActiveCustomers: input.activeCustomer
+        }),
+      });
+    }
+    closeModals();
+    confirmEndGame(); // lanjut ke end game setelah submit semua
+  } catch (err) {
+    console.error('❌ Error submitAllCustomers:', err);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+
 const submitCustomer = async () => {
   isSubmitting.value = true;
   try {
-    await fetch('https://api-fastify-pi.vercel.app/game/inputCustomer', {
+    await fetch('https://api-fastify-pi.vercel.app/game/inputCustomers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ gameCode, team: teamName.value, activeCustomer: activeCustomer.value }),

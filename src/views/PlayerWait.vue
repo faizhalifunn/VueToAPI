@@ -6,6 +6,7 @@
       <template v-if="gameStatus === 'Waiting'">
         <p class="font-bold mb-6 text-3xl">Waiting...</p>
         <p class="text-lg font-medium mb-6">Tunggu sampai Admin memulai game-nya!</p>
+        <p class="text-lg font-small mb-6">Refresh page untuk memuat ulang!</p>
         <div class="wave-animation p-10">
           <span></span>
           <span></span>

@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] p-6 text-white font-sans relative">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] p-6 text-gray-500 font-sans relative">
     <!-- Loading Overlay -->
     <div
       v-if="isLoading"
       class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 backdrop-blur-md"
     >
       <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#00A8C6]"></div>
-      <span class="mt-4 text-white text-2xl font-bold">Loading...</span>
+      <span class="mt-4 text-gray-500 text-2xl font-bold">Loading...</span>
     </div>
 
     <!-- Back Button -->
@@ -19,7 +19,7 @@
 
     <!-- Main Form -->
     <div
-      class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 w-full max-w-4xl border border-white/20"
+      class="bg-white text-gray-500 backdrop-blur-lg shadow-white/30 rounded-2xl shadow-2xl p-8 w-full max-w-4xl border border-white/20"
       :class="{ 'pointer-events-none': isLoading }"
     >
       <div class="grid grid-cols-2 gap-8 items-start">
@@ -31,6 +31,7 @@
            <input
             v-model="formData[key]"
             type="number"
+            @keydown="preventNonNumeric"
             :placeholder="label.text"
             class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
             :class="[
@@ -51,8 +52,9 @@
             <input
               v-model="formData[key]"
               type="number"
+              @keydown="preventNonNumeric"
               :placeholder="label.text"
-              class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+              class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
               :disabled="isLoading"
             />
             <p v-if="formData[key] === ''" class="text-red-400 text-sm mt-1">Harap isi field ini</p>
@@ -67,12 +69,13 @@
           <input
             v-model="formData.InterOfficeAccountPlacement"
             type="number"
+            @keydown="preventNonNumeric"
             placeholder="Placement"
-            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             :class="{ 'bg-white/20 cursor-not-allowed': !isPenempatanEnabled || isLoading }"
             :disabled="!isPenempatanEnabled || isLoading"
           />
-          <p v-if="!isPenempatanEnabled" class="text-white/60 text-sm mt-1">Fund &lt; Total of Loans</p>
+          <p v-if="!isPenempatanEnabled" class="text-gray-400/60 text-sm mt-1">Fund &lt; Total of Loans</p>
         </div>
 
         <div>
@@ -80,12 +83,13 @@
           <input
             v-model="formData.PinjamPusat"
             type="number"
+            @keydown="preventNonNumeric"
             placeholder="Borrow"
-            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             :class="{ 'bg-white/20 cursor-not-allowed': !isPeminjamanEnabled || isLoading }"
             :disabled="!isPeminjamanEnabled || isLoading"
           />
-          <p v-if="!isPeminjamanEnabled" class="text-white/60 text-sm mt-1">Fund &gt; Total of Loans</p>
+          <p v-if="!isPeminjamanEnabled" class="text-gray-400/60 text-sm mt-1">Fund &gt; Total of Loans</p>
         </div>
       </div>
 
@@ -95,9 +99,10 @@
           <p class="font-semibold">Credit Card</p>
           <input
             v-model="formData.CreditCard"
-            type="text"
+            type="number"
+            @keydown="preventNonNumeric"
             placeholder="Credit Card"
-            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             :disabled="isLoading"
           />
         </div>
@@ -106,9 +111,10 @@
           <p class="font-semibold">Insurance</p>
           <input
             v-model="formData.Insurance"
-            type="text"
+            type="number"
+            @keydown="preventNonNumeric"
             placeholder="Insurance"
-            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             :disabled="isLoading"
           />
         </div>
@@ -117,11 +123,17 @@
           <p class="font-semibold">Achievement Star</p>
           <input
             v-model="formData.AchievementStar"
-            type="text"
+            type="number"
+            @keydown="preventNonNumeric"
             placeholder="Achievement Star"
-            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-white placeholder-white/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
+            class="w-full p-3 rounded-md border border-white/30 bg-transparent text-gray-500 placeholder-gray-500/60 font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00A8C6]"
             :disabled="isLoading"
           />
+        </div>
+        <div>
+          <div class="flex justify-between mt-4 bg-yellow-600/20 p-4 rounded-lg shadow-md text-gray-600">
+          <h3>Refresh Page untuk menampilkan data round terbaru !</h3>
+        </div>
         </div>
       </div>
 
@@ -151,8 +163,28 @@ export default {
     const router = useRouter();
     const isLoading = ref(true);
 
-    // Data dari front end
-      const formData = ref({
+    const preventNonNumeric = (e) => {
+      // Izinkan angka, backspace, delete, panah, tab, dan titik (.)
+      const allowedKeys = [
+        "Backspace",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
+        "Tab",
+        "Home",
+        "End",
+        ".",
+      ];
+
+      if (
+        !/[0-9]/.test(e.key) &&
+        !allowedKeys.includes(e.key)
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    const formData = ref({
       ConsumptiveLoan: 0,
       ProductiveLoan: 0,
       CreditCard: "",
@@ -169,7 +201,6 @@ export default {
       NetInterestIncome: 0,
     });
 
-    // Kolom kiri/kanan untuk menampilkan label
     const leftInputs = {
       ConsumptiveLoan: { text: "Consumptive Loan" },
       ProductiveLoan: { text: "Productive Loan" },
@@ -179,22 +210,18 @@ export default {
       DanaPihakKetiga: { text: "Fund" },
     };
 
-    // totalKredit => untuk memutuskan Penempatan / Peminjaman
     const totalKredit = computed(() => {
       return Number(formData.value.ConsumptiveLoan) + Number(formData.value.ProductiveLoan);
     });
 
-    // Jika DPK < total kredit => Penempatan aktif
     const isPenempatanEnabled = computed(() => {
       return formData.value.DanaPihakKetiga > totalKredit.value;
     });
 
-    // Jika DPK > total kredit => Peminjaman aktif
     const isPeminjamanEnabled = computed(() => {
       return formData.value.DanaPihakKetiga < totalKredit.value;
     });
 
-    // Styling input
     const getInputClass = (key) => {
       if (key === "ConsumptiveLoan") {
         return "bg-red-100 focus:ring-red-600 border-red-400";
@@ -205,7 +232,19 @@ export default {
       }
     };
 
-    // Menangani round dari API
+    const validateNumericInputs = () => {
+      const invalidFields = [];
+
+      for (const key in formData.value) {
+        const value = formData.value[key];
+        if (value !== "" && value !== null && isNaN(Number(value))) {
+          invalidFields.push(key);
+        }
+      }
+
+      return invalidFields;
+    };
+
     const currentRound = ref("Round - n");
 
     onMounted(() => {
@@ -217,7 +256,6 @@ export default {
         return;
       }
 
-      // Memanggil API: get round
       axios
         .get(`https://api-fastify-pi.vercel.app/round/getroundnow?gameCode=${gameCode}`)
         .then((response) => {
@@ -234,112 +272,109 @@ export default {
         });
     });
 
-    // Submit form ke endpoint /round/input
     const submitForm = async () => {
-    isLoading.value = true;
-    
-    try {
-      const gameCode = localStorage.getItem("gameCode");
-      const teamName = localStorage.getItem("teamName");
+      isLoading.value = true;
 
-      if (!gameCode || !teamName) {
-        throw new Error("gameCode atau teamName tidak ditemukan di localStorage");
+      const invalids = validateNumericInputs();
+      if (invalids.length > 0) {
+        isLoading.value = false;
+        alert(
+          `Field berikut bukan angka:\n- ${invalids.join(
+            "\n- "
+          )}\n\nMohon isi hanya dengan angka jika diisi.`
+        );
+        return;
       }
 
-      // Tentukan mana yang dipakai => Penempatan / Peminjaman
-      let penempatanAtauPeminjamanValue = 0;
-      if (isPenempatanEnabled.value) {
-        penempatanAtauPeminjamanValue = Number(formData.value.InterOfficeAccountPlacement) || 0;
-      } else if (isPeminjamanEnabled.value) {
-        penempatanAtauPeminjamanValue = Number(formData.value.PinjamPusat) || 0;
-      }
+      try {
+        const gameCode = localStorage.getItem("gameCode");
+        const teamName = localStorage.getItem("teamName");
 
-      const getInputClass = (key) => {
-      if (key === "ConsumptiveLoan") {
-        return "bg-red-100 text-black focus:ring-red-600 border-red-400";
-      } else if (key === "ProductiveLoan") {
-        return "bg-green-100 text-black focus:ring-green-600 border-green-400";
-      } else {
-        return "bg-gray-100 text-white focus:ring-gray-600 border-gray-400";
+        if (!gameCode || !teamName) {
+          throw new Error("gameCode atau teamName tidak ditemukan di localStorage");
+        }
+
+        let penempatanAtauPeminjamanValue = 0;
+        if (isPenempatanEnabled.value) {
+          penempatanAtauPeminjamanValue = Number(formData.value.InterOfficeAccountPlacement) || 0;
+        } else if (isPeminjamanEnabled.value) {
+          penempatanAtauPeminjamanValue = Number(formData.value.PinjamPusat) || 0;
+        }
+
+        const payload = {
+          gameCode,
+          teamName,
+          ProductiveLoan: Number(formData.value.ProductiveLoan) || 0,
+          ConsumptiveLoan: Number(formData.value.ConsumptiveLoan) || 0,
+          Fund: Number(formData.value.DanaPihakKetiga) || 0,
+          PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
+          Insurance: Number(formData.value.Insurance) || 0,
+          CreditCard: Number(formData.value.CreditCard) || 0,
+          AchievementStar: Number(formData.value.AchievementStar) || 0,
+          TotalSalary: Number(formData.value.TotalSalary) || 0,
+          Development: Number(formData.value.Development) || 0,
+          MarketingCost: Number(formData.value.MarketingCost) || 0,
+          OperationalCost: Number(formData.value.OperationalCost) || 0,
+          InterestCost: Number(formData.value.InterestCost) || 0,
+          NetInterestIncome: Number(formData.value.NetInterestIncome) || 0,
+        };
+
+        console.log("Payload yang dikirim:", payload);
+
+        const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Gagal mengirim data round. Coba lagi!");
+        }
+
+        console.log("Submit success:", await response.json());
+
+        const countResponse = await fetch("https://api-fastify-pi.vercel.app/round/count", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ gameCode, teamName }),
+        });
+
+        if (!countResponse.ok) {
+          throw new Error("Gagal menghitung round. Coba lagi!");
+        }
+
+        console.log("Round counted successfully:", await countResponse.json());
+
+        alert("Data berhasil dikirim dan round dicatat!");
+
+        formData.value = {
+          ProductiveLoan: "",
+          ConsumptiveLoan: "",
+          InterOfficeAccountPlacement: "",
+          DanaPihakKetiga: "",
+          PinjamanPusat: "",
+          Insurance: "",
+          CreditCard: "",
+          AchievementStar: "",
+          TotalSalary: "",
+          Development: "",
+          MarketingCost: "",
+          OperationalCost: "",
+          InterestCost: "",
+          NetInterestIncome: "",
+        };
+      } catch (error) {
+        console.error("Submit error:", error);
+        alert("Terjadi kesalahan: " + error.message);
+      } finally {
+        isLoading.value = false;
       }
     };
 
-      // 🔹 Buat payload dengan memastikan semua angka dikonversi ke Number
-      const payload = {
-      gameCode,
-      teamName,
-      ProductiveLoan: Number(formData.value.ProductiveLoan) || 0,
-      ConsumptiveLoan: Number(formData.value.ConsumptiveLoan) || 0,
-      Fund: Number(formData.value.DanaPihakKetiga) || 0,
-      PenempatanAtauPeminjaman: penempatanAtauPeminjamanValue,
-      Insurance: Number(formData.value.Insurance) || 0,
-      CreditCard: Number(formData.value.CreditCard) || 0,
-      AchievementStar: Number(formData.value.AchievementStar) || 0,
-      TotalSalary: Number(formData.value.TotalSalary) || 0,
-      Development: Number(formData.value.Development) || 0,
-      MarketingCost: Number(formData.value.MarketingCost) || 0,
-      OperationalCost: Number(formData.value.OperationalCost) || 0,
-      InterestCost: Number(formData.value.InterestCost) || 0,
-      NetInterestIncome: Number(formData.value.NetInterestIncome) || 0,
-    };
-
-
-      // 🔹 1. Kirim data ke endpoint /round/input
-      console.log("Payload yang dikirim:", payload); // ✅ Letakkan di sini
-      const response = await fetch("https://api-fastify-pi.vercel.app/round/input", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit round data. Try again!");
-      }
-
-      console.log("Submit success:", await response.json());
-
-      // 🔹 2. Setelah sukses, jalankan endpoint /round/count
-      const countResponse = await fetch("https://api-fastify-pi.vercel.app/round/count", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ gameCode, teamName }),
-      });
-
-      if (!countResponse.ok) {
-        throw new Error("Failed to count round. Try again!");
-      }
-
-      console.log("Round counted successfully:", await countResponse.json());
-
-      alert("Data successfully submitted and round counted!");
-
-      // 🔹 Reset form setelah submit
-      formData.value = {
-        ProductiveLoan: "",
-        ConsumptiveLoan: "",
-        InterOfficeAccountPlacement: "",
-        Fund: "",
-        PinjamanPusat: "",
-        Insurance: "",
-        CreditCard: "",
-        AchievementStar: "",
-      };
-
-    } catch (error) {
-      console.error("Submit error:", error);
-      alert("Terjadi kesalahan: " + error.message);
-    } finally {
-      isLoading.value = false;
-    }
-};
-
-
-
-    // Tombol kembali
     const goBack = () => {
       router.go(-1);
     };
@@ -356,11 +391,9 @@ export default {
       isLoading,
       submitForm,
       goBack,
+      validateNumericInputs,
+      preventNonNumeric
     };
   },
 };
 </script>
-
-<style>
-/* Tambahan style jika diperlukan */
-</style>

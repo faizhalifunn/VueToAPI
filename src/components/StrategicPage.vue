@@ -1,6 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white font-sans p-6">
-    <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 w-full max-w-md border border-white/20">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-gray-900 font-sans p-6">
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl p-6 w-full max-w-md border border-white/20 shadow-md m-2
+inset-shadow-2xs">
 
       <!-- Header -->
       <div class="flex justify-center items-center mb-4">
@@ -14,7 +15,8 @@
       <!-- Select Team -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Select Team</label>
-        <select v-model="selectedTeam" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
+        <select v-model="selectedTeam" class="w-full p-2 shadow-md
+inset-shadow-2xs rounded-lg bg-white text-gray-600 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option disabled value="">
             {{ teams.length === 0 ? "Loading teams..." : "Select Team" }}
           </option>
@@ -27,7 +29,8 @@
       <!-- Hire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Hire</label>
-        <select v-model="selectedHire" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
+        <select v-model="selectedHire" class="w-full p-2 rounded-lg shadow-md
+inset-shadow-2xs bg-white text-gray-500 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in hireEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
@@ -38,7 +41,8 @@
       <!-- Train -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Train</label>
-        <select v-model="selectedTrain" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
+        <select v-model="selectedTrain" class="w-full p-2 rounded-lg shadow-md
+inset-shadow-2xs bg-white text-gray-600 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in trainEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
@@ -49,13 +53,22 @@
       <!-- Fire -->
       <div class="mb-4">
         <label class="text-sm font-semibold">Fire</label>
-        <select v-model="selectedFire" class="w-full p-2 rounded-lg bg-white/10 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
+        <select v-model="selectedFire" class="w-full p-2 rounded-lg bg-white shadow-md
+inset-shadow-2xs text-gray-600 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
           <option v-for="employee in fireEmployees" :key="employee.id" :value="employee.id">
             {{ employee.name ? employee.name + ' (' + employee.id + ')' : employee.id }}
           </option>
         </select>
       </div>
+
+    <div class="mb-4">
+      <div class="text-center text-gray-600 mt-4 bg-yellow-600/20 p-4 rounded-lg shadow-md gap-2">
+        <h3>
+          Refresh Page untuk menampilkan data round terbaru !
+        </h3>
+      </div>
+    </div>
 
       <!-- Submit Button -->
       <div class="mt-6 flex justify-center py-2">
