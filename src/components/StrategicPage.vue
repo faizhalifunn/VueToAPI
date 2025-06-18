@@ -21,7 +21,7 @@ inset-shadow-2xs rounded-lg bg-white text-gray-600 border border-white/30 focus:
             {{ teams.length === 0 ? "Loading teams..." : "Select Team" }}
           </option>
           <option v-for="team in teams" :key="team" :value="team">
-            {{ team }} {{ submittedTeams.includes(team) ? "(submitted)" : "" }}
+            {{ team }} {{ submittedTeams.includes(team) ? "" : "" }}
           </option>
         </select>
       </div>
