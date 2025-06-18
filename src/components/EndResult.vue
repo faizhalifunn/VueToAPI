@@ -247,6 +247,23 @@
                 </tr>
               </table>
 
+              <!-- Operational Cost -->
+              <h4 class="font-semibold text-lg mb-2">Ratio</h4>
+              <table class="w-full text-sm mb-4">
+                <tr>
+                  <td>Cost efficiency ratio</td>
+                  <td>{{ formatPercent(teamData.CostEfficiencyRatio) }}</td>
+                </tr>
+                <tr>
+                  <td>Net Interest Margin</td>
+                  <td>{{ formatPercent(teamData.NetInterestMargin) }}</td>
+                </tr>
+                <tr>
+                  <td>CM per Employee</td>
+                  <td>{{ formatPercent(teamData.CMPerEmployee) }}</td>
+                </tr>
+              </table>
+
               <!-- Contribution Margin -->
               <h4 class="font-semibold text-lg mb-2">Contribution Margin</h4>
               <table class="w-full text-sm mb-4">
