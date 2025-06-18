@@ -28,7 +28,7 @@ inset-shadow-2xs rounded-lg bg-white text-gray-600 border border-white/30 focus:
 
       <!-- Hire -->
       <div class="mb-4">
-        <label class="text-sm font-semibold">Hire</label>
+        <label class="text-sm font-semibold">Recruit</label>
         <select v-model="selectedHire" class="w-full p-2 rounded-lg shadow-md
 inset-shadow-2xs bg-white text-gray-500 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
@@ -40,7 +40,7 @@ inset-shadow-2xs bg-white text-gray-500 border border-white/30 focus:outline-non
 
       <!-- Train -->
       <div class="mb-4">
-        <label class="text-sm font-semibold">Train</label>
+        <label class="text-sm font-semibold">Development</label>
         <select v-model="selectedTrain" class="w-full p-2 rounded-lg shadow-md
 inset-shadow-2xs bg-white text-gray-600 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
@@ -52,7 +52,7 @@ inset-shadow-2xs bg-white text-gray-600 border border-white/30 focus:outline-non
 
       <!-- Fire -->
       <div class="mb-4">
-        <label class="text-sm font-semibold">Fire</label>
+        <label class="text-sm font-semibold">Dismissal</label>
         <select v-model="selectedFire" class="w-full p-2 rounded-lg bg-white shadow-md
 inset-shadow-2xs text-gray-600 border border-white/30 focus:outline-none focus:ring-2 focus:ring-[#00A8C6]">
           <option value="">None</option>
