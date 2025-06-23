@@ -95,7 +95,7 @@
                 formatNumber(team.endResult.ActiveCustomers)
               }}</span>
               <span class="font-mono font-bold">{{
-                formatNumber(team.endResult.TotalAchievementStar)
+                formatNumber(team.endResult.totalAchievementStar)
               }}</span>
               <span class="font-mono font-bold">{{
                 formatNumber(team.endResult.FinalContributionMargin)
@@ -110,175 +110,140 @@
 
         <!-- ✅ Round Tab -->
         <div
-          v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length"
-          class="flex flex-col items-center"
-        >
-          <div class="flex-overflow-container">
-            <div
-              v-for="(teamData, teamName) in teamRoundData"
-              :key="teamName"
-              class="card-container p-4 bg-white text-black border border-gray-300 shadow-md"
-            >
-              <h3 class="text-xl font-bold text-center mb-4">{{ teamName }}</h3>
+    v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length"
+    class="w-full overflow-x-auto bg-white p-4 text-black"
+  >
+    <table class="min-w-full table-fixed border-collapse border border-gray-300 bg-white">
+      <!-- tetap satu kolom variable + N kolom tim -->
+      <colgroup>
+        <!-- lebar statis untuk kolom Variable -->
+        <col class="w-64">
+        <!-- sisanya untuk tiap tim -->
+        <col
+          v-for="teamName in Object.keys(teamRoundData)"
+          :key="teamName"
+        />
+      </colgroup>
 
-              <!-- Interest Section -->
-              <h4 class="font-semibold text-lg mb-2">Interest (%)</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Productive Interest</td>
-                  <td>{{ formatPercent(teamData.ProductiveInterest) }}</td>
-                </tr>
-                <tr>
-                  <td>Consumptive Interest</td>
-                  <td>{{ formatPercent(teamData.ConsumptiveInterest) }}</td>
-                </tr>
-                <tr>
-                  <td>Inter Office Interest</td>
-                  <td>{{ formatPercent(teamData.InterOfficeInterest) }}</td>
-                </tr>
-                <tr>
-                  <td>Fund Interest</td>
-                  <td>{{ formatPercent(teamData.FundInterest) }}</td>
-                </tr>
-              </table>
+      <!-- HEADER -->
+      <thead>
+        <tr class="h-10 bg-gray-50">
+          <th class="px-4 text-left font-semibold">Variable</th>
+          <th
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName"
+            class="px-4 text-center font-semibold"
+          >
+            {{ teamName }}
+          </th>
+        </tr>
+      </thead>
 
-              <!-- Assets -->
-              <h4 class="font-semibold text-lg mb-2">Assets</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Productive Loan</td>
-                  <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
-                </tr>
-                <tr>
-                  <td>Consumptive Loan</td>
-                  <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
-                </tr>
-                <tr>
-                  <td>Inter Office Account Placement</td>
-                  <td>
-                    {{ formatNumber(teamData.InterOfficeAccountPlacement) }}
-                  </td>
-                </tr>
-              </table>
+      <!-- BODY -->
+      <tbody>
+        <!-- === Segmen: Interest === -->
+        
+        <tr class="h-12 border-t">
+          <td class="px-4">Productive Interest</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-pi'"
+            class="px-4 text-right"
+          >
+            {{ formatPercent(teamRoundData[teamName].ProductiveInterest) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Consumptive Interest</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-ci'"
+            class="px-4 text-right"
+          >
+            {{ formatPercent(teamRoundData[teamName].ConsumptiveInterest) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Inter Office Interest</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-ioi'"
+            class="px-4 text-right"
+          >
+            {{ formatPercent(teamRoundData[teamName].InterOfficeInterest) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Fund Interest</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-fi'"
+            class="px-4 text-right"
+          >
+            {{ formatPercent(teamRoundData[teamName].FundInterest) }}
+          </td>
+        </tr>
 
-              <!-- Liabilities -->
-              <h4 class="font-semibold text-lg mb-2">Liabilities</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Fund</td>
-                  <td>{{ formatNumber(teamData.Fund) }}</td>
-                </tr>
-                <tr>
-                  <td>Inter Office Account Borrow</td>
-                  <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
-                </tr>
-              </table>
+        <!-- === Segmen: Assets === -->
+        
+        <tr class="h-12 border-t">
+          <td class="px-4">Productive Loan</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-pl'"
+            class="px-4 text-right"
+          >
+            {{ formatNumber(teamRoundData[teamName].ProductiveLoan) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Consumptive Loan</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-cl'"
+            class="px-4 text-right"
+          >
+            {{ formatNumber(teamRoundData[teamName].ConsumptiveLoan) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Inter Office Account Placement</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-ioap'"
+            class="px-4 text-right"
+          >
+            {{ formatNumber(teamRoundData[teamName].InterOfficeAccountPlacement) }}
+          </td>
+        </tr>
 
-              <!-- Fee Based -->
-              <h4 class="font-semibold text-lg mb-2">Fee Based</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Insurance</td>
-                  <td>{{ formatNumber(teamData.Insurance) }}</td>
-                </tr>
-                <tr>
-                  <td>Credit Card</td>
-                  <td>{{ formatNumber(teamData.KartuKredit) }}</td>
-                </tr>
-              </table>
+        <!-- === Segmen: Liabilities === -->
+        
+        <tr class="h-12 border-t">
+          <td class="px-4">Fund</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-fund'"
+            class="px-4 text-right"
+          >
+            {{ formatNumber(teamRoundData[teamName].Fund) }}
+          </td>
+        </tr>
+        <tr class="h-12 border-t">
+          <td class="px-4">Inter Office Account Borrow</td>
+          <td
+            v-for="teamName in Object.keys(teamRoundData)"
+            :key="teamName + '-iob'"
+            class="px-4 text-right"
+          >
+            {{ formatNumber(teamRoundData[teamName].InterOfficeAccountBorrow) }}
+          </td>
+        </tr>
 
-              <!-- Net Interest -->
-              <h4 class="font-semibold text-lg mb-2">Net Interest</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Productive Loan</td>
-                  <td>{{ formatNumber(teamData.ProductiveLoan) }}</td>
-                </tr>
-                <tr>
-                  <td>Consumptive Loan</td>
-                  <td>{{ formatNumber(teamData.ConsumptiveLoan) }}</td>
-                </tr>
-                <tr>
-                  <td>Inter Office Account Borrow</td>
-                  <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
-                </tr>
-              </table>
-
-              <!-- Interest Cost -->
-              <h4 class="font-semibold text-lg mb-2">Interest Cost</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Fund</td>
-                  <td>{{ formatNumber(teamData.Fund) }}</td>
-                </tr>
-                <tr>
-                  <td>Inter Office Account Borrow</td>
-                  <td>{{ formatNumber(teamData.InterOfficeAccountBorrow) }}</td>
-                </tr>
-              </table>
-
-              <!-- Fee Based Income + Net Interest Income -->
-              <h4 class="font-semibold text-lg mb-2">Incomes</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Fee Based Income</td>
-                  <td>{{ formatNumber(teamData.FeeBasedIncome) }}</td>
-                </tr>
-                <tr>
-                  <td>Net Interest Income</td>
-                  <td>{{ formatNumber(teamData.NetInterestIncome) }}</td>
-                </tr>
-              </table>
-
-              <!-- Operational Cost -->
-              <h4 class="font-semibold text-lg mb-2">Operational Cost</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Total Salary</td>
-                  <td>{{ formatNumber(teamData.TotalSalary) }}</td>
-                </tr>
-                <tr>
-                  <td>DevelompentCost</td>
-                  <td>{{ formatNumber(teamData.DevelompentCost) }}</td>
-                </tr>
-                <tr>
-                  <td>Marketing Cost</td>
-                  <td>{{ formatNumber(teamData.MarketingCost) }}</td>
-                </tr>
-              </table>
-
-              <!-- Operational Cost -->
-              <h4 class="font-semibold text-lg mb-2">Ratio</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Cost efficiency ratio</td>
-                  <td>{{ formatPercent(teamData.CostEfficiencyRatio) }}</td>
-                </tr>
-                <tr>
-                  <td>Net Interest Margin</td>
-                  <td>{{ formatPercent(teamData.NetInterestMargin) }}</td>
-                </tr>
-                <tr>
-                  <td>CM per Employee</td>
-                  <td>{{ formatPercent(teamData.CMPerEmployee) }}</td>
-                </tr>
-              </table>
-
-              <!-- Contribution Margin -->
-              <h4 class="font-semibold text-lg mb-2">Contribution Margin</h4>
-              <table class="w-full text-sm mb-4">
-                <tr>
-                  <td>Contribution Margin</td>
-                  <td>{{ formatNumber(teamData.ContributionMargin) }}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-
-          <!-- <div class="chart-container mt-6">
-            <canvas ref="roundChart"></canvas>
-          </div> -->
-        </div>
+        <!-- === Lanjutkan segmen Fee Based, Net Interest, Interest Cost, Incomes, Operational Cost, Ratio, Contribution Margin mengikuti pola di atas === -->
+      </tbody>
+    </table>
+  </div>
 
         <!-- ✅ Tambahkan ini setelah Round Tab -->
         <div v-if="activeTab === 'charts'" class="mt-6">
@@ -479,6 +444,7 @@ async function fetchAllGameData() {
     alert(err.message);
   }
 }
+
 
 function drawSummaryChart() {
   if (!summaryChart.value || !teams.value.length) return;

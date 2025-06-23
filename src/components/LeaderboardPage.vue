@@ -30,9 +30,9 @@
         <div class="grid grid-cols-7 gap-3 items-stretch text-sm font-semibold text-white bg-[#00A8C6] px-1 py-2 rounded-t-md">
           <span class="text-center">No.</span>
           <span class="text-center">Team Name</span>
-          <span class="text-center">Fund</span>
-          <span class="text-center">Fee Based Income</span>
-          <span class="text-center">Net Interest Income</span>
+          <span class="text-center">Net Interest Margin</span>
+          <span class="text-center">Cost Efficiency Ratio</span>
+          <span class="text-center">CM/Employee</span>
           <span class="text-center">Contribution Margin</span>
           <span class="text-center">Achievement Stars (total)</span>
         </div>
@@ -43,15 +43,32 @@
         >
           <span class="text-center">{{ index + 1 }}</span>
           <span class="text-center">{{ team.team || 'N/A' }}</span>
-          <span class="text-center font-mono">{{ formatNumber(team.data.Fund) }}</span>
-          <span class="text-center font-mono">{{ formatNumber(team.data.FeeBasedIncome) }}</span>
-          <span class="text-center font-mono">{{ formatNumber(team.data.NetInterestIncome) }}</span>
+          <span class="text-center font-mono">{{ formatPercent(team.data.NetInterestMargin) }}</span>
+          <span class="text-center font-mono">{{ formatPercent(team.data.CostEfficiencyRatio) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.CMPerEmployee) }}</span>
           <span class="text-center font-mono">{{ formatNumber(team.data.ContributionMargin) }}</span>
           <span class="text-center font-mono">{{ formatNumber(team.TotalAchievementStar) }}</span>
         </div>
       </div>
 
-      
+      <transition name="popup">
+  <div v-if="showConfirmEndRoundModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black opacity-60 backdrop-blur-md"></div>
+    <div class="relative bg-white text-black rounded-xl shadow-lg w-[90%] max-w-md p-6 z-10">
+      <h3 class="text-xl font-bold mb-4 text-center">Lanjut ke Next Round?</h3>
+      <div class="flex justify-end gap-3">
+        <button @click="closeModals" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <button
+          @click="confirmEndRound"
+          class="px-4 py-2 bg-[#00A8C6] text-white rounded hover:bg-[#2C3E68] disabled:opacity-50"
+          :disabled="isProcessing"
+        >
+          {{ isProcessing ? 'Processing...' : 'Confirm' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</transition>
 
       <!-- Chart Section -->
       <div class="bg-white/10 p-6 rounded-xl inset-shadow-xs shadow-md overflow-hidden">
@@ -72,7 +89,7 @@
       <!-- Action Buttons -->
       <div class="flex justify-center flex-wrap gap-6">
         <button
-          @click="showConfirmEndRoundModal = true"
+        @click="showConfirmEndRoundModal = true"
           :disabled="isProcessing"
           class="bg-[#00A8C6] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#2C3E68] shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
@@ -178,12 +195,14 @@ const hasChartData = ref(false);
 const teamInputs = ref([]);
 
 // ✅ Tambahan yang sebelumnya hilang
-const showConfirmEndRoundModal = ref(false);
+
 const showConfirmEndGameModal = ref(false);
 const showInputCustomerModal = ref(false);
 const teamName = ref('');
 const activeCustomers = ref(null);
 const isSubmitting = ref(false);
+const showConfirmEndRoundModal = ref(false);
+
 
 const goBack = () => router.go(-1);
 
@@ -281,6 +300,7 @@ const confirmEndRound = async () => {
   }
 };
 
+
 const confirmEndGame = async () => {
   isProcessing.value = true;
   try {
@@ -339,11 +359,16 @@ const submitCustomer = async () => {
   }
 };
 
+const formatPercent = (value) => {
+  return value != null ? value.toFixed(1) + " %" : "-";
+};
+
 const closeModals = () => {
   showConfirmEndGameModal.value = false;
   showConfirmEndRoundModal.value = false;
   showInputCustomerModal.value = false;
 };
+
 
 onMounted(() => {
   fetchRoundData();
