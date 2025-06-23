@@ -325,7 +325,7 @@
             :key="team+'-cmpe'"
             class="px-4 text-right"
           >
-            {{ formatPercent(teamRoundData[team].CMPerEmployee) }}
+            {{ formatNumber(teamRoundData[team].CMPerEmployee) }}
           </td>
         </tr>
         <tr class="h-12 border-t">
@@ -444,7 +444,7 @@ const chartCategories = [
   "Con Interest",
   "Head Interest",
   "Out Interest",
-  "DevelompentCost",
+  "DevelopmentCost",
   "MarketingCost",
   "Insurance",
   "ProductiveLoan",
@@ -462,7 +462,7 @@ const trackedParameters = [
   'ConsumerLoan',
   'Fund',
   'MarketingCost',
-  'DevelompentCost',
+  'DevelopmentCost',
   'OperationalCost',
   'Insurance',
   'CreditCard',
