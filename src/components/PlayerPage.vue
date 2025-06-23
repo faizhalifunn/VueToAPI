@@ -36,7 +36,7 @@
               class="w-full p-3 rounded-md border font-bold shadow-sm focus:outline-none focus:ring-2"
               :class="[
                 getInputClass(key),
-                key === 'ConsumptiveLoan' || key === 'ProductiveLoan' ? 'text-black' : ''
+                key === 'ConsumerLoan' || key === 'ProductiveLoan' ? 'text-black' : ''
               ]"
               :disabled="isLoading"
             />
@@ -162,7 +162,7 @@ export default {
     };
 
     const formData = ref({
-      ConsumptiveLoan: 0,
+      ConsumerLoan: 0,
       ProductiveLoan: 0,
       DanaPihakKetiga: 0,
       CreditCard: '',
@@ -177,12 +177,12 @@ export default {
     });
 
     const leftInputs = {
-      ConsumptiveLoan: { text: 'Consumptive Loan' },
+      ConsumerLoan: { text: 'Consumer Loan' },
       ProductiveLoan: { text: 'Productive Loan' },
     };
     const rightInputs = { DanaPihakKetiga: { text: 'Fund' } };
 
-    const totalKredit = computed(() => Number(formData.value.ConsumptiveLoan) + Number(formData.value.ProductiveLoan));
+    const totalKredit = computed(() => Number(formData.value.ConsumerLoan) + Number(formData.value.ProductiveLoan));
 
     const placementValue = computed(() => {
       const diff = Number(formData.value.DanaPihakKetiga) - totalKredit.value;
@@ -194,7 +194,7 @@ export default {
     });
 
     const getInputClass = (key) => {
-      if (key === 'ConsumptiveLoan') return 'bg-red-100 focus:ring-red-600 border-red-400';
+      if (key === 'ConsumerLoan') return 'bg-red-100 focus:ring-red-600 border-red-400';
       if (key === 'ProductiveLoan') return 'bg-green-100 focus:ring-green-600 border-green-400';
       return 'bg-gray-100 focus:ring-gray-600 border-gray-400';
     };
@@ -244,7 +244,7 @@ export default {
           gameCode,
           teamName,
           ProductiveLoan: Number(formData.value.ProductiveLoan) || 0,
-          ConsumptiveLoan: Number(formData.value.ConsumptiveLoan) || 0,
+          ConsumerLoan: Number(formData.value.ConsumerLoan) || 0,
           Fund: Number(formData.value.DanaPihakKetiga) || 0,
           PenempatanAtauPeminjaman: penempatanAtauPeminjaman,
           Insurance: Number(formData.value.Insurance) || 0,
@@ -269,7 +269,7 @@ export default {
         alert('Data berhasil dikirim dan round dicatat!');
         // Reset form
         formData.value = {
-          ConsumptiveLoan: '',
+          ConsumerLoan: '',
           ProductiveLoan: '',
           DanaPihakKetiga: '',
           CreditCard: '',

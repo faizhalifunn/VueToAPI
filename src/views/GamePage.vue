@@ -92,14 +92,14 @@ const showConfirm = ref(false)
 const showInterest = ref(false)
 
 const interest = ref({
-  ConsumptiveInterest: '',
+  ConsumerInterest: '',
   ProductiveInterest: '',
   InterOfficeInterest: '',
   FundInterest: ''
 })
 
 const interestLabels = {
-  ConsumptiveInterest: 'ConsumptiveInterest (Bunga Konsumtif)',
+  ConsumerInterest: 'ConsumerInterest (Bunga Konsumtif)',
   ProductiveInterest: 'ProductiveInterest (Bunga Produktif)',
   InterOfficeInterest: 'InterOfficeInterest (Bunga Kantor Pusat)',
   FundInterest: 'FundInterest (Bunga Pihak Ketiga)'

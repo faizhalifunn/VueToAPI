@@ -143,13 +143,13 @@
           </td>
         </tr>
         <tr class="h-12 border-t">
-          <td class="px-4">Consumptive Interest</td>
+          <td class="px-4">Consumer Interest</td>
           <td
             v-for="team in Object.keys(teamRoundData)"
             :key="team+'-ci'"
             class="px-4 text-right"
           >
-            {{ formatPercent(teamRoundData[team].ConsumptiveInterest) }}
+            {{ formatPercent(teamRoundData[team].ConsumerInterest) }}
           </td>
         </tr>
         <tr class="h-12 border-t">
@@ -185,13 +185,13 @@
           </td>
         </tr>
         <tr class="h-12 border-t">
-          <td class="px-4">Consumptive Loan</td>
+          <td class="px-4">Consumer Loan</td>
           <td
             v-for="team in Object.keys(teamRoundData)"
             :key="team+'-cl'"
             class="px-4 text-right"
           >
-            {{ formatNumber(teamRoundData[team].ConsumptiveLoan) }}
+            {{ formatNumber(teamRoundData[team].ConsumerLoan) }}
           </td>
         </tr>
         <tr class="h-12 border-t">
@@ -449,7 +449,7 @@ const chartCategories = [
   "Insurance",
   "ProductiveLoan",
   "InterOfficeAccountBorrow",
-  "ConsumptiveLoan",
+  "ConsumerLoan",
   "CreditCard",
   "Pendapatan Fee Based",
   "Total Salary",
@@ -459,7 +459,7 @@ const chartCategories = [
 
 const trackedParameters = [
   'ProductiveLoan',
-  'ConsumptiveLoan',
+  'ConsumerLoan',
   'Fund',
   'MarketingCost',
   'DevelompentCost',
