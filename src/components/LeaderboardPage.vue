@@ -80,6 +80,23 @@
   </div>
 </transition>
 
+<!-- Achievement & Forecast -->
+<div class="bg-white/10 p-4 rounded-xl inset-shadow-xs shadow-md overflow-hidden text-[#1C2541]">
+  <div v-if="isForecastLoading" class="text-center font-semibold text-black">
+    Loading achievement & forecast...
+  </div>
+  <div v-else class="grid grid-cols-2 gap-4 text-gray-600">
+    <div>
+      <h4 class="text-lg font-semibold">Achievement</h4>
+      <p>{{ achievement || '-' }}</p>
+    </div>
+    <div>
+      <h4 class="text-lg font-semibold">Forecast</h4>
+      <p>{{ forecast || '-' }}</p>
+    </div>
+  </div>
+</div>
+
       <!-- Chart Section -->
       <div class="bg-white/10 p-6 rounded-xl inset-shadow-xs shadow-md overflow-hidden">
         <div v-if="isChartLoading" class="text-center py-4 font-semibold text-white">Loading chart...</div>
@@ -191,6 +208,31 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import Chart from 'chart.js/auto';
+
+import { watch } from 'vue';
+
+// … existing refs …
+const achievement = ref('');
+const forecast    = ref('');
+const isForecastLoading = ref(true);
+
+// Fungsi untuk fetch Achievement & Forecast
+const fetchForecastAchievement = async () => {
+  if (!gameCode || !round.value) return;
+  isForecastLoading.value = true;
+  try {
+    const url = `https://api-fastify-pi.vercel.app/game/forecastAchievementbyround?gameCode=${gameCode}&round=${encodeURIComponent(round.value)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    achievement.value = data.Achievement;
+    forecast.value    = data.Forecast;
+  } catch (err) {
+    console.error('❌ Error fetchForecastAchievement:', err);
+  } finally {
+    isForecastLoading.value = false;
+  }
+};
+
 
 const router = useRouter();
 const round = ref(1);
@@ -383,6 +425,10 @@ const closeModals = () => {
 onMounted(() => {
   fetchRoundData();
   fetchChartData();
+});
+
+watch(round, (newRound) => {
+  if (newRound) fetchForecastAchievement();
 });
 
 onBeforeUnmount(() => {
