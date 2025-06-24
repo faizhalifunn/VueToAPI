@@ -1,13 +1,13 @@
 
 <template>
-  <div class="min-h-screen flex flex-col items-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white py-10 px-4 relative overflow-x-hidden">
+  <div class="min-h-screen  flex flex-col items-center bg-gradient-to-br from-[#2C3E68] to-[#0D1B2A] text-white py-12 px-4 relative overflow-x-hidden">
     <!-- Tombol Back -->
-    <button
+    <!-- <button
       @click="goBack"
       class="absolute top-4 left-4 bg-[#00A8C6] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2C3E68] transition hover:scale-105 shadow-md"
     >
       ← Back
-    </button>
+    </button> -->
 
     <!-- Loading Screen -->
     <div v-if="isRefreshing" class="fixed inset-0 flex items-center justify-center bg-black text-white z-50">
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-10 w-full max-w-5xl z-10 flex flex-col gap-10 border border-white/20">
+    <div v-else class="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-10 w-full max-w-fit z-10 flex flex-col gap-10 border border-white/20">
       <!-- Header -->
       <div class="bg-[#1C2541] text-white text-2xl font-bold py-2 px-4 rounded-t-lg flex justify-between items-center">
         <span>{{ round }}</span>
@@ -27,9 +27,14 @@
 
       <!-- Leaderboard Table -->
       <div class="bg-white/10 p-2 rounded-xl shadow-md inset-shadow-2xs overflow-hidden">
-        <div class="grid grid-cols-7 gap-3 items-stretch text-sm font-semibold text-white bg-[#00A8C6] px-1 py-2 rounded-t-md">
+        <div class="grid grid-cols-12 gap-3 items-stretch text-sm font-semibold text-white bg-[#00A8C6] px-1 py-2 rounded-t-md">
           <span class="text-center">No.</span>
           <span class="text-center">Team Name</span>
+          <span class="text-center">Consumer Loan</span>
+          <span class="text-center">Productive Loan</span>
+          <span class="text-center">Fund</span>
+          <span class="text-center">Total Salary</span>
+          <span class="text-center">Marketing Cost</span>
           <span class="text-center">Net Interest Margin</span>
           <span class="text-center">Cost Efficiency Ratio</span>
           <span class="text-center">CM/Employee</span>
@@ -39,10 +44,15 @@
         <div
           v-for="(team, index) in sortedLeaderboard"
           :key="index"
-          class="grid grid-cols-7 gap-3 items-stretch bg-white text-[#1C2541] px-1 py-2 border-b border-gray-200 rounded-t-md hover:bg-gray-100"
+          class="grid grid-cols-12 gap-3 items-stretch bg-white text-[#1C2541] px-1 py-2 border-b border-gray-200 rounded-t-md hover:bg-gray-100"
         >
           <span class="text-center">{{ index + 1 }}</span>
           <span class="text-center">{{ team.team || 'N/A' }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.ConsumerLoan) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.ProductiveLoan) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.Fund) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.TotalSalary) }}</span>
+          <span class="text-center font-mono">{{ formatNumber(team.data.MarketingCost) }}</span>
           <span class="text-center font-mono">{{ formatPercent(team.data.NetInterestMargin) }}</span>
           <span class="text-center font-mono">{{ formatPercent(team.data.CostEfficiencyRatio) }}</span>
           <span class="text-center font-mono">{{ formatNumber(team.data.CMPerEmployee) }}</span>
