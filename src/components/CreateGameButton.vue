@@ -108,7 +108,7 @@ export default {
           } else if (status === "Waiting") {
             router.push({ name: "GamePage", params: { gameCode } });
           } else if (status === "Ended") {
-            router.push({ name: "Adminpage", params: { gameCode } });
+            router.push({ name: "Result", params: { gameCode } });
           } else {
             alert("This game has already ended.");
           }
