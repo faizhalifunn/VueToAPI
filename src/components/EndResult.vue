@@ -2,13 +2,13 @@
   <div class="relative">
 
     <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen text-white">
-  <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-    <path class="opacity-75" fill="currentColor"
-      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-  </svg>
-  <p class="text-xl font-semibold">Loading game data...</p>
-</div>
+      <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-xl font-semibold">Loading game data...</p>
+    </div>
 
     <!-- ✅ Konten utama -->
     <div
@@ -23,7 +23,7 @@
           <h2 class="text-2xl font-bold">{{ gameCode }}</h2>
         </div>
 
-        <!-- ✅ Tab Navigation (Sticky + Back Button) -->
+        <!-- ✅ Tab Navigation -->
         <div
           class="gap-1 flex items-center justify-start overflow-x-auto pb-2 mb-4 border-b border-white/30 sticky top-0 bg-white/5 z-20 px-4 pt-2"
         >
@@ -38,8 +38,6 @@
           >
             End Summary
           </button>
-
-
 
           <button
             v-for="round in availableRounds"
@@ -56,50 +54,46 @@
           </button>
 
           <button
-  @click="activeTab = 'charts'"
-  :class="[ 'px-4 py-2 font-medium rounded-lg', activeTab === 'charts' ? 'bg-[#00A8C6] text-white' : 'bg-white/10 hover:bg-white/20']"
->
-  Round Charts
-</button>
-
+            @click="activeTab = 'charts'"
+            :class="[ 'px-4 py-2 font-medium rounded-lg', activeTab === 'charts' ? 'bg-[#00A8C6] text-white' : 'bg-white/10 hover:bg-white/20']"
+          >
+            Round Charts
+          </button>
         </div>
 
-        <!-- ✅ Summary Tab -->
+        <!-- ✅ Summary Tab (KPI versi PM) -->
         <div v-if="activeTab === 'summary'">
-          <div class="border-t border-white/30">
+          <div class="border-t border-white/30 overflow-x-auto">
+            <!-- Header Grid -->
             <div
-              class="grid grid-cols-7 gap-2 items-center py-2 border-b bg-cyan-300/10 border-white/10 text-center text-lg font-extrabold"
+              class="grid gap-2 items-center py-2 border-b bg-cyan-300/10 border-white/10 text-center text-lg font-extrabold min-w-[1400px]"
+              :style="{ gridTemplateColumns: `repeat(${2 + kpiFields.length}, minmax(160px, 1fr))` }"
             >
-              <span font-extrabold>No.</span>
-              <span font-extrabold>Team</span>
-              <span font-extrabold>Total Contribution Margin</span>
-              <span font-extrabold>Level 3 Employees</span>
-              <span font-extrabold>Active Customers</span>
-              <span font-extrabold>Achievement Stars</span>
-              <span font-extrabold>Final Contribution Margin</span>
+              <span>No.</span>
+              <span>Team</span>
+              <span v-for="f in kpiFields" :key="'h-'+f.key">{{ f.label }}</span>
             </div>
+            <!-- Rows -->
             <div
               v-for="(team, index) in sortedTeams"
-              :key="index"
-              class="grid grid-cols-7 gap-2 items-center py-2 border-b border-white/10 text-center"
+              :key="team.teamName || index"
+              class="grid gap-2 items-center py-2 border-b border-white/10 text-center min-w-[1400px]"
+              :style="{ gridTemplateColumns: `repeat(${2 + kpiFields.length}, minmax(160px, 1fr))` }"
             >
               <span class="font-semibold">{{ index + 1 }}</span>
               <span class="font-medium">{{ team.teamName || "N/A" }}</span>
-              <span class="font-mono">{{
-                formatNumber(team.endResult.baseContributionMargin)
-              }}</span>
-              <span class="font-mono">{{
-                formatNumber(team.endResult.level3EmployeesCount)
-              }}</span>
-              <span class="font-mono font-bold">{{
-                formatNumber(team.endResult.ActiveCustomers)
-              }}</span>
-              <span class="font-mono font-bold">{{
-                formatNumber(team.endResult.totalAchievementStar)
-              }}</span>
-              <span class="font-mono font-bold">{{
-                formatNumber(team.endResult.FinalContributionMargin)
-              }}</span>
+
+              <span
+                v-for="f in kpiFields"
+                :key="team.teamName+'-'+f.key"
+                class="font-mono"
+                :class="[
+                  f.key === 'ContributionMargin' ? 'font-bold' : '',
+                  f.key === 'AchievementStar' ? 'font-bold' : ''
+                ]"
+              >
+                {{ formatByType(team.endResult[f.key], f.type) }}
+              </span>
             </div>
           </div>
 
@@ -108,299 +102,69 @@
           </div>
         </div>
 
-        <!-- ✅ Round Tab -->
+        <!-- ✅ Round Tab (HANYA KPI PM) -->
         <div
-    v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length"
-    class="w-full overflow-x-auto bg-white p-4 text-gray-800"
-  >
-    <table class="min-w-full table-fixed border-collapse border border-gray-300 bg-white">
-      <colgroup>
-        <col class="w-64">
-        <col v-for="team in Object.keys(teamRoundData)" :key="team"/>
-      </colgroup>
-      <thead>
-        <tr class="h-10 bg-gray-50">
-          <th class="px-4 text-left font-semibold">Variable</th>
-          <th
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team"
-            class="px-4 text-center font-semibold"
-          >
-            {{ team }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- 1) Interest -->
-        <tr class="h-12 border-t">
-          <td class="px-4">Productive Interest</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-pi'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].ProductiveInterest) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Consumer Interest</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-ci'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].ConsumerInterest) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Inter Office Interest</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-ioi'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].InterOfficeInterest) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Fund Interest</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-fi'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].FundInterest) }}
-          </td>
-        </tr>
+          v-if="activeTab !== 'summary' && Object.keys(teamRoundData).length && activeTab !== 'charts'"
+          class="w-full overflow-x-auto bg-white p-4 text-gray-800"
+        >
+          <table class="min-w-full table-fixed border-collapse border border-gray-300 bg-white">
+            <colgroup>
+              <col class="w-64">
+              <col v-for="team in Object.keys(teamRoundData)" :key="team"/>
+            </colgroup>
+            <thead>
+              <tr class="h-10 bg-gray-50">
+                <th class="px-4 text-left font-semibold">Variable / KPI</th>
+                <th
+                  v-for="team in Object.keys(teamRoundData)"
+                  :key="team"
+                  class="px-4 text-center font-semibold"
+                >
+                  {{ team }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="f in kpiFields" :key="'row-'+f.key" class="h-12 border-t">
+                <td class="px-4">{{ f.label }}</td>
+                <td
+                  v-for="team in Object.keys(teamRoundData)"
+                  :key="'cell-'+team+'-'+f.key"
+                  class="px-4 text-right"
+                >
+                  {{ formatByType(teamRoundData[team][f.key], f.type) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        <!-- 2) Loans & Fees -->
-        <tr class="h-12 border-t">
-          <td class="px-4">Productive Loan</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-pl'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].ProductiveLoan) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Consumer Loan</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-cl'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].ConsumerLoan) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Fund</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-fund'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].Fund) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Insurance</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-ins'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].Insurance) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Credit Card</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-cc'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].CreditCard) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Inter Office Account Borrow</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-iob'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].InterOfficeAccountBorrow) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Inter Office Account Placement</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-iop'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].InterOfficeAccountPlacement) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Net Interest Income</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-nii'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].NetInterestIncome) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Fee Based Income</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-fbi'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].FeeBasedIncome) }}
-          </td>
-        </tr>
-
-        <!-- 3) Operational Costs -->
-        <tr class="h-12 border-t">
-          <td class="px-4">Total Salary</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-sal'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].TotalSalary) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Development Cost</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-dev'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].DevelopmentCost) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Marketing Cost</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-mkt'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].MarketingCost) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Operational Cost</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-opcost'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].OperationalCost) }}
-          </td>
-        </tr>
-
-        <!-- 4) Ratios & Employee -->
-        <tr class="h-12 border-t">
-          <td class="px-4">Total Employees</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-te'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].TotalEmployees) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">CM per Employee</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-cmpe'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].CMPerEmployee) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Cost Efficiency Ratio (%)</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-cer'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].CostEfficiencyRatio) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Net Interest Margin (%)</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-nim'"
-            class="px-4 text-right"
-          >
-            {{ formatPercent(teamRoundData[team].NetInterestMargin) }}
-          </td>
-        </tr>
-
-        <!-- 5) Achievement & Contribution -->
-        <tr class="h-12 border-t">
-          <td class="px-4">Achievement Star</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-as'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].AchievementStar) }}
-          </td>
-        </tr>
-        <tr class="h-12 border-t">
-          <td class="px-4">Contribution Margin</td>
-          <td
-            v-for="team in Object.keys(teamRoundData)"
-            :key="team+'-cm'"
-            class="px-4 text-right"
-          >
-            {{ formatNumber(teamRoundData[team].ContributionMargin) }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-        <!-- ✅ Tambahkan ini setelah Round Tab -->
+        <!-- ✅ Charts Tab -->
         <div v-if="activeTab === 'charts'" class="mt-6">
-  <h3 class="text-2xl font-bold mb-4 text-center p-5">Round-by-Round Parameter Charts</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div
-      v-for="(key, index) in trackedParameters"
-      :key="key"
-      class="chart-container border rounded-xl bg-white p-4 text-black shadow"
-    >
-      <h4 class="text-lg font-semibold mb-2 text-center">{{ key }}</h4>
-      <canvas :ref="el => parameterChartRefs[index] = el"></canvas>
-    </div>
-  </div>
-</div>
+          <h3 class="text-2xl font-bold mb-4 text-center p-5">Round-by-Round Parameter Charts</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              v-for="(f, index) in trackedChartFields"
+              :key="f.key"
+              class="chart-container border rounded-xl bg-white p-4 text-black shadow"
+            >
+              <h4 class="text-lg font-semibold mb-2 text-center">{{ f.label }}</h4>
+              <canvas :ref="el => parameterChartRefs[index] = el"></canvas>
+            </div>
+          </div>
+        </div>
 
-<!-- ✅ Loading Spinner -->
-<div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen text-white">
-  <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-    <path class="opacity-75" fill="currentColor"
-      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-  </svg>
-  <p class="text-xl font-semibold">Loading game data...</p>
-</div>
+        <!-- (Duplikat) Loading biarkan -->
+        <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-screen text-white">
+          <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          <p class="text-xl font-semibold">Loading game data...</p>
+        </div>
 
-
-        <!-- ✅ Export Button -->
+        <!-- Export -->
         <div class="mt-6 flex justify-center gap-4">
           <button
             @click="exportToExcel"
@@ -432,48 +196,61 @@ const gameCode = localStorage.getItem("gameCode");
 
 const activeTab = ref("summary");
 const summaryChart = ref(null);
-const roundChart = ref(null);
 const summaryChartInstance = ref(null);
+
+// Disisakan (legacy) untuk kompatibilitas
+const roundChart = ref(null);
 const roundChartInstance = ref(null);
 
 const teams = ref([]);
 const gameData = ref(null);
 const availableRounds = ref([]);
-const chartCategories = [
-  "Pro Interest",
-  "Con Interest",
-  "Head Interest",
-  "Out Interest",
-  "DevelopmentCost",
-  "MarketingCost",
-  "Insurance",
-  "ProductiveLoan",
-  "InterOfficeAccountBorrow",
-  "ConsumerLoan",
-  "CreditCard",
-  "Pendapatan Fee Based",
-  "Total Salary",
-  "Fund",
-  "InterOfficeAccountPlacement",
-];
-
-const trackedParameters = [
-  'ProductiveLoan',
-  'ConsumerLoan',
-  'Fund',
-  'MarketingCost',
-  'DevelopmentCost',
-  'OperationalCost',
-  'Insurance',
-  'CreditCard',
-  'FeeBasedIncome',
-  'NetInterestIncome'
-];
-
-const parameterChartRefs = [];
-const parameterChartInstances = [];
 const isLoading = ref(true);
 
+/* =========================
+   KPI SESUAI LIST PM
+   label (UI), key (API), type ('nominal' | 'percentage')
+   ========================= */
+const kpiFields = [
+  { label: "Productive Loan",                  key: "ProductiveLoan",               type: "nominal"    },
+  { label: "Consumer Loan",                    key: "ConsumerLoan",                 type: "nominal"    },
+  { label: "Total Loan",                       key: "TotalLoan",                    type: "nominal"    },
+  { label: "Total Fund",                       key: "Fund",                         type: "nominal"    },
+  { label: "Inter Office Account (placement)", key: "InterOfficeAccountPlacement",  type: "nominal"    },
+  { label: "Inter Office Account (borrow)",    key: "InterOfficeAccountBorrow",     type: "nominal"    },
+  { label: "Total Interest Income",            key: "TotalInterestIncome",          type: "nominal"    },
+  { label: "Total Interest Expense",           key: "TotalInterestExpense",         type: "nominal"    },
+  { label: "Net Interest Income",              key: "NetInterestIncome",            type: "nominal"    },
+  { label: "Total FBI",                        key: "FeeBasedIncome",               type: "nominal"    },
+  { label: "Total Income",                     key: "TotalIncome",                  type: "nominal"    },
+  { label: "Total Operational Cost",           key: "OperationalCost",              type: "nominal"    },
+  { label: "Contribution Margin",              key: "ContributionMargin",           type: "nominal"    },
+  { label: "Net Interest Margin",              key: "NetInterestMargin",            type: "percentage" },
+  { label: "Cost Efficiency Ratio",            key: "CostEfficiencyRatio",          type: "percentage" },
+  { label: "Loan to Deposit Ratio",            key: "LoanToDepositRatio",           type: "percentage" },
+  { label: "CM per Employee",                  key: "CMPerEmployee",                type: "nominal"    },
+  { label: "Achievement Stars",                key: "AchievementStar",              type: "nominal"    },
+];
+
+// Chart: subset KPI nominal
+const trackedChartFields = [
+  { label: "Productive Loan", key: "ProductiveLoan", type: "nominal" },
+  { label: "Consumer Loan", key: "ConsumerLoan", type: "nominal" },
+  { label: "Total Loan", key: "TotalLoan", type: "nominal" },
+  { label: "Total Fund", key: "Fund", type: "nominal" },
+  { label: "IOA (placement)", key: "InterOfficeAccountPlacement", type: "nominal" },
+  { label: "IOA (borrow)", key: "InterOfficeAccountBorrow", type: "nominal" },
+  { label: "Net Interest Income", key: "NetInterestIncome", type: "nominal" },
+  { label: "Total FBI", key: "FeeBasedIncome", type: "nominal" },
+  { label: "Total Income", key: "TotalIncome", type: "nominal" },
+  { label: "Total Operational Cost", key: "OperationalCost", type: "nominal" },
+  { label: "Contribution Margin", key: "ContributionMargin", type: "nominal" },
+  { label: "CM per Employee", key: "CMPerEmployee", type: "nominal" },
+];
+
+// Refs & instances untuk charts
+const parameterChartRefs = [];
+const parameterChartInstances = [];
 
 watch(activeTab, async (val) => {
   if (val === 'charts') {
@@ -484,34 +261,64 @@ watch(activeTab, async (val) => {
 
 const formatNumber = (num) =>
   isNaN(Number(num)) ? "0" : Number(num).toLocaleString("en-US");
-const formatPercent = (value) => {
-  return value != null ? value.toFixed(2) + "%" : "-";
+const formatPercent = (value) =>
+  value != null && !isNaN(value) ? Number(value).toFixed(2) + "%" : "-";
+const formatByType = (val, type) => {
+  if (val === null || val === undefined || val === '') return '-';
+  return type === 'percentage' ? formatPercent(val) : formatNumber(val);
 };
-const goBack = () => router.go(-1);
 
+// ✅ Sort by ContributionMargin desc
 const sortedTeams = computed(() => {
   const teamsObject = gameData.value?.teams || {};
   return Object.entries(teamsObject)
     .map(([teamName, rounds], index) => {
-      const endResult = rounds["EndResult"] || {};
-      return {
-        index,
-        teamName,
-        endResult,
-        roundData: rounds, // semua data per round
-      };
+      const endResult = { ...(rounds["EndResult"] || {}) };
+
+      // Fallback ringan bila field total belum disediakan API
+      if (endResult.TotalLoan == null) {
+        endResult.TotalLoan =
+          (Number(endResult.ProductiveLoan) || 0) + (Number(endResult.ConsumerLoan) || 0);
+      }
+      if (endResult.NetInterestIncome == null) {
+        endResult.NetInterestIncome =
+          (Number(endResult.TotalInterestIncome) || 0) - (Number(endResult.TotalInterestExpense) || 0);
+      }
+      if (endResult.TotalIncome == null) {
+        endResult.TotalIncome =
+          (Number(endResult.NetInterestIncome) || 0) + (Number(endResult.FeeBasedIncome) || 0);
+      }
+
+      return { index, teamName, endResult, roundData: rounds };
     })
-    .sort(
-      (a, b) => (b.endResult.TotalScore || 0) - (a.endResult.TotalScore || 0)
+    .sort((a, b) =>
+      (b.endResult.ContributionMargin || 0) - (a.endResult.ContributionMargin || 0)
     );
 });
 
+// ✅ Data per-round (hanya KPI PM)
 const teamRoundData = computed(() => {
-  if (!gameData.value || activeTab.value === "summary") return {};
+  if (!gameData.value || activeTab.value === "summary" || activeTab.value === "charts") return {};
   const round = activeTab.value;
   const result = {};
   Object.entries(gameData.value.teams || {}).forEach(([team, rounds]) => {
-    if (rounds[round]) result[team] = rounds[round];
+    if (rounds[round]) {
+      const r = { ...(rounds[round] || {}) };
+
+      // Fallback ringan
+      if (r.TotalLoan == null) {
+        r.TotalLoan = (Number(r.ProductiveLoan) || 0) + (Number(r.ConsumerLoan) || 0);
+      }
+      if (r.NetInterestIncome == null) {
+        r.NetInterestIncome =
+          (Number(r.TotalInterestIncome) || 0) - (Number(r.TotalInterestExpense) || 0);
+      }
+      if (r.TotalIncome == null) {
+        r.TotalIncome = (Number(r.NetInterestIncome) || 0) + (Number(r.FeeBasedIncome) || 0);
+      }
+
+      result[team] = r;
+    }
   });
   return result;
 });
@@ -519,27 +326,27 @@ const teamRoundData = computed(() => {
 watch(activeTab, async (val) => {
   await nextTick();
   if (val === "summary") drawSummaryChart();
-  else if (availableRounds.value.includes(val)) drawRoundChart(val);
 });
 
 onMounted(async () => {
   if (!gameCode) return router.replace("/");
   await fetchEndResult();
   await fetchAllGameData();
+
   if (availableRounds.value.length) {
     activeTab.value = "summary";
+    await nextTick();
     drawSummaryChart();
   }
+
   isLoading.value = false;
-
-await nextTick(); // pastikan DOM canvas siap
-drawSummaryChart(); // pastikan grafik digambar setelah DOM tersedia
-
+  await nextTick();
+  drawSummaryChart();
 });
-
 
 onBeforeUnmount(() => {
   if (summaryChartInstance.value) summaryChartInstance.value.destroy();
+  parameterChartInstances.forEach((inst) => inst?.destroy());
   if (roundChartInstance.value) roundChartInstance.value.destroy();
 });
 
@@ -574,7 +381,7 @@ async function fetchAllGameData() {
   }
 }
 
-
+/** Summary Chart: Contribution Margin per round (per team) */
 function drawSummaryChart() {
   if (!summaryChart.value || !teams.value.length) return;
   const ctx = summaryChart.value.getContext("2d");
@@ -596,7 +403,7 @@ function drawSummaryChart() {
       label: team.team,
       data: sortedRounds.map((r) => {
         const match = (team.rounds || []).find((x) => x.round === r);
-        return match ? match.ContributionMargin : 0;
+        return match ? Number(match.ContributionMargin) || 0 : 0;
       }),
       borderColor: color,
       backgroundColor: color + "40",
@@ -612,10 +419,7 @@ function drawSummaryChart() {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: "Contribution Points" },
-        },
+        y: { beginAtZero: true, title: { display: true, text: "Contribution Margin" } },
         x: { title: { display: true, text: "Rounds" } },
       },
       plugins: {
@@ -626,8 +430,12 @@ function drawSummaryChart() {
   });
 }
 
+/* ===== Legacy round chart (tidak dipakai) ===== */
+const chartCategories = []; // <-- SATU KALI saja, biar nggak error duplikasi
+
 function drawRoundChart(roundKey) {
   if (!roundChart.value || !gameData.value?.teams) return;
+  if (!chartCategories.length) return;
   const ctx = roundChart.value.getContext("2d");
   if (!ctx) return;
 
@@ -680,21 +488,32 @@ function drawRoundChart(roundKey) {
     },
   });
 }
-function drawAllParameterCharts() {
-  if (!parameterChartRefs.length || !gameData.value?.teams) return;
 
-  parameterChartInstances.forEach(instance => instance?.destroy());
+/** KPI charts per-round (subset nominal) */
+function drawAllParameterCharts() {
+  parameterChartInstances.forEach((inst) => inst?.destroy());
   parameterChartInstances.length = 0;
 
-  trackedParameters.forEach((param, i) => {
+  trackedChartFields.forEach((f, i) => {
     const ctx = parameterChartRefs[i]?.getContext('2d');
     if (!ctx) return;
 
-    const datasets = Object.entries(gameData.value.teams || {}).map(([teamName, rounds]) => {
+    const datasets = Object.entries(gameData.value?.teams || {}).map(([teamName, rounds]) => {
       const color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
-      const values = availableRounds.value.map(round => {
-        const roundData = rounds[round] || {};
-        return Number(roundData[param]) || 0;
+      const values = availableRounds.value.map(roundKey => {
+        const rd = rounds[roundKey] || {};
+        let v = rd[f.key];
+        // fallback agar chart tetap tampil jika API belum kirim field total
+        if (f.key === "TotalLoan" && (v == null || v === "")) {
+          v = (Number(rd.ProductiveLoan) || 0) + (Number(rd.ConsumerLoan) || 0);
+        }
+        if (f.key === "NetInterestIncome" && (v == null || v === "")) {
+          v = (Number(rd.TotalInterestIncome) || 0) - (Number(rd.TotalInterestExpense) || 0);
+        }
+        if (f.key === "TotalIncome" && (v == null || v === "")) {
+          v = (Number(rd.NetInterestIncome) || 0) + (Number(rd.FeeBasedIncome) || 0);
+        }
+        return Number(v) || 0;
       });
       return {
         label: teamName,
@@ -708,12 +527,9 @@ function drawAllParameterCharts() {
       };
     });
 
-    const chartInstance = new Chart(ctx, {
+    const chartInst = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: availableRounds.value,
-        datasets,
-      },
+      data: { labels: availableRounds.value, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -728,15 +544,13 @@ function drawAllParameterCharts() {
       },
     });
 
-    parameterChartInstances.push(chartInstance);
+    parameterChartInstances.push(chartInst);
   });
 }
 
 async function exportToExcel() {
   try {
-    const res = await fetch(
-      `${API_BASE_URL}/game/Excelresult?gameCode=${gameCode}`
-    );
+    const res = await fetch(`${API_BASE_URL}/game/Excelresult?gameCode=${gameCode}`);
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
