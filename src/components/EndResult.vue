@@ -89,7 +89,7 @@
                 :key="team.teamName+'-'+f.key"
                 class="font-mono"
                 :class="[
-                  f.key === 'TotalBranchValue' ? 'font-bold' : '',
+                  f.key === 'FinalContributionPoint' ? 'font-bold' : '',
                   f.key === 'baseContributionMargin' ? 'font-bold' : ''
                 ]"
               >
@@ -217,8 +217,9 @@ const endSummaryFields = [
   { label: "Highest Round",                           key: "HighestRound",                        type: "text"    },
   { label: "Level 3 Employees Contribution Bonus",    key: "Level3EmployeesContributionBonus",    type: "nominal" },
   // yang diminta PM:
-  { label: "TotalBranchValue",                        key: "TotalBranchValue",              type: "nominal" },
+  { label: "Final Contribution Point",                key: "FinalContributionPoint",              type: "nominal" },
   { label: "Base Contribution Margin",                key: "baseContributionMargin",              type: "nominal" },
+  { label: "Calculated At",                           key: "calculatedAt",                        type: "text"    },
   { label: "Level 3 Employees Count",                 key: "level3EmployeesCount",                type: "nominal" },
   { label: "Total Achievement Star",                  key: "totalAchievementStar",                type: "nominal" },
   { label: "Total Achievement Star Score",            key: "totalAchievementStarscore",           type: "nominal" },
@@ -296,8 +297,8 @@ const sortedTeams = computed(() => {
 
       // ===== Fallback & mapping agar cocok dengan screenshot =====
       // FinalContributionPoint => TotalBranchValue
-      if (endResult.TotalBranchValue == null) {
-        endResult.TotalBranchValue = Number(endResult.FinalContributionPoint) || 0;
+      if (endResult.FinalContributionPoint == null) {
+        endResult.FinalContributionPoint = Number(endResult.TotalBranchValue) || 0;
       }
 
       // baseContributionMargin pakai ContributionMargin jika belum ada
